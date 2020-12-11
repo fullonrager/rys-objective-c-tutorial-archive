@@ -4,7 +4,7 @@
 
 ### About
 
-While searching for Objective-C tutorials online, I came across a webpage that was preserved on the Wayback Machine but is no longer hosted today. Using [Wayback Machine Downloader](https://github.com/hartator/wayback-machine-downloader), I did my best to clone the [Ry's Objective-C Tutorial](https://web.archive.org/web/20160929141832/http://rypress.com/tutorials/objective-c/index) series. All credit goes to the original author. This project was created with the intention of preservation. 
+While searching for Objective-C tutorials online, I came across a webpage that was preserved on the Wayback Machine but is no longer hosted today. Using [Wayback Machine Downloader](https://github.com/hartator/wayback-machine-downloader), I did my best to clone the [Ry's Objective-C Tutorial](https://web.archive.org/web/20160929141832/http://rypress.com/tutorials/objective-c/index) series. Some of the files were slightly modified to work properly with this archive. All credit goes to the original author. This project was created with the intention of preservation. 
 
 Most links in this project are local, meaning you can clone or download this repository and read it locally. However, some try to direct to rypress.com, which no longer hosts the files in question.
 
