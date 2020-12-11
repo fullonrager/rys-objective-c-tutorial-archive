@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<title>Memory Management - Ry’s Objective-C Tutorial - RyPress</title>
+<meta charset='UTF-8'/>
+<meta name='description' content="As discussed in the Properties module, the goal of any
+memory management system is to reduce the memory footprint of a program by
+controlling the lifetime of all its objects. iOS and OS X applications
+accomplish this through object ownership, which makes sure
+objects exist as long as they have to, but no longer."/>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'/>
+<link rel="icon" type="image/png" href="/media/favicon.png"/>
+<link rel="stylesheet" href="/media/style.css"/>
+<link rel="stylesheet" href="/media/pygments.css"/>
+<script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  
+    ga('create', 'UA-37121774-2', 'auto');
+    ga('send', 'pageview');
+  </script>
+</head>
+<body>
+<div id='page'>
+<div id='banner'>
+<a href='/tutorials/cocoa/index'>Ry&rsquo;s Cocoa Tutorial</a> is now only $10.
+Happy Holidays! <span style='font-size: .8em'>(Offer extended to Jan 31st, 2016)</span>
+</div>
+<div id='content'>
+<nav id='main-nav'>
+<a href='/'><img src='/media/logo-small.png' width='120px' alt='RyPress - Quality Software Tutorials'/></a>
+<ul>
+<li><a href='/'>Tutorials</a></li>
+<li><a href='/secure/purchases.php'>Purchases</a></li>
+<li><a href='/about.php'>About</a></li>
+</ul>
+</nav>
+<div class='divider'></div>
+<table class="icon-and-text"><tr>
+<td><a href="index"><img src="media/icons/index.png" width="40px" height="40px"></a></td>
+<td><p>You’re
+reading
+<a href="index"><em>Ry’s Objective-C Tutorial</em></a></p></td>
+</tr></table><div class="divider"></div>
+<h1 id="memory-management">Memory Management</h1>
+<p>As discussed in the <a href="properties.html#memory-management">Properties</a> module, the goal of any
+memory management system is to reduce the memory footprint of a program by
+controlling the lifetime of all its objects. iOS and OS X applications
+accomplish this through <strong>object ownership</strong>, which makes sure
+objects exist as long as they have to, but no longer.</p>
+<p>This object-ownership scheme is implemented through a
+<strong>reference-counting system</strong> that internally tracks how many
+owners each object has. When you claim ownership of an object, you increase
+it’s reference count, and when you’re done with the object, you
+decrease its reference count. While its reference count is greater than zero,
+an object is guaranteed to exist, but as soon as the count reaches zero, the
+operating system is allowed to destroy it.</p>
+<figure>
+<img style="max-width: 400px" src="media/memory-management/reference-counting.png">
+<figcaption>Destroying an object with zero references</figcaption>
+</figure>
+<p>In the past, developers manually controlled an object’s reference
+count by calling special memory-management methods defined by the <a href="https://developer.apple.com/library/mac/documentation/cocoa/reference/foundation/Protocols/NSObject_Protocol/Reference/NSObject.html"><code>NSObject</code>
+protocol</a>. This is called <strong>Manual Retain Release (MRR)</strong>.
+However, Xcode 4.2 introduced <strong>Automatic Reference Counting
+(ARC)</strong>, which automatically inserts all of these method calls for you.
+Modern applications should always use ARC, since it’s more reliable and
+lets you focus on your app’s features instead of its memory
+management.</p>
+<p>This module explains core reference-counting concepts in the context of MRR,
+then discusses some of the practical considerations of ARC.</p>
+<h1 id="manual-retain-release">Manual Retain Release</h1>
+<p>In a Manual Retain Release environment, it’s your job to claim and
+relinquish ownership of every object in your program. You do this by calling
+special memory-related methods, which are described below.</p>
+<table class="multiline">
+<thead>
+<tr>
+<th>Method</th>
+<th>Behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>alloc</code></td>
+<td>Create an object and claim ownership of it.</td>
+</tr>
+<tr>
+<td><code>retain</code></td>
+<td>Claim ownership of an existing object.</td>
+</tr>
+<tr>
+<td><code>copy</code></td>
+<td>Copy an object and claim ownership of it.</td>
+</tr>
+<tr>
+<td><code>release</code></td>
+<td>Relinquish ownership of an object and destroy it immediately.</td>
+</tr>
+<tr>
+<td><code>autorelease</code></td>
+<td>Relinquish ownership of an object but defer its destruction.</td>
+</tr>
+</tbody>
+</table>
+<p>Manually controlling object ownership might seem like a daunting task, but
+it’s actually very easy. All you have to do is claim ownership of any
+object you need and remember to relinquish ownership when you’re
+done with it. From a practical standpoint, this means that you have to balance
+every <code>alloc</code>, <code>retain</code>, and <code>copy</code> call with
+a <code>release</code> or <code>autorelease</code> on the same object.</p>
+<p>When you forget to balance these calls, one of two things can happen. If you
+forget to release an object, its underlying memory is never freed, resulting in
+a <strong>memory leak</strong>. Small leaks won’t have a visible effect
+on your program, but if you eat up enough memory, your program will eventually
+crash. On the other hand, if you try to release an object too many times,
+you’ll have what’s called a <strong>dangling pointer</strong>. When
+you try to access the dangling pointer, you’ll be requesting an invalid
+memory address, and your program will most likely crash.</p>
+<figure>
+<img style="max-width: 390px" src="media/memory-management/balance.png">
+<figcaption>Balancing ownership claims with reliquishes</figcaption>
+</figure>
+<p>The rest of this section explains how to avoid memory leaks and dangling
+pointers through the proper usage of the above methods.</p>
+<h2 id="enabling-mrr">Enabling MRR</h2>
+<p>Before we can experiment with manual memory management, we need to turn off
+Automatic Reference Counting. Click the project icon in the <em>Project
+Navigator</em>, make sure the <em>Build Settings</em> tab is selected, and
+start typing <code>automatic reference counting</code> in the search bar. The
+<em>Objective-C Automatic Reference Counting</em> compiler option should
+appear. Change it from <em>Yes</em> to <em>No</em>.</p>
+<figure>
+<img style="max-width: 459px" src="media/memory-management/turning-off-arc.png">
+<figcaption>Turning off Automatic Reference Counting</figcaption>
+</figure>
+<p>Remember, we’re only doing this for instructional purposes—you
+should never use Manual Retain Release for new projects.</p>
+<h2 id="the-alloc-method">The alloc Method</h2>
+<p>We’ve been using the <code>alloc</code> method to create objects
+throughout this tutorial. But, it’s not just allocating memory for the
+object, it’s also setting its reference count to <code>1</code>. This
+makes a lot of sense, since we wouldn’t be creating the object if we
+didn’t want to keep it around for at least a little while.</p>
+<pre><code class="c1">// main.m</code>
+<code class="cp">#import</code> <code class="l">&lt;Foundation/Foundation.h&gt;</code><code class="cp"></code>
+
+<code class="kt">int</code> <code class="nf">main</code><code class="p">(</code><code class="kt">int</code> <code class="n">argc</code><code class="p">,</code> <code class="kt">const</code> <code class="kt">char</code> <code class="o">*</code> <code class="n">argv</code><code class="p">[])</code> <code class="p">{</code>
+    <code class="k">@autoreleasepool</code> <code class="p">{</code>
+        <code class="nb">NSMutableArray</code> <code class="o">*</code><code class="n">inventory</code> <code class="o">=</code> <code class="p">[[</code><code class="n">NSMutableArray</code> <code class="nf">alloc</code><code class="p">]</code> <code class="nf">init</code><code class="p">];</code>
+        <code class="p">[</code><code class="n">inventory</code> <code class="nf">addObject:</code><code class="s">@&quot;Honda Civic&quot;</code><code class="p">];</code>
+        <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%@&quot;</code><code class="p">,</code> <code class="n">inventory</code><code class="p">);</code>
+    <code class="p">}</code>
+    <code class="k">return</code> <code class="mi">0</code><code class="p">;</code>
+<code class="p">}</code>
+</pre>
+<p>The above code should look familiar. All we’re doing is instantiating
+a <a href="data-types/nsarray.html#nsmutablearray">mutable array</a>, adding a
+value, and displaying its contents. From a memory-management perspective, we
+now own the <code>inventory</code> object, which means it’s our
+responsibility to release it somewhere down the road.</p>
+<p>But, since we <em>haven’t</em> released it, our program currently has
+a memory leak. We can examine this in Xcode by running our project through the
+static analyzer tool. Navigate to <em>Product &gt; Analyze</em> in
+the menu bar or use the <em>Shift+Cmd+B</em> keyboard shortcut. This looks for
+predictable problems in your code, and it should uncover the following in
+<code>main.m</code>.</p>
+<figure>
+<img style="max-width: 515px" src="media/memory-management/analyzer-memory-leak.png">
+<figcaption>A memory leak! Oh no!</figcaption>
+</figure>
+<p>This is a small object, so the leak isn’t fatal. However, if it
+happened over and over (e.g., in a long loop or every time the user clicked a
+button), the program would eventually run out of memory and crash.</p>
+<h2 id="the-release-method">The release Method</h2>
+<p>The <code>release</code> method relinquishes ownership of an object by
+decrementing its reference count. So, we can get rid of our memory leak by
+adding the following line after the <code>NSLog()</code> call in
+<code>main.m</code>.</p>
+<pre><code class="p">[</code><code class="n">inventory</code> <code class="nf">release</code><code class="p">];</code>
+</pre>
+<p>Now that our <code>alloc</code> is balanced with a <code>release</code>, the
+static analyzer shouldn’t output any problems. Typically, you’ll
+want to relinquish ownership of an object at the end of the same method in
+which it was created, as we did here.</p>
+<p>Releasing an object too soon creates a dangling pointer. For example, try
+moving the above line to <em>before</em> the <code>NSLog()</code> call. Since
+<code>release</code> immediately frees the underlying memory, the
+<code>inventory</code> variable in <code>NSLog()</code> now points to an
+invalid address, and your program will crash with a <code>EXC_BAD_ACCESS</code>
+error code when you try to run it:</p>
+<figure>
+<img style="max-width: 516px" src="media/memory-management/crash-invalid-address.png">
+<figcaption>Trying to access an invalid memory address</figcaption>
+</figure>
+<p>The point is, don’t relinquish ownership of an object before
+you’re done using it.</p>
+<h2 id="the-retain-method">The retain Method</h2>
+<p>The <code>retain</code> method claims ownership of an existing object.
+It’s like telling the operating system, “Hey! I need that object
+too, so don’t get rid of it!” This is a necessary ability when
+other objects need to make sure their properties refer to a valid instance.</p>
+<p>As an example, we’ll use <code>retain</code> to create a <a href="properties.html#the-strong-attribute">strong reference</a> to our
+<code>inventory</code> array. Create a new class called <code>CarStore</code>
+and change its header to the following.</p>
+<pre><code class="c1">// CarStore.h</code>
+<code class="cp">#import</code> <code class="l">&lt;Foundation/Foundation.h&gt;</code><code class="cp"></code>
+
+<code class="k">@interface</code> <code class="nc">CarStore</code> : <code class="nc">NSObject</code>
+
+<code class="k">-</code> <code class="p">(</code><code class="nb">NSMutableArray</code> <code class="o">*</code><code class="p">)</code><code class="nf">inventory</code><code class="p">;</code>
+<code class="k">-</code> <code class="p">(</code><code class="kt">void</code><code class="p">)</code><code class="nf">setInventory:</code><code class="p">(</code><code class="nb">NSMutableArray</code> <code class="o">*</code><code class="p">)</code><code class="nv">newInventory</code><code class="p">;</code>
+
+<code class="k">@end</code>
+</pre>
+<p>This manually declares the accessors for a property called
+<code>inventory</code>. Our first iteration of <code>CarStore.m</code> provides
+a straightforward implementation of the getter and setter, along with an
+instance variable to record the object:</p>
+<pre><code class="c1">// CarStore.m</code>
+<code class="cp">#import</code> <code class="l">&quot;CarStore.h&quot;</code><code class="cp"></code>
+
+<code class="k">@implementation</code> <code class="nc">CarStore</code> <code class="p">{</code>
+    <code class="nb">NSMutableArray</code> <code class="o">*</code><code class="n">_inventory</code><code class="p">;</code>
+<code class="p">}</code>
+
+<code class="o">-</code> <code class="p">(</code><code class="nb">NSMutableArray</code> <code class="o">*</code><code class="p">)</code><code class="n">inventory</code> <code class="p">{</code>
+    <code class="k">return</code> <code class="n">_inventory</code><code class="p">;</code>
+<code class="p">}</code>
+
+<code class="o">-</code> <code class="p">(</code><code class="kt">void</code><code class="p">)</code><code class="nf">setInventory:</code><code class="p">(</code><code class="nb">NSMutableArray</code> <code class="o">*</code><code class="p">)</code><code class="n">newInventory</code> <code class="p">{</code>
+    <code class="n">_inventory</code> <code class="o">=</code> <code class="n">newInventory</code><code class="p">;</code>
+<code class="p">}</code>
+
+<code class="k">@end</code>
+</pre>
+<p>Back in <code>main.m</code>, let’s assign our <code>inventory</code>
+variable to <code>CarStore</code>’s <code>inventory</code> property:</p>
+<pre><code class="c1">// main.m</code>
+<code class="cp">#import</code> <code class="l">&lt;Foundation/Foundation.h&gt;</code><code class="cp"></code>
+<code class="cp">#import</code> <code class="l">&quot;CarStore.h&quot;</code><code class="cp"></code>
+
+<code class="kt">int</code> <code class="nf">main</code><code class="p">(</code><code class="kt">int</code> <code class="n">argc</code><code class="p">,</code> <code class="kt">const</code> <code class="kt">char</code> <code class="o">*</code> <code class="n">argv</code><code class="p">[])</code> <code class="p">{</code>
+    <code class="k">@autoreleasepool</code> <code class="p">{</code>
+        <code class="nb">NSMutableArray</code> <code class="o">*</code><code class="n">inventory</code> <code class="o">=</code> <code class="p">[[</code><code class="n">NSMutableArray</code> <code class="nf">alloc</code><code class="p">]</code> <code class="nf">init</code><code class="p">];</code>
+        <code class="p">[</code><code class="n">inventory</code> <code class="nf">addObject:</code><code class="s">@&quot;Honda Civic&quot;</code><code class="p">];</code>
+        
+        <code class="n">CarStore</code> <code class="o">*</code><code class="n">superstore</code> <code class="o">=</code> <code class="p">[[</code><code class="n">CarStore</code> <code class="nf">alloc</code><code class="p">]</code> <code class="nf">init</code><code class="p">];</code>
+        <code class="p">[</code><code class="n">superstore</code> <code class="nf">setInventory:</code><code class="n">inventory</code><code class="p">];</code>
+        <code class="p">[</code><code class="n">inventory</code> <code class="nf">release</code><code class="p">];</code>
+
+        <code class="c1">// Do some other stuff...</code>
+
+        <code class="c1">// Try to access the property later on (error!)</code>
+        <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%@&quot;</code><code class="p">,</code> <code class="p">[</code><code class="n">superstore</code> <code class="nf">inventory</code><code class="p">]);</code>
+    <code class="p">}</code>
+    <code class="k">return</code> <code class="mi">0</code><code class="p">;</code>
+<code class="p">}</code>
+</pre>
+<p>The <code>inventory</code> property in the last line is a dangling pointer
+because the object was already released earlier in <code>main.m</code>. Right
+now, the <code>superstore</code> object has a <a href="properties.html#the-weak-attribute">weak reference</a> to the array. To
+turn it into a strong reference, <code>CarStore</code> needs to claim ownership
+of the array in its <code>setInventory:</code> accessor:</p>
+<pre><code class="c1">// CarStore.m</code>
+<code class="k">-</code> <code class="p">(</code><code class="kt">void</code><code class="p">)</code><code class="nf">setInventory:</code><code class="p">(</code><code class="nb">NSMutableArray</code> <code class="o">*</code><code class="p">)</code><code class="nv">newInventory</code> <code class="p">{</code>
+    <code class="n">_inventory</code> <code class="o">=</code> <code class="p">[</code><code class="n">newInventory</code> <code class="nf">retain</code><code class="p">];</code>
+<code class="p">}</code>
+</pre>
+<p>This ensures the <code>inventory</code> object won’t be released while
+<code>superstore</code> is using it. Notice that the <code>retain</code> method
+returns the object itself, which lets us perform the retain and assignment in a
+single line.</p>
+<p>Unfortunately, this code creates another problem: the <code>retain</code>
+call isn’t balanced with a <code>release</code>, so we have another
+memory leak. As soon as we pass another value to <code>setInventory:</code>, we
+can’t access the old value, which means we can never free it. To fix
+this, <code>setInventory:</code> needs to call <code>release</code> on the old
+value:</p>
+<pre><code class="c1">// CarStore.m</code>
+<code class="k">-</code> <code class="p">(</code><code class="kt">void</code><code class="p">)</code><code class="nf">setInventory:</code><code class="p">(</code><code class="nb">NSMutableArray</code> <code class="o">*</code><code class="p">)</code><code class="nv">newInventory</code> <code class="p">{</code>
+    <code class="k">if</code> <code class="p">(</code><code class="n">_inventory</code> <code class="o">==</code> <code class="n">newInventory</code><code class="p">)</code> <code class="p">{</code>
+        <code class="k">return</code><code class="p">;</code>
+    <code class="p">}</code>
+    <code class="nb">NSMutableArray</code> <code class="o">*</code><code class="n">oldValue</code> <code class="o">=</code> <code class="n">_inventory</code><code class="p">;</code>
+    <code class="n">_inventory</code> <code class="o">=</code> <code class="p">[</code><code class="n">newInventory</code> <code class="nf">retain</code><code class="p">];</code>
+    <code class="p">[</code><code class="n">oldValue</code> <code class="nf">release</code><code class="p">];</code>
+<code class="p">}</code>
+</pre>
+<p>This is basically what the <a href="properties.html#the-retain-attribute"><code>retain</code></a> and the <a href="properties.html#the-strong-attribute"><code>strong</code></a> property
+attributes do. Obviously, using <code>@property</code> is much more convenient
+than creating these accessors on our own.</p>
+<figure>
+<img style="max-width: 520px" src="media/memory-management/retain-release-calls.png">
+<figcaption>Memory management calls on the <code>inventory</code>
+object</figcaption>
+</figure>
+<p>The above diagram visualizes all of the memory management calls on the
+<code>inventory</code> array that we created in <code>main.m</code>, along with
+their respective locations. As you can see, all of the
+<code>alloc</code>’s and <code>retain</code>’s are balanced with a
+<code>release</code> somewhere down the line, ensuring that the underlying
+memory will eventually be freed up.</p>
+<h2 id="the-copy-method">The copy Method</h2>
+<p>An alternative to <code>retain</code> is the <code>copy</code> method, which
+creates a brand new instance of the object and increments the reference count
+on that, leaving the original unaffected. So, if you want to copy the
+<code>inventory</code> array instead of referring to the mutable one, you can
+change <code>setInventory:</code> to the following.</p>
+<pre><code class="c1">// CarStore.m</code>
+<code class="k">-</code> <code class="p">(</code><code class="kt">void</code><code class="p">)</code><code class="nf">setInventory:</code><code class="p">(</code><code class="nb">NSMutableArray</code> <code class="o">*</code><code class="p">)</code><code class="nv">newInventory</code> <code class="p">{</code>
+    <code class="k">if</code> <code class="p">(</code><code class="n">_inventory</code> <code class="o">==</code> <code class="n">newInventory</code><code class="p">)</code> <code class="p">{</code>
+        <code class="k">return</code><code class="p">;</code>
+    <code class="p">}</code>
+    <code class="nb">NSMutableArray</code> <code class="o">*</code><code class="n">oldValue</code> <code class="o">=</code> <code class="n">_inventory</code><code class="p">;</code>
+    <code class="n">_inventory</code> <code class="o">=</code> <code class="p">[</code><code class="n">newInventory</code> <code class="nf">copy</code><code class="p">];</code>
+    <code class="p">[</code><code class="n">oldValue</code> <code class="nf">release</code><code class="p">];</code>
+<code class="p">}</code>
+</pre>
+<p>You may also recall from <a href="properties.html#the-copy-attribute">The
+<code>copy</code> Attribute</a> that this has the added perk of freezing
+mutable collections at the time of assignment. Some classes provide multiple
+<code>copy</code> methods (much like multiple <code>init</code> methods), and
+it’s safe to assume that any method starting with <code>copy</code> has
+the same behavior.</p>
+<h2 id="the-autorelease-method">The autorelease method</h2>
+<p>Like <code>release</code>, the <code>autorelease</code> method relinquishes
+ownership of an object, but instead of destroying the object immediately, it
+defers the actual freeing of memory until later on in the program. This allows
+you to release objects when you are “supposed” to, while still
+keeping them around for others to use.</p>
+<p>For example, consider a simple factory method that creates and returns a
+<code>CarStore</code> object:</p>
+<pre><code class="c1">// CarStore.h</code>
+<code class="k">+</code> <code class="p">(</code><code class="n">CarStore</code> <code class="o">*</code><code class="p">)</code><code class="nf">carStore</code><code class="p">;</code>
+</pre>
+<p>Technically speaking, it’s the <code>carStore</code> method’s
+responsibility to release the object because the caller has no way of knowing
+that he owns the returned object. So, its implementation should return an
+autoreleased object, like so:</p>
+<pre><code class="c1">// CarStore.m</code>
+<code class="k">+</code> <code class="p">(</code><code class="n">CarStore</code> <code class="o">*</code><code class="p">)</code><code class="nf">carStore</code> <code class="p">{</code>
+    <code class="n">CarStore</code> <code class="o">*</code><code class="n">newStore</code> <code class="o">=</code> <code class="p">[[</code><code class="n">CarStore</code> <code class="nf">alloc</code><code class="p">]</code> <code class="nf">init</code><code class="p">];</code>
+    <code class="k">return</code> <code class="p">[</code><code class="n">newStore</code> <code class="nf">autorelease</code><code class="p">];</code>
+<code class="p">}</code>
+</pre>
+<p>This relinquishes ownership of the object immediately after creating it, but
+keeps it in memory long enough for the caller to interact with it.
+Specifically, it waits until the end of the nearest
+<code>@autoreleasepool{}</code> block, after which it calls a normal
+<code>release</code> method. This is why there’s always an
+<code>@autoreleasepool{}</code> surrounding the entire <code>main()</code>
+function—it makes sure all of the autoreleased objects are destroyed
+after the program is done executing.</p>
+<p>All of those built-in factory methods like <a href="data-types/nsstring.html"><code>NSString</code></a>’s
+<code>stringWithFormat:</code> and <code>stringWithContentsOfFile:</code> work
+the exact same way as our <code>carStore</code> method. Before ARC, this was a
+convenient convention, since it let you create objects without worrying about
+calling <code>release</code> somewhere down the road.</p>
+<p>If you change the <code>superstore</code> constructor from
+<code>alloc</code>/<code>init</code> to the following, you won’t have to
+release it at the end of <code>main()</code>.</p>
+<pre><code class="c1">// main.m</code>
+<code class="n">CarStore</code> <code class="o">*</code><code class="n">superstore</code> <code class="o">=</code> <code class="p">[</code><code class="n">CarStore</code> <code class="nf">carStore</code><code class="p">];</code>
+</pre>
+<p>In fact, you aren’t <em>allowed</em> to release the
+<code>superstore</code> instance now because you no longer own it—the
+<code>carStore</code> factory method does. It’s very important to avoid
+explicitly releasing autoreleased objects (otherwise, you’ll have a
+dangling pointer and a crashed program).</p>
+<h2 id="the-dealloc-method">The dealloc Method</h2>
+<p>An object’s <code>dealloc</code> method is the opposite of its
+<code>init</code> method. It’s called right before the object is
+destroyed, giving you a chance to clean up any internal objects. This method is
+called automatically by the runtime—you should never try to call
+<code>dealloc</code> yourself.</p>
+<p>In an MRR environment, the most common thing you need to do in a
+<code>dealloc</code> method is release objects stored in instance variables.
+Think about what happens to our current <code>CarStore</code> when an instance
+is deallocated: its <code>_inventory</code> instance variable, which has been
+retained by the setter, never has the chance to be released. This is another
+form of memory leak. To fix this, all we have to do is add a custom
+<code>dealloc</code> to <code>CarStore.m</code>:</p>
+<pre><code class="c1">// CarStore.m</code>
+<code class="k">-</code> <code class="p">(</code><code class="kt">void</code><code class="p">)</code><code class="nf">dealloc</code> <code class="p">{</code>
+    <code class="p">[</code><code class="n">_inventory</code> <code class="nf">release</code><code class="p">];</code>
+    <code class="p">[</code><code class="n">super</code> <code class="nf">dealloc</code><code class="p">];</code>
+<code class="p">}</code>
+</pre>
+<p>Note that you should always call the superclass’s <code>dealloc</code>
+to make sure that all of the instance variables in parent classes are properly
+released. As a general rule, you want to keep custom <code>dealloc</code>
+methods as simple as possible, so you shouldn’t try to use them for logic
+that can be handled elsewhere.</p>
+<h2 id="mrr-summary">MRR Summary</h2>
+<p>And that’s manual memory management in a nutshell. The key is to
+balance every <code>alloc</code>, <code>retain</code>, and <code>copy</code>
+with a <code>release</code> or <code>autorelease</code>, otherwise you’ll
+encounter either a dangling pointer or a memory leak at some point in your
+application.</p>
+<p>Remember that this section only used Manual Retain Release to understand the
+internal workings of iOS and OS X memory management. In the real world,
+much of the above code is actually obsolete, though you might encounter it in
+older documentation. It’s very important to understand that explicitly
+claiming and relinquishing ownership like this has been completely superseded
+by Automatic Reference Counting.</p>
+<h1 id="automatic-reference-counting">Automatic Reference Counting</h1>
+<p>Now that you’ve got your head wrapped around manual memory management,
+you can forget all about it. Automatic Reference Counting works the exact same
+way as MRR, but it automatically inserts the appropriate memory-management
+methods for you. This is a big deal for Objective-C developers, as it lets them
+focus entirely on <em>what</em> their application needs to do rather than
+<em>how</em> it does it.</p>
+<p>ARC takes the human error out of memory management with virtually no
+downside, so the only reason <em>not</em> to use it is when you’re
+interfacing with a legacy code base (however, ARC is, for the most part,
+backward compatible with MRR programs). The rest of this module explains the
+major changes between MRR and ARC.</p>
+<h2 id="enabling-arc">Enabling ARC</h2>
+<p>First, let’s go ahead and turn ARC back on in the project’s
+<em>Build Settings</em> tab. Change the <em>Automatic Reference Counting</em>
+compiler option to <em>Yes</em>. Again, this is the default for all Xcode
+templates, and it’s what you should be using for all of your
+projects.</p>
+<figure>
+<img style="max-width: 477px" src="media/memory-management/turning-on-arc.png">
+<figcaption>Turning on Automatic Reference Counting</figcaption>
+</figure>
+<h2 id="no-more-memory-methods">No More Memory Methods</h2>
+<p>ARC works by analyzing your code to figure how what the ideal lifetime of
+each object should be, then inserts the necessary <code>retain</code> and
+<code>release</code> calls automatically. The algorithm requires complete
+control over the object-ownership in your entire program, which means
+you’re <em>not allowed</em> to manually call <code>retain</code>,
+<code>release</code>, or <code>autorelease</code>.</p>
+<p>The only memory-related methods you should ever find in an ARC program are
+<code>alloc</code> and <code>copy</code>. You can think of these as plain old
+constructors and ignore the whole object-ownership thing.</p>
+<h2 id="new-property-attributes">New Property Attributes</h2>
+<p>ARC introduces new <code>@property</code> attributes. You should use the
+<code>strong</code> attribute in place of <code>retain</code>, and
+<code>weak</code> in place of <code>assign</code>. All of these attributes are
+discussed in the <a href="properties.html">Properties</a> module.</p>
+<h2 id="the-dealloc-method-in-arc">The dealloc Method in ARC</h2>
+<p>Deallocation in ARC is also a little bit different. You don’t need to
+release instance variables as we did in <a href="#the-dealloc-method">The
+<code>dealloc</code> Method</a>—ARC does this for you. In addition, the
+superclass’s <code>dealloc</code> is automatically called, so you
+don’t have to do that either.</p>
+<p>For the most part, this means you’ll never need to include a custom
+<code>dealloc</code> method. One of the few exceptions is when you’re
+using low-level memory allocation functions like <a href="https://developer.apple.com/library/mac/#documentation/Darwin/Reference/ManPages/man3/malloc.3.html"><code>malloc()</code></a>.
+In this case, you’d still have to call <code>free()</code> in
+<code>dealloc</code> to avoid a memory leak.</p>
+<h1 id="summary">Summary</h1>
+<p>For the most part, Automatic Reference Counting lets you completely forget
+about memory management. The idea is to focus on high-level functionality
+instead of the underlying memory management. The only thing you need to worry
+about are retain cycles, which was covered in the <a href="properties.html">Properties</a> module.</p>
+<p>If you need a more detailed discussion about the nuances of ARC, please
+visit the <a href="https://developer.apple.com/library/mac/releasenotes/ObjectiveC/RN-TransitioningToARC/Introduction/Introduction.html#//apple_ref/doc/uid/TP40011226">Transitioning
+to ARC Release Notes</a>.</p>
+<p>By now, you should know almost everything you need to know about
+Objective-C. The only thing we haven’t covered are the basic data types
+provided by both C and the Foundation Framework. The next module introduces all
+of the standard types, from numbers to strings, arrays, dictionaries, and even
+dates.</p>
+<div class="divider" style="margin-top: 2em; margin-bottom: 1.3em;"></div><table class="icon-and-text advert"><tr>
+<td><a href="http://rypress.com/tutorials/cocoa"><img src="media/advert-image.png" width="120px" height="165px" class="cover"></a></td>
+<td><p id="advert-text">Be sure to check out <a href="http://rypress.com/tutorials/cocoa">Ry’s Cocoa Tutorial</a>. This
+brand new guide is a complete walkthrough of Mac App development, and it
+leverages all of the Objective-C skills that we just discussed. <a href="http://rypress.com/tutorials/cocoa">Learn more ›</a></p></td>
+</tr></table>
+<div id='mailing-list'>
+<div class='divider' style='margin: 1.8em -22px;'></div>
+<h3>Mailing List</h3>
+<p>Sign up for my low-volume mailing list to find out when new content is
+released. Next up is a comprehensive <a href='https://developer.apple.com/swift/'>Swift</a> tutorial planned for late
+January.</p>
+<form id='mailing-list-form' action='/secure/mailing-list/request-add' method='get'>
+<label>
+<div class='label'>Email Address:</div>
+<div class='input'>
+<input name='email' style='width: 200px;' type='email'/>
+</div>
+</label>
+<input id='mailing-list-button' class='button' style='margin-top: .5em;' type='submit' value='Subscribe'/>
+</form>
+<div style='clear: both'></div>
+<p class='fine-print'>You&rsquo;ll only receive emails when new tutorials are
+released, and your contact information will never be shared with third
+parties. <a href='/secure/mailing-list/unsubscribe'>Click here</a> to
+unsubscribe.</p>
+</div>
+<div class='divider'></div>
+<footer id='footer' class='fine-print'>
+<ul>
+<li><a href='/licensing.php'>&copy; 2012-2014</a></li>
+<li><a href='/'>RyPress.com</a></li>
+<li>
+<a href='/licensing.php'>All Rights Reserved</a>
+</li>
+<li>
+<a href='/tos.php'>Terms&nbsp;of&nbsp;Service</a>
+</li>
+<li>
+<a href='/privacy.php'>Privacy Policy</a>
+</li>
+</ul>
+</footer>
+</div>  
+</div>  
+</body>
+</html>

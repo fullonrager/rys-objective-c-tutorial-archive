@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+  <title>Functions - Ry’s Objective-C Tutorial - RyPress</title>
+  <meta charset='UTF-8' />
+  <meta name='description' content="Along with variables, conditionals, and loops, functions are one of the
+fundamental components of any modern programming language. They let you reuse
+an arbitrary block of code throughout your application, which is necessary for
+organizing and maintaining all but the most trivial code bases. You’ll
+find many
+examples of functions throughout the iOS and OS X frameworks." />
+  <meta name='viewport'
+  	    content='width=device-width, initial-scale=1.0, maximum-scale=1.0' />
+  <link rel="icon" type="image/png" href="media/favicon.png" />
+  <link rel="stylesheet" href="media/style.css" />
+  <link rel="stylesheet" href="media/pygments.css" />
+
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  
+    ga('create', 'UA-37121774-2', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+  
+</head>
+<body>
+
+<div id='page'>
+
+<div id='content'>
+
+<nav id='main-nav'>
+	<a href='/'><img src='media/logo-small.png'
+		 width='120px'
+		 alt='RyPress - Quality Software Tutorials'/></a>
+	<ul>
+	<li><a href='/'>Tutorials</a></li>
+	<li><a href='/secure/purchases.php'>Purchases</a></li>
+	<li><a href='/about.php'>About</a></li>
+	</ul>
+</nav>
+
+<div class='divider'></div>
+<table class="icon-and-text"><tr>
+<td><a href="index"><img src="media/icons/index.png" width="40px" height="40px"></a></td>
+<td><p>You’re
+
+			
+					reading
+				<a href="index.html"><em>Ry’s Objective-C Tutorial</em></a></p></td>
+</tr></table><div class="divider"></div>
+
+<h1 id="functions">Functions</h1>
+
+<p>Along with variables, conditionals, and loops, functions are one of the
+fundamental components of any modern programming language. They let you reuse
+an arbitrary block of code throughout your application, which is necessary for
+organizing and maintaining all but the most trivial code bases. You’ll
+find <a href="https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Miscellaneous/Foundation_Functions/Reference/reference.html#//apple_ref/doc/uid/TP40003774">many
+examples</a> of functions throughout the iOS and OS X frameworks.</p>
+
+<p>Just like its other basic constructs, Objective-C relies entirely on the C
+programming language for functions. This module introduces the most important
+aspects of C functions, including basic syntax, the separation of declaration
+and implementation, common scope issues, and function library considerations.</p>
+
+
+<h2 id="basic-syntax">Basic Syntax</h2>
+
+<p>There are four components to a C function: its return value, name,
+parameters, and associated code block. After you’ve defined these, you
+can <strong>call</strong> the function to execute its associated code by
+passing any necessary parameters between parentheses.</p>
+
+<p>For example, the following snippet defines a function called
+<code>getRandomInteger()</code> that accepts two <code>int</code> values as
+parameters and returns another <code>int</code> value. Inside of the function,
+we access the inputs through the <code>minimum</code> and <code>maximum</code>
+parameters, and we return a calculated value via the <code>return</code>
+keyword. Then in <code>main()</code>, we call this new function and pass
+<code>-10</code> and <code>10</code> as arguments.</p>
+
+<pre><code class="c1">// main.m</code>
+<code class="cp">#import</code> <code class="l">&lt;Foundation/Foundation.h&gt;</code><code class="cp"></code>
+
+<code class="kt">int</code> <code class="nf">getRandomInteger</code><code class="p">(</code><code class="kt">int</code> <code class="n">minimum</code><code class="p">,</code> <code class="kt">int</code> <code class="n">maximum</code><code class="p">)</code> <code class="p">{</code>
+    <code class="k">return</code> <code class="nb">arc4random_uniform</code><code class="p">((</code><code class="n">maximum</code> <code class="o">-</code> <code class="n">minimum</code><code class="p">)</code> <code class="o">+</code> <code class="mi">1</code><code class="p">)</code> <code class="o">+</code> <code class="n">minimum</code><code class="p">;</code>
+<code class="p">}</code>
+
+<code class="kt">int</code> <code class="nf">main</code><code class="p">(</code><code class="kt">int</code> <code class="n">argc</code><code class="p">,</code> <code class="kt">const</code> <code class="kt">char</code> <code class="o">*</code> <code class="n">argv</code><code class="p">[])</code> <code class="p">{</code>
+    <code class="k">@autoreleasepool</code> <code class="p">{</code>
+        <code class="kt">int</code> <code class="n">randomNumber</code> <code class="o">=</code> <code class="n">getRandomInteger</code><code class="p">(</code><code class="o">-</code><code class="mi">10</code><code class="p">,</code> <code class="mi">10</code><code class="p">);</code>
+        <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;Selected a random number between -10 and 10: %d&quot;</code><code class="p">,</code>
+              <code class="n">randomNumber</code><code class="p">);</code>
+    <code class="p">}</code>
+    <code class="k">return</code> <code class="mi">0</code><code class="p">;</code>
+<code class="p">}</code>
+</pre>
+
+
+<p>The built-in <a href="https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man3/arc4random.3.html"><code>arc4random_uniform()</code></a>
+function returns a random number between 0 and whatever argument you pass. (This
+is preferred over the older <code>rand()</code> and <code>random()</code>
+algorithms.)</p>
+
+<p>Functions let you use pointer references as return values or parameters,
+which means that they can be seamlessly integrated with Objective-C objects
+(remember that all objects are represented as pointers). For example, try
+changing <code>main.m</code> to the following.</p>
+
+<pre><code class="c1">// main.m</code>
+<code class="cp">#import</code> <code class="l">&lt;Foundation/Foundation.h&gt;</code><code class="cp"></code>
+
+<code class="nb">NSString</code> <code class="o">*</code><code class="nf">getRandomMake</code><code class="p">(</code><code class="nb">NSArray</code> <code class="o">*</code><code class="n">makes</code><code class="p">)</code> <code class="p">{</code>
+    <code class="kt">int</code> <code class="n">maximum</code> <code class="o">=</code> <code class="p">(</code><code class="kt">int</code><code class="p">)[</code><code class="n">makes</code> <code class="nf">count</code><code class="p">];</code>
+    <code class="kt">int</code> <code class="n">randomIndex</code> <code class="o">=</code> <code class="nb">arc4random_uniform</code><code class="p">(</code><code class="n">maximum</code><code class="p">);</code>
+    <code class="k">return</code> <code class="n">makes</code><code class="p">[</code><code class="n">randomIndex</code><code class="p">];</code>
+<code class="p">}</code>
+
+<code class="kt">int</code> <code class="nf">main</code><code class="p">(</code><code class="kt">int</code> <code class="n">argc</code><code class="p">,</code> <code class="kt">const</code> <code class="kt">char</code> <code class="o">*</code> <code class="n">argv</code><code class="p">[])</code> <code class="p">{</code>
+    <code class="k">@autoreleasepool</code> <code class="p">{</code>
+        <code class="nb">NSArray</code> <code class="o">*</code><code class="n">makes</code> <code class="o">=</code> <code class="p">@[</code><code class="s">@&quot;Honda&quot;</code><code class="p">,</code> <code class="s">@&quot;Ford&quot;</code><code class="p">,</code> <code class="s">@&quot;Nissan&quot;</code><code class="p">,</code> <code class="s">@&quot;Porsche&quot;</code><code class="p">];</code>
+        <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;Selected a %@&quot;</code><code class="p">,</code> <code class="n">getRandomMake</code><code class="p">(</code><code class="n">makes</code><code class="p">));</code>
+    <code class="p">}</code>
+    <code class="k">return</code> <code class="mi">0</code><code class="p">;</code>
+<code class="p">}</code>
+</pre>
+
+
+<p>This <code>getRandomMake()</code> function accepts an <code>NSArray</code>
+object as an argument and returns an <code>NSString</code> object. Note that it
+uses the same asterisk syntax as <a href="c-basics.html#pointers">pointer
+variable declarations</a>.</p>
+
+
+<h2 id="declarations-vs-implementations">Declarations vs. Implementations</h2>
+
+<p>Functions need to be defined <em>before</em> they are used. If you were to
+define the above <code>getRandomMake()</code> function <em>after</em>
+<code>main()</code>, the compiler wouldn’t be able to find it when you
+try to call it in <code>main()</code>. This imposes a rather strict structure
+on developers and can make it hard to organize larger applications. To solve
+this problem, C lets you separate the declaration of a function from its
+implementation.</p>
+
+<figure>
+    <img style="max-width: 460px" src="media/functions/declarations-vs-implementations.png">
+    <figcaption>Function declarations vs. implementations</figcaption>
+</figure>
+
+<p>A function <strong>declaration</strong> tells the compiler what the
+function’s inputs and outputs look like. By providing the data types for
+the return value and parameters of a function, the compiler can make sure that
+you’re using it properly without knowing what it actually does. The
+corresponding <strong>implementation</strong> attaches a code block to the
+declared function. Together, these give you a complete function
+<strong>definition</strong>.</p>
+
+<p>The following example declares the <code>getRandomMake()</code> function so
+that it can be used in <code>main()</code> before it gets implemented. Notice
+that the declaration only needs the data types of the parameters—their
+names can be omitted (if desired).</p>
+
+<pre><code class="c1">// main.m</code>
+<code class="cp">#import</code> <code class="l">&lt;Foundation/Foundation.h&gt;</code><code class="cp"></code>
+
+<code class="c1">// Declaration</code>
+<code class="nb">NSString</code> <code class="o">*</code><code class="nf">getRandomMake</code><code class="p">(</code><code class="nb">NSArray</code> <code class="o">*</code><code class="p">)</code><code class="o">;</code>
+
+<code class="kt">int</code> <code class="nf">main</code><code class="p">(</code><code class="kt">int</code> <code class="n">argc</code><code class="p">,</code> <code class="kt">const</code> <code class="kt">char</code> <code class="o">*</code> <code class="n">argv</code><code class="p">[])</code> <code class="p">{</code>
+    <code class="k">@autoreleasepool</code> <code class="p">{</code>
+        <code class="nb">NSArray</code> <code class="o">*</code><code class="n">makes</code> <code class="o">=</code> <code class="p">@[</code><code class="s">@&quot;Honda&quot;</code><code class="p">,</code> <code class="s">@&quot;Ford&quot;</code><code class="p">,</code> <code class="s">@&quot;Nissan&quot;</code><code class="p">,</code> <code class="s">@&quot;Porsche&quot;</code><code class="p">];</code>
+        <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;Selected a %@&quot;</code><code class="p">,</code> <code class="n">getRandomMake</code><code class="p">(</code><code class="n">makes</code><code class="p">));</code>
+    <code class="p">}</code>
+    <code class="k">return</code> <code class="mi">0</code><code class="p">;</code>
+<code class="p">}</code>
+
+<code class="c1">// Implementation</code>
+<code class="nb">NSString</code> <code class="o">*</code><code class="n">getRandomMake</code><code class="p">(</code><code class="nb">NSArray</code> <code class="o">*</code><code class="n">makes</code><code class="p">)</code> <code class="p">{</code>
+    <code class="kt">int</code> <code class="n">maximum</code> <code class="o">=</code> <code class="p">(</code><code class="kt">int</code><code class="p">)[</code><code class="n">makes</code> <code class="nf">count</code><code class="p">];</code>
+    <code class="kt">int</code> <code class="n">randomIndex</code> <code class="o">=</code> <code class="nb">arc4random_uniform</code><code class="p">(</code><code class="n">maximum</code><code class="p">);</code>
+    <code class="k">return</code> <code class="n">makes</code><code class="p">[</code><code class="n">randomIndex</code><code class="p">];</code>
+<code class="p">}</code>
+</pre>
+
+
+<p>As we’ll see in <a href="#function-libraries">Function Libraries</a>,
+separating function declarations from implementations is really more useful for
+organizing large frameworks.</p>
+
+
+<h2 id="the-static-keyword">The Static Keyword</h2>
+
+<p>The <code>static</code> keyword lets you alter the availability of a
+function or variable. Unfortunately, it has different effects depending on
+where you use it. This section explains two common use cases for the
+<code>static</code> keyword.</p>
+
+
+<h3 id="static-functions">Static Functions</h3>
+
+<p>By default, all functions have a global scope. This means that as soon as
+you define a function in one file, it’s immediately available everywhere
+else. The <code>static</code> specifier lets you limit the function’s
+scope to the current file, which is useful for creating “private”
+functions and avoiding naming conflicts.</p>
+
+<figure>
+    <img style="max-width: 290px" src="media/functions/static-functions.png">
+    <figcaption>Globally-scoped functions vs. statically-scoped
+    functions</figcaption>
+</figure>
+
+<p>The following example shows you how to create a static function. If you were
+to add this code to another file (e.g., a dedicated function library), you
+would not be able to access <code>getRandomInteger()</code> from
+<code>main.m</code>. Note that the <code>static</code> keyword should be used
+on both the function declaration and implementation.</p>
+
+<pre><code class="c1">// Static function declaration</code>
+<code class="kt">static</code> <code class="kt">int</code> <code class="nf">getRandomInteger</code><code class="p">(</code><code class="kt">int</code><code class="p">,</code> <code class="kt">int</code><code class="p">)</code><code class="o">;</code>
+
+<code class="c1">// Static function implementation</code>
+<code class="kt">static</code> <code class="kt">int</code> <code class="nf">getRandomInteger</code><code class="p">(</code><code class="kt">int</code> <code class="n">minimum</code><code class="p">,</code> <code class="kt">int</code> <code class="n">maximum</code><code class="p">)</code> <code class="p">{</code>
+    <code class="k">return</code> <code class="nb">arc4random_uniform</code><code class="p">((</code><code class="n">maximum</code> <code class="o">-</code> <code class="n">minimum</code><code class="p">)</code> <code class="o">+</code> <code class="mi">1</code><code class="p">)</code> <code class="o">+</code> <code class="n">minimum</code><code class="p">;</code>
+<code class="p">}</code>
+</pre>
+
+
+
+<h3 id="static-local-variables">Static Local Variables</h3>
+
+<p>Variables declared inside of a function (also called <strong>automatic local
+variables</strong>) are reset each time the function is called. This is an
+intuitive default behavior, as the function behaves consistently regardless of
+how many times you call it. However, when you use the <code>static</code>
+modifier on a local variable, the function “remembers” its value
+across invocations.</p>
+
+<figure>
+    <img style="max-width: 520px" src="media/functions/static-local-variables.png">
+    <figcaption>Independent automatic variables vs. shared static
+    variables</figcaption>
+</figure>
+
+<p>For example, the <code>currentCount</code> variable in the following snippet
+never gets reset, so instead of storing the count in a variable inside of
+<code>main()</code>, we can let <code>countByTwo()</code> do the recording for
+us.</p>
+
+<pre><code class="c1">// main.m</code>
+<code class="cp">#import</code> <code class="l">&lt;Foundation/Foundation.h&gt;</code><code class="cp"></code>
+
+<code class="kt">int</code> <code class="nf">countByTwo</code><code class="p">()</code> <code class="p">{</code>
+    <code class="kt">static</code> <code class="kt">int</code> <code class="n">currentCount</code> <code class="o">=</code> <code class="mi">0</code><code class="p">;</code>
+    <code class="n">currentCount</code> <code class="o">+=</code> <code class="mi">2</code><code class="p">;</code>
+    <code class="k">return</code> <code class="n">currentCount</code><code class="p">;</code>
+<code class="p">}</code>
+
+<code class="kt">int</code> <code class="nf">main</code><code class="p">(</code><code class="kt">int</code> <code class="n">argc</code><code class="p">,</code> <code class="kt">const</code> <code class="kt">char</code> <code class="o">*</code> <code class="n">argv</code><code class="p">[])</code> <code class="p">{</code>
+    <code class="k">@autoreleasepool</code> <code class="p">{</code>
+        <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%d&quot;</code><code class="p">,</code> <code class="n">countByTwo</code><code class="p">());</code>    <code class="c1">// 2</code>
+        <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%d&quot;</code><code class="p">,</code> <code class="n">countByTwo</code><code class="p">());</code>    <code class="c1">// 4</code>
+        <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%d&quot;</code><code class="p">,</code> <code class="n">countByTwo</code><code class="p">());</code>    <code class="c1">// 6</code>
+    <code class="p">}</code>
+    <code class="k">return</code> <code class="mi">0</code><code class="p">;</code>
+<code class="p">}</code>
+</pre>
+
+
+<p>But, unlike the static functions discussed in the previous section, this use
+of the <code>static</code> keyword does <em>not</em> affect the scope of local
+variables. That is to say, local variables are still only accessible inside of
+the function itself.</p>
+
+
+<h2 id="function-libraries">Function Libraries</h2>
+
+<p>Objective-C doesn’t support namespaces, so to prevent naming
+collisions with other global functions, large frameworks need to prefix their
+functions (and classes) with a unique identifier. This is why you see built-in
+functions like <a href="https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Miscellaneous/Foundation_Functions/index.html#//apple_ref/c/func/NSMakeRange"><code>NSMakeRange()</code></a>
+and <a href="https://developer.apple.com/library/ios/documentation/GraphicsImaging/Reference/CGImage/index.html#//apple_ref/c/func/CGImageCreate"><code>CGImageCreate()</code></a>
+instead of just <code>makeRange()</code> and <code>imageCreate()</code>.</p>
+
+<p>When creating your own function libraries, you should declare functions in a
+dedicated header file and implement them in a separate implementation file
+(just like <a href="classes.html">Objective-C classes</a>). This lets files
+that use the library import the header without worrying about how its functions
+are implemented. For example, the header for a <code>CarUtilities</code>
+library might look something like the following:</p>
+
+<pre><code class="c1">// CarUtilities.h</code>
+<code class="cp">#import</code> <code class="l">&lt;Foundation/Foundation.h&gt;</code><code class="cp"></code>
+
+<code class="nb">NSString</code> <code class="o">*</code><code class="nf">CUGetRandomMake</code><code class="p">(</code><code class="nb">NSArray</code> <code class="o">*</code><code class="n">makes</code><code class="p">)</code><code class="o">;</code>
+<code class="nb">NSString</code> <code class="o">*</code><code class="nf">CUGetRandomModel</code><code class="p">(</code><code class="nb">NSArray</code> <code class="o">*</code><code class="n">models</code><code class="p">)</code><code class="o">;</code>
+<code class="nb">NSString</code> <code class="o">*</code><code class="nf">CUGetRandomMakeAndModel</code><code class="p">(</code><code class="nb">NSDictionary</code> <code class="o">*</code><code class="n">makesAndModels</code><code class="p">)</code><code class="o">;</code>
+</pre>
+
+
+<p>The corresponding implementation file defines what these functions actually
+do.  Since other files are not supposed to import the implementation, you can
+use the <code>static</code> specifier to create “private” functions
+for internal use by the library.</p>
+
+<pre><code class="c1">// CarUtilities.m</code>
+<code class="cp">#import</code> <code class="l">&quot;CarUtilities.h&quot;</code><code class="cp"></code>
+
+<code class="c1">// Private function declaration</code>
+<code class="kt">static</code> <code class="kt">id</code> <code class="nf">getRandomItemFromArray</code><code class="p">(</code><code class="nb">NSArray</code> <code class="o">*</code><code class="n">anArray</code><code class="p">)</code><code class="o">;</code>
+
+<code class="c1">// Public function implementations</code>
+<code class="nb">NSString</code> <code class="o">*</code><code class="nf">CUGetRandomMake</code><code class="p">(</code><code class="nb">NSArray</code> <code class="o">*</code><code class="n">makes</code><code class="p">)</code> <code class="p">{</code>
+    <code class="k">return</code> <code class="n">getRandomItemFromArray</code><code class="p">(</code><code class="n">makes</code><code class="p">);</code>
+<code class="p">}</code>
+<code class="nb">NSString</code> <code class="o">*</code><code class="nf">CUGetRandomModel</code><code class="p">(</code><code class="nb">NSArray</code> <code class="o">*</code><code class="n">models</code><code class="p">)</code> <code class="p">{</code>
+    <code class="k">return</code> <code class="n">getRandomItemFromArray</code><code class="p">(</code><code class="n">models</code><code class="p">);</code>
+<code class="p">}</code>
+<code class="nb">NSString</code> <code class="o">*</code><code class="nf">CUGetRandomMakeAndModel</code><code class="p">(</code><code class="nb">NSDictionary</code> <code class="o">*</code><code class="n">makesAndModels</code><code class="p">)</code> <code class="p">{</code>
+    <code class="nb">NSArray</code> <code class="o">*</code><code class="n">makes</code> <code class="o">=</code> <code class="p">[</code><code class="n">makesAndModels</code> <code class="nf">allKeys</code><code class="p">];</code>
+    <code class="nb">NSString</code> <code class="o">*</code><code class="n">randomMake</code> <code class="o">=</code> <code class="n">CUGetRandomMake</code><code class="p">(</code><code class="n">makes</code><code class="p">);</code>
+    <code class="nb">NSArray</code> <code class="o">*</code><code class="n">models</code> <code class="o">=</code> <code class="n">makesAndModels</code><code class="p">[</code><code class="n">randomMake</code><code class="p">];</code>
+    <code class="nb">NSString</code> <code class="o">*</code><code class="n">randomModel</code> <code class="o">=</code> <code class="n">CUGetRandomModel</code><code class="p">(</code><code class="n">models</code><code class="p">);</code>
+    <code class="k">return</code> <code class="p">[</code><code class="n">randomMake</code> <code class="nf">stringByAppendingFormat:</code><code class="s">@&quot; %@&quot;</code><code class="p">,</code> <code class="n">randomModel</code><code class="p">];</code>
+<code class="p">}</code>
+
+<code class="c1">// Private function implementation</code>
+<code class="kt">static</code> <code class="kt">id</code> <code class="nf">getRandomItemFromArray</code><code class="p">(</code><code class="nb">NSArray</code> <code class="o">*</code><code class="n">anArray</code><code class="p">)</code> <code class="p">{</code>
+    <code class="kt">int</code> <code class="n">maximum</code> <code class="o">=</code> <code class="p">(</code><code class="kt">int</code><code class="p">)[</code><code class="n">anArray</code> <code class="nf">count</code><code class="p">];</code>
+    <code class="kt">int</code> <code class="n">randomIndex</code> <code class="o">=</code> <code class="nb">arc4random_uniform</code><code class="p">(</code><code class="n">maximum</code><code class="p">);</code>
+    <code class="k">return</code> <code class="n">anArray</code><code class="p">[</code><code class="n">randomIndex</code><code class="p">];</code>
+<code class="p">}</code>
+</pre>
+
+
+<p>Now, <code>main.m</code> can import the header and call the functions as if
+they were defined in the same file. Also notice that trying to call the static
+<code>getRandomItemFromArray()</code> function from <code>main.m</code> results
+in a compiler error.</p>
+
+<pre><code class="c1">// main.m</code>
+<code class="cp">#import</code> <code class="l">&lt;Foundation/Foundation.h&gt;</code><code class="cp"></code>
+<code class="cp">#import</code> <code class="l">&quot;CarUtilities.h&quot;</code><code class="cp"></code>
+
+<code class="kt">int</code> <code class="nf">main</code><code class="p">(</code><code class="kt">int</code> <code class="n">argc</code><code class="p">,</code> <code class="kt">const</code> <code class="kt">char</code> <code class="o">*</code> <code class="n">argv</code><code class="p">[])</code> <code class="p">{</code>
+    <code class="k">@autoreleasepool</code> <code class="p">{</code>
+        <code class="nb">NSDictionary</code> <code class="o">*</code><code class="n">makesAndModels</code> <code class="o">=</code> <code class="p">@{</code>
+            <code class="s">@&quot;Ford&quot;</code><code class="o">:</code> <code class="p">@[</code><code class="s">@&quot;Explorer&quot;</code><code class="p">,</code> <code class="s">@&quot;F-150&quot;</code><code class="p">],</code>
+            <code class="s">@&quot;Honda&quot;</code><code class="o">:</code> <code class="p">@[</code><code class="s">@&quot;Accord&quot;</code><code class="p">,</code> <code class="s">@&quot;Civic&quot;</code><code class="p">,</code> <code class="s">@&quot;Pilot&quot;</code><code class="p">],</code>
+            <code class="s">@&quot;Nissan&quot;</code><code class="o">:</code> <code class="p">@[</code><code class="s">@&quot;370Z&quot;</code><code class="p">,</code> <code class="s">@&quot;Altima&quot;</code><code class="p">,</code> <code class="s">@&quot;Versa&quot;</code><code class="p">],</code>
+            <code class="s">@&quot;Porsche&quot;</code><code class="o">:</code> <code class="p">@[</code><code class="s">@&quot;911 Turbo&quot;</code><code class="p">,</code> <code class="s">@&quot;Boxster&quot;</code><code class="p">,</code> <code class="s">@&quot;Cayman S&quot;</code><code class="p">]</code>
+        <code class="p">};</code>
+        <code class="nb">NSString</code> <code class="o">*</code><code class="n">randomCar</code> <code class="o">=</code> <code class="n">CUGetRandomMakeAndModel</code><code class="p">(</code><code class="n">makesAndModels</code><code class="p">);</code>
+        <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;Selected a %@&quot;</code><code class="p">,</code> <code class="n">randomCar</code><code class="p">)</code><code class="o">;</code>
+    <code class="p">}</code>
+    <code class="k">return</code> <code class="mi">0</code><code class="p">;</code>
+<code class="p">}</code>
+</pre>
+
+
+
+<h2 id="summary">Summary</h2>
+
+<p>This module finished up our introduction to the C programming language with
+an in-depth look at functions. We learned how to declare and implement
+functions, change their scope, make them remember local variables, and organize
+large function libraries.</p>
+
+<p>While most of the functionality behind the Cocoa and Cocoa Touch frameworks
+is encapsulated as Objective-C classes, there’s no shortage of built-in
+functions. The ones you’re most likely to encounter in the real world are
+utility functions like <code>NSLog()</code> and convenience functions like
+<code>NSMakeRect()</code> that create and configure complex objects using a
+friendlier API.</p>
+
+<p>We’re now ready to start tackling the object-oriented aspects of
+Objective-C. In the next module, we’ll learn how to define classes,
+instantiate objects, set properties, and call methods.</p>
+
+<div class="divider" style="margin-top: 2em; margin-bottom: 1.3em;"></div><table class="icon-and-text advert"><tr>
+<td><a href="http://rypress.com/tutorials/cocoa"><img src="media/advert-image.png" width="120px" height="165px" class="cover"></a></td>
+<td><p id="advert-text">Be sure to check out <a href="http://rypress.com/tutorials/cocoa">Ry’s Cocoa Tutorial</a>. This
+brand new guide is a complete walkthrough of Mac App development, and it
+leverages all of the Objective-C skills that we just discussed. <a href="http://rypress.com/tutorials/cocoa">Learn more ›</a></p></td>
+</tr></table>
+<div id='mailing-list'>
+
+<div class='divider' style='margin: 1.8em -22px;'></div>
+
+<h3>Mailing List</h3>
+
+<p>Sign up for my low-volume mailing list to find out when new content is
+released. Next up is a comprehensive <a
+href='https://developer.apple.com/swift/'>Swift</a> tutorial planned for late
+January.</p>
+
+<form id='mailing-list-form'
+	  action='/secure/mailing-list/request-add' method='get'>
+<label>
+	<div class='label'>Email Address:</div>
+	<div class='input'>
+	<input name='email'
+		   style='width: 200px;'
+		   type='email' />
+	</div>
+</label>
+
+<input id='mailing-list-button'
+	   class='button'
+	   style='margin-top: .5em;'
+	   type='submit' value='Subscribe'/>
+
+</form>
+
+<div style='clear: both'></div>
+
+<p class='fine-print'>You&rsquo;ll only receive emails when new tutorials are
+released, and your contact information will never be shared with third
+parties. <a href='/secure/mailing-list/unsubscribe'>Click here</a> to
+unsubscribe.</p>
+
+</div>
+
+
+<div class='divider'></div>
+
+<footer id='footer' class='fine-print'>
+  <ul>
+  	<li><a href='/licensing.php'>&copy; 2012-2014</a></li>
+	<li><a href='/'>RyPress.com</a></li>
+	<li>
+		<a href='/licensing.php'>All Rights Reserved</a>
+	</li>
+	<li>
+		<a href='/tos.php'>Terms&nbsp;of&nbsp;Service</a>
+	</li>
+	<li>
+		<a href='/privacy.php'>Privacy Policy</a>
+	</li>
+  </ul>
+</footer>
+
+</div>		<!-- .content -->
+</div>		<!-- .page -->
+</body>
+</html>

@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+  <title>NSNumber - Ry’s Objective-C Tutorial - RyPress</title>
+  <meta charset='UTF-8' />
+  <meta name='description' content="The NSNumber class is a lightweight, object-oriented wrapper
+around C’s numeric primitives. It’s main job is to store and
+retrieve primitive values, and it comes with dedicated methods for each data
+type:" />
+  <meta name='viewport'
+  	    content='width=device-width, initial-scale=1.0, maximum-scale=1.0' />
+  <link rel="icon" type="image/png" href="/media/favicon.png" />
+  <link rel="stylesheet" href="/media/style.css" />
+  <link rel="stylesheet" href="/media/pygments.css" />
+
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  
+    ga('create', 'UA-37121774-2', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+  
+</head>
+<body>
+
+<div id='page'>
+
+<div id='content'>
+
+<nav id='main-nav'>
+	<a href='/'><img src='/media/logo-small.png'
+		 width='120px'
+		 alt='RyPress - Quality Software Tutorials'/></a>
+	<ul>
+	<li><a href='/'>Tutorials</a></li>
+	<li><a href='/secure/purchases.php'>Purchases</a></li>
+	<li><a href='/about.php'>About</a></li>
+	</ul>
+</nav>
+
+<div class='divider'></div>
+<table class="icon-and-text"><tr>
+<td><a href="../index"><img src="../media/icons/index.png" width="40px" height="40px"></a></td>
+<td><p>You’re
+
+			
+					reading
+				<a href="../index"><em>Ry’s Objective-C Tutorial</em></a>
+				→
+				
+				<a href="index"><em>Data Types</em></a></p></td>
+</tr></table><div class="divider"></div>
+
+<h1 id="nsnumber">NSNumber</h1>
+
+<p>The <code>NSNumber</code> class is a lightweight, object-oriented wrapper
+around C’s numeric primitives. It’s main job is to store and
+retrieve primitive values, and it comes with dedicated methods for each data
+type:</p>
+
+<pre><code class="nb">NSNumber</code> <code class="o">*</code><code class="n">aBool</code> <code class="o">=</code> <code class="p">[</code><code class="nb">NSNumber</code> <code class="nf">numberWithBool:</code><code class="kc">NO</code><code class="p">];</code>
+<code class="nb">NSNumber</code> <code class="o">*</code><code class="n">aChar</code> <code class="o">=</code> <code class="p">[</code><code class="nb">NSNumber</code> <code class="nf">numberWithChar:</code><code class="sc">&#39;z&#39;</code><code class="p">];</code>
+<code class="nb">NSNumber</code> <code class="o">*</code><code class="n">aUChar</code> <code class="o">=</code> <code class="p">[</code><code class="nb">NSNumber</code> <code class="nf">numberWithUnsignedChar:</code><code class="mi">255</code><code class="p">];</code>
+<code class="nb">NSNumber</code> <code class="o">*</code><code class="n">aShort</code> <code class="o">=</code> <code class="p">[</code><code class="nb">NSNumber</code> <code class="nf">numberWithShort:</code><code class="mi">32767</code><code class="p">];</code>
+<code class="nb">NSNumber</code> <code class="o">*</code><code class="n">aUShort</code> <code class="o">=</code> <code class="p">[</code><code class="nb">NSNumber</code> <code class="nf">numberWithUnsignedShort:</code><code class="mi">65535</code><code class="p">];</code>
+<code class="nb">NSNumber</code> <code class="o">*</code><code class="n">anInt</code> <code class="o">=</code> <code class="p">[</code><code class="nb">NSNumber</code> <code class="nf">numberWithInt:</code><code class="mi">2147483647</code><code class="p">];</code>
+<code class="nb">NSNumber</code> <code class="o">*</code><code class="n">aUInt</code> <code class="o">=</code> <code class="p">[</code><code class="nb">NSNumber</code> <code class="nf">numberWithUnsignedInt:</code><code class="mi">4294967295</code><code class="p">];</code>
+<code class="nb">NSNumber</code> <code class="o">*</code><code class="n">aLong</code> <code class="o">=</code> <code class="p">[</code><code class="nb">NSNumber</code> <code class="nf">numberWithLong:</code><code class="mi">9223372036854775807</code><code class="p">];</code>
+<code class="nb">NSNumber</code> <code class="o">*</code><code class="n">aULong</code> <code class="o">=</code> <code class="p">[</code><code class="nb">NSNumber</code> <code class="nf">numberWithUnsignedLong:</code><code class="mi">18446744073709551615</code><code class="p">];</code>
+<code class="nb">NSNumber</code> <code class="o">*</code><code class="n">aFloat</code> <code class="o">=</code> <code class="p">[</code><code class="nb">NSNumber</code> <code class="nf">numberWithFloat:</code><code class="mf">26.99f</code><code class="p">];</code>
+<code class="nb">NSNumber</code> <code class="o">*</code><code class="n">aDouble</code> <code class="o">=</code> <code class="p">[</code><code class="nb">NSNumber</code> <code class="nf">numberWithDouble:</code><code class="mf">26.99</code><code class="p">];</code>
+
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%@&quot;</code><code class="p">,</code> <code class="p">[</code><code class="n">aBool</code> <code class="nf">boolValue</code><code class="p">]</code> <code class="o">?</code> <code class="s">@&quot;YES&quot;</code> <code class="o">:</code> <code class="s">@&quot;NO&quot;</code><code class="p">)</code><code class="o">;</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%c&quot;</code><code class="p">,</code> <code class="p">[</code><code class="n">aChar</code> <code class="nf">charValue</code><code class="p">])</code><code class="o">;</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%hhu&quot;</code><code class="p">,</code> <code class="p">[</code><code class="n">aUChar</code> <code class="nf">unsignedCharValue</code><code class="p">])</code><code class="o">;</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%hi&quot;</code><code class="p">,</code> <code class="p">[</code><code class="n">aShort</code> <code class="nf">shortValue</code><code class="p">])</code><code class="o">;</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%hu&quot;</code><code class="p">,</code> <code class="p">[</code><code class="n">aUShort</code> <code class="nf">unsignedShortValue</code><code class="p">])</code><code class="o">;</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%i&quot;</code><code class="p">,</code> <code class="p">[</code><code class="n">anInt</code> <code class="nf">intValue</code><code class="p">])</code><code class="o">;</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%u&quot;</code><code class="p">,</code> <code class="p">[</code><code class="n">aUInt</code> <code class="nf">unsignedIntValue</code><code class="p">])</code><code class="o">;</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%li&quot;</code><code class="p">,</code> <code class="p">[</code><code class="n">aLong</code> <code class="nf">longValue</code><code class="p">])</code><code class="o">;</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%lu&quot;</code><code class="p">,</code> <code class="p">[</code><code class="n">aULong</code> <code class="nf">unsignedLongValue</code><code class="p">])</code><code class="o">;</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%f&quot;</code><code class="p">,</code> <code class="p">[</code><code class="n">aFloat</code> <code class="nf">floatValue</code><code class="p">])</code><code class="o">;</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%f&quot;</code><code class="p">,</code> <code class="p">[</code><code class="n">aDouble</code> <code class="nf">doubleValue</code><code class="p">])</code><code class="o">;</code>
+</pre>
+
+
+<p>It may seem redundant to have an object-oriented version of all the C
+primitives, but it’s necessary if you want to store numeric values in an
+<a href="nsarray.html"><code>NSArray</code></a>, <a href="nsdictionary.html"><code>NSDictionary</code></a>, or any of the other Foundation
+Framework collections. These classes require all of their elements to be
+objects—they do not know how to interact with primitive values. In
+addition, <code>NSNumber</code> makes it possible to pass numbers to methods
+like <code>performSelector:withObject:</code>, as discussed in <a href="../methods.html#selectors">Selectors</a>.</p>
+
+<p>But, aside from the object-oriented interface, there are a few perks to
+using <code>NSNumber</code>. For one, it provides a straightforward way to
+convert between primitive data types or get an <code>NSString</code>
+representation of the value:</p>
+
+<pre><code class="nb">NSNumber</code> <code class="o">*</code><code class="n">anInt</code> <code class="o">=</code> <code class="p">[</code><code class="nb">NSNumber</code> <code class="nf">numberWithInt:</code><code class="mi">42</code><code class="p">];</code>
+<code class="kt">float</code> <code class="n">asFloat</code> <code class="o">=</code> <code class="p">[</code><code class="n">anInt</code> <code class="nf">floatValue</code><code class="p">];</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%.2f&quot;</code><code class="p">,</code> <code class="n">asFloat</code><code class="p">)</code><code class="o">;</code>
+<code class="nb">NSString</code> <code class="o">*</code><code class="n">asString</code> <code class="o">=</code> <code class="p">[</code><code class="n">anInt</code> <code class="nf">stringValue</code><code class="p">];</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%@&quot;</code><code class="p">,</code> <code class="n">asString</code><code class="p">)</code><code class="o">;</code>
+</pre>
+
+
+<p>And, like all Objective-C objects, <code>NSNumber</code> can be displayed
+with the <code>%@</code> format specifier, which means that you can forget
+about all of the C-style specifiers introduced in the <a href="primitives.html">Primitives</a> module. This makes life a tiny bit easier
+when trying to debug values:</p>
+
+<pre><code class="nb">NSNumber</code> <code class="o">*</code><code class="n">aUChar</code> <code class="o">=</code> <code class="p">[</code><code class="nb">NSNumber</code> <code class="nf">numberWithUnsignedChar:</code><code class="mi">255</code><code class="p">];</code>
+<code class="nb">NSNumber</code> <code class="o">*</code><code class="n">anInt</code> <code class="o">=</code> <code class="p">[</code><code class="nb">NSNumber</code> <code class="nf">numberWithInt:</code><code class="mi">2147483647</code><code class="p">];</code>
+<code class="nb">NSNumber</code> <code class="o">*</code><code class="n">aFloat</code> <code class="o">=</code> <code class="p">[</code><code class="nb">NSNumber</code> <code class="nf">numberWithFloat:</code><code class="mf">26.99f</code><code class="p">];</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%@&quot;</code><code class="p">,</code> <code class="n">aUChar</code><code class="p">)</code><code class="o">;</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%@&quot;</code><code class="p">,</code> <code class="n">anInt</code><code class="p">)</code><code class="o">;</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%@&quot;</code><code class="p">,</code> <code class="n">aFloat</code><code class="p">)</code><code class="o">;</code>
+</pre>
+
+
+
+<h2 id="numeric-literals">Numeric Literals</h2>
+
+<p>Xcode 4.4 introduced numeric literals, which offer a much more convenient
+alternative to the above factory methods. The <code>NSNumber</code> version of
+<code>BOOL</code>’s, <code>char</code>’s, <code>int</code>’s
+and <code>double</code>’s can all be created by simply prefixing the
+corresponding primitive type with the <code>@</code> symbol; however,
+<code>unsigned int</code>’s, <code>long</code>’s, and
+<code>float</code>’s must be appended with the <code>U</code>,
+<code>L</code>, or <code>F</code> modifiers, as shown below.</p>
+
+<pre><code class="nb">NSNumber</code> <code class="o">*</code><code class="n">aBool</code> <code class="o">=</code> <code class="kc">@NO</code><code class="p">;</code>
+<code class="nb">NSNumber</code> <code class="o">*</code><code class="n">aChar</code> <code class="o">=</code> <code class="sc">@&#39;z&#39;</code><code class="p">;</code>
+<code class="nb">NSNumber</code> <code class="o">*</code><code class="n">anInt</code> <code class="o">=</code> <code class="m">@2147483647</code><code class="p">;</code>
+<code class="nb">NSNumber</code> <code class="o">*</code><code class="n">aUInt</code> <code class="o">=</code> <code class="m">@4294967295</code><code class="n">U</code><code class="p">;</code>
+<code class="nb">NSNumber</code> <code class="o">*</code><code class="n">aLong</code> <code class="o">=</code> <code class="m">@9223372036854775807</code><code class="n">L</code><code class="p">;</code>
+<code class="nb">NSNumber</code> <code class="o">*</code><code class="n">aFloat</code> <code class="o">=</code> <code class="m">@26</code><code class="mf">.99F</code><code class="p">;</code>
+<code class="nb">NSNumber</code> <code class="o">*</code><code class="n">aDouble</code> <code class="o">=</code> <code class="m">@26</code><code class="mf">.99</code><code class="p">;</code>
+</pre>
+
+
+<p>In addition to literal values, it’s possible to box arbitrary C
+expressions using the <code>@()</code> syntax. This makes it trivial to turn basic
+arithmetic calculations into <code>NSNumber</code> objects:</p>
+
+<pre><code class="kt">double</code> <code class="n">x</code> <code class="o">=</code> <code class="mf">24.0</code><code class="p">;</code>
+<code class="nb">NSNumber</code> <code class="o">*</code><code class="n">result</code> <code class="o">=</code> <code class="p">@(</code><code class="n">x</code> <code class="o">*</code> <code class="mf">.15</code><code class="p">);</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%.2f&quot;</code><code class="p">,</code> <code class="p">[</code><code class="n">result</code> <code class="nf">doubleValue</code><code class="p">])</code><code class="o">;</code>
+</pre>
+
+
+
+<h2 id="immutability">Immutability</h2>
+
+<p>It’s important to understand that <code>NSNumber</code> objects are
+immutable—it’s not possible to change its associated value after
+you create it. In this sense, an <code>NSNumber</code> instance acts exactly
+like a primitive value: When you need a new <code>double</code> value, you 
+create a new literal—you don’t change an existing one.</p>
+
+<p>From a practical standpoint, this means you need to create a new
+<code>NSNumber</code> object every time you change its value. For example, the
+following loop increments a <code>counter</code> object by adding to its
+primitive value, then re-boxing it into a new <code>NSNumber</code> and
+assigning it to the same variable.</p>
+
+<pre><code class="nb">NSNumber</code> <code class="o">*</code><code class="n">counter</code> <code class="o">=</code> <code class="m">@0</code><code class="p">;</code>
+<code class="k">for</code> <code class="p">(</code><code class="kt">int</code> <code class="n">i</code><code class="o">=</code><code class="mi">0</code><code class="p">;</code> <code class="n">i</code><code class="o">&lt;</code><code class="mi">10</code><code class="p">;</code> <code class="n">i</code><code class="o">++</code><code class="p">)</code> <code class="p">{</code>
+    <code class="n">counter</code> <code class="o">=</code> <code class="p">@([</code><code class="n">counter</code> <code class="nf">intValue</code><code class="p">]</code> <code class="o">+</code> <code class="mi">1</code><code class="p">);</code>
+    <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%@&quot;</code><code class="p">,</code> <code class="n">counter</code><code class="p">)</code><code class="o">;</code>
+<code class="p">}</code>
+</pre>
+
+
+<p>As you could probably imagine, this isn’t the most efficient way to
+work with numbers. In real applications, you should limit yourself to primitive
+numeric types for computationally intensive algorithms and wait as long as
+possible to store the result in an <code>NSNumber</code> container.</p>
+
+
+<h2 id="comparing-numbers">Comparing Numbers</h2>
+
+<p>While it’s possible to directly compare <code>NSNumber</code>
+pointers, the <code>isEqualToNumber:</code> method is a much more robust way to
+check for equality. It guarantees that two <em>values</em> will compare equal,
+even if they are stored in different <em>objects</em>. For example, the
+following snippet shows a common case of pointer comparison failure.</p>
+
+<pre><code class="nb">NSNumber</code> <code class="o">*</code><code class="n">anInt</code> <code class="o">=</code> <code class="m">@27</code><code class="p">;</code>
+<code class="nb">NSNumber</code> <code class="o">*</code><code class="n">sameInt</code> <code class="o">=</code> <code class="m">@27</code><code class="n">U</code><code class="p">;</code>
+<code class="c1">// Pointer comparison (fails)</code>
+<code class="k">if</code> <code class="p">(</code><code class="n">anInt</code> <code class="o">==</code> <code class="n">sameInt</code><code class="p">)</code> <code class="p">{</code>
+    <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;They are the same object&quot;</code><code class="p">);</code>
+<code class="p">}</code>
+<code class="c1">// Value comparison (succeeds)</code>
+<code class="k">if</code> <code class="p">([</code><code class="n">anInt</code> <code class="nf">isEqualToNumber:</code><code class="n">sameInt</code><code class="p">])</code> <code class="p">{</code>
+    <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;They are the same value&quot;</code><code class="p">);</code>
+<code class="p">}</code>
+</pre>
+
+
+<p>If you need to check for inequalities, you can use the related
+<code>compare:</code> method. Instead of a Boolean value, it returns an <a href="https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Miscellaneous/Foundation_Constants/Reference/reference.html#//apple_ref/c/tdef/NSComparisonResult"><code>NSComparisonResult</code></a>,
+which is an <code>enum</code> that defines the relationship between the
+operands:</p>
+
+<table>
+<thead>
+<tr>
+    <th>Return Value</th>
+    <th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+    <td><code>NSOrderedAscending</code></td>
+    <td>receiver <code>&lt;</code> argument</td>
+</tr>
+<tr>
+    <td><code>NSOrderedSame</code></td>
+    <td>receiver <code>==</code> argument</td>
+</tr>
+<tr>
+    <td><code>NSOrderedDescending</code></td>
+    <td>receiver <code>&gt;</code> argument</td>
+</tr>
+</tbody>
+</table>
+
+<p>The following example shows these enumerators in action.</p>
+
+<pre> <code class="nb">NSNumber</code> <code class="o">*</code><code class="n">anInt</code> <code class="o">=</code> <code class="m">@27</code><code class="p">;</code>
+<code class="nb">NSNumber</code> <code class="o">*</code><code class="n">anotherInt</code> <code class="o">=</code> <code class="m">@42</code><code class="p">;</code>
+<code class="nb">NSComparisonResult</code> <code class="n">result</code> <code class="o">=</code> <code class="p">[</code><code class="n">anInt</code> <code class="nf">compare:</code><code class="n">anotherInt</code><code class="p">];</code>
+<code class="k">if</code> <code class="p">(</code><code class="n">result</code> <code class="o">==</code> <code class="nb">NSOrderedAscending</code><code class="p">)</code> <code class="p">{</code>
+    <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;27 &lt; 42&quot;</code><code class="p">);</code>
+<code class="p">}</code> <code class="k">else</code> <code class="k">if</code> <code class="p">(</code><code class="n">result</code> <code class="o">==</code> <code class="nb">NSOrderedSame</code><code class="p">)</code> <code class="p">{</code>
+    <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;27 == 42&quot;</code><code class="p">);</code>
+<code class="p">}</code> <code class="k">else</code> <code class="k">if</code> <code class="p">(</code><code class="n">result</code> <code class="o">==</code> <code class="nb">NSOrderedDescending</code><code class="p">)</code> <code class="p">{</code>
+    <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;27 &gt; 42&quot;</code><code class="p">);</code>
+<code class="p">}</code>
+</pre>
+
+
+<p>This kind of object-oriented comparison may not be as convenient as the
+familiar <code>&lt;</code>, <code>==</code>, and <code>&gt;</code> operators,
+but abstracting them into methods affords a lot more flexibility to the
+Foundation Framework classes.</p>
+
+<div class="divider" style="margin-top: 2em; margin-bottom: 1.3em;"></div><table class="icon-and-text advert"><tr>
+<td><a href="http://rypress.com/tutorials/cocoa"><img src="../media/advert-image.png" width="120px" height="165px" class="cover"></a></td>
+<td><p id="advert-text">Be sure to check out <a href="http://rypress.com/tutorials/cocoa">Ry’s Cocoa Tutorial</a>. This
+brand new guide is a complete walkthrough of Mac App development, and it
+leverages all of the Objective-C skills that we just discussed. <a href="http://rypress.com/tutorials/cocoa">Learn more ›</a></p></td>
+</tr></table>
+<div id='mailing-list'>
+
+<div class='divider' style='margin: 1.8em -22px;'></div>
+
+<h3>Mailing List</h3>
+
+<p>Sign up for my low-volume mailing list to find out when new content is
+released. Next up is a comprehensive <a
+href='https://developer.apple.com/swift/'>Swift</a> tutorial planned for late
+January.</p>
+
+<form id='mailing-list-form'
+	  action='/secure/mailing-list/request-add' method='get'>
+<label>
+	<div class='label'>Email Address:</div>
+	<div class='input'>
+	<input name='email'
+		   style='width: 200px;'
+		   type='email' />
+	</div>
+</label>
+
+<input id='mailing-list-button'
+	   class='button'
+	   style='margin-top: .5em;'
+	   type='submit' value='Subscribe'/>
+
+</form>
+
+<div style='clear: both'></div>
+
+<p class='fine-print'>You&rsquo;ll only receive emails when new tutorials are
+released, and your contact information will never be shared with third
+parties. <a href='/secure/mailing-list/unsubscribe'>Click here</a> to
+unsubscribe.</p>
+
+</div>
+
+
+<div class='divider'></div>
+
+<footer id='footer' class='fine-print'>
+  <ul>
+  	<li><a href='/licensing.php'>&copy; 2012-2014</a></li>
+	<li><a href='/'>RyPress.com</a></li>
+	<li>
+		<a href='/licensing.php'>All Rights Reserved</a>
+	</li>
+	<li>
+		<a href='/tos.php'>Terms&nbsp;of&nbsp;Service</a>
+	</li>
+	<li>
+		<a href='/privacy.php'>Privacy Policy</a>
+	</li>
+  </ul>
+</footer>
+
+</div>		<!-- .content -->
+</div>		<!-- .page -->
+</body>
+</html>

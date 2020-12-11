@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<title>Methods - Ry’s Objective-C Tutorial - RyPress</title>
+<meta charset='UTF-8'/>
+<meta name='description' content="Methods represent the actions that an object knows how to perform.
+They’re the logical counterpart to properties, which represent an
+object’s data. You can think of methods as functions that are attached to
+an object; however, they have a very different syntax."/>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'/>
+<link rel="icon" type="image/png" href="/media/favicon.png"/>
+<link rel="stylesheet" href="/media/style.css"/>
+<link rel="stylesheet" href="/media/pygments.css"/>
+<script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  
+    ga('create', 'UA-37121774-2', 'auto');
+    ga('send', 'pageview');
+  </script>
+</head>
+<body>
+<div id='page'>
+<div id='banner'>
+<a href='/tutorials/cocoa/index'>Ry&rsquo;s Cocoa Tutorial</a> is now only $10.
+Happy Holidays! <span style='font-size: .8em'>(Offer extended to Jan 31st, 2016)</span>
+</div>
+<div id='content'>
+<nav id='main-nav'>
+<a href='/'><img src='/media/logo-small.png' width='120px' alt='RyPress - Quality Software Tutorials'/></a>
+<ul>
+<li><a href='/'>Tutorials</a></li>
+<li><a href='/secure/purchases.php'>Purchases</a></li>
+<li><a href='/about.php'>About</a></li>
+</ul>
+</nav>
+<div class='divider'></div>
+<table class="icon-and-text"><tr>
+<td><a href="index"><img src="media/icons/index.png" width="40px" height="40px"></a></td>
+<td><p>You’re
+reading
+<a href="index"><em>Ry’s Objective-C Tutorial</em></a></p></td>
+</tr></table><div class="divider"></div>
+<h1 id="methods">Methods</h1>
+<p>Methods represent the actions that an object knows how to perform.
+They’re the logical counterpart to properties, which represent an
+object’s data. You can think of methods as functions that are attached to
+an object; however, they have a very different syntax.</p>
+<p>In this module, we’ll explore Objective-C’s method naming
+conventions, which can be frustrating for experienced developers coming from
+C++, Java, Python, and similar languages. We’ll also briefly discuss
+Objective-C’s <a href="#protected-and-private-methods">access
+modifiers</a> (or lack thereof), and we’ll learn how to refer to methods
+using <a href="#selectors">selectors</a>.</p>
+<h2 id="naming-conventions">Naming Conventions</h2>
+<p>Objective-C methods are designed to remove all ambiguities from an API. As a
+result, method names are horribly verbose, but undeniably descriptive.
+Accomplishing this boils down to three simple rules for naming Objective-C
+methods:</p>
+<ol>
+<li>Don’t abbreviate anything.</li>
+<li>Explicitly state parameter names in the method itself.</li>
+<li>Explicitly describe the return value of the method.</li>
+</ol>
+<p>Keep these rules in mind as you read through the following exemplary
+interface for a <code>Car</code> class.</p>
+<pre><code class="c1">// Car.h</code>
+<code class="cp">#import</code> <code class="l">&lt;Foundation/Foundation.h&gt;</code><code class="cp"></code>
+
+<code class="k">@interface</code> <code class="nc">Car</code> : <code class="nc">NSObject</code>
+
+<code class="c1">// Accessors</code>
+<code class="k">-</code> <code class="p">(</code><code class="kt">BOOL</code><code class="p">)</code><code class="nf">isRunning</code><code class="p">;</code>
+<code class="k">-</code> <code class="p">(</code><code class="kt">void</code><code class="p">)</code><code class="nf">setRunning:</code><code class="p">(</code><code class="kt">BOOL</code><code class="p">)</code><code class="nv">running</code><code class="p">;</code>
+<code class="k">-</code> <code class="p">(</code><code class="nb">NSString</code> <code class="o">*</code><code class="p">)</code><code class="nf">model</code><code class="p">;</code>
+<code class="k">-</code> <code class="p">(</code><code class="kt">void</code><code class="p">)</code><code class="nf">setModel:</code><code class="p">(</code><code class="nb">NSString</code> <code class="o">*</code><code class="p">)</code><code class="nv">model</code><code class="p">;</code>
+
+<code class="c1">// Calculated values</code>
+<code class="k">-</code> <code class="p">(</code><code class="kt">double</code><code class="p">)</code><code class="nf">maximumSpeed</code><code class="p">;</code>
+<code class="k">-</code> <code class="p">(</code><code class="kt">double</code><code class="p">)</code><code class="nf">maximumSpeedUsingLocale:</code><code class="p">(</code><code class="nb">NSLocale</code> <code class="o">*</code><code class="p">)</code><code class="nv">locale</code><code class="p">;</code>
+
+<code class="c1">// Action methods</code>
+<code class="k">-</code> <code class="p">(</code><code class="kt">void</code><code class="p">)</code><code class="nf">startEngine</code><code class="p">;</code>
+<code class="k">-</code> <code class="p">(</code><code class="kt">void</code><code class="p">)</code><code class="nf">driveForDistance:</code><code class="p">(</code><code class="kt">double</code><code class="p">)</code><code class="nv">theDistance</code><code class="p">;</code>
+<code class="k">-</code> <code class="p">(</code><code class="kt">void</code><code class="p">)</code><code class="nf">driveFromOrigin:</code><code class="p">(</code><code class="kt">id</code><code class="p">)</code><code class="nv">theOrigin</code> <code class="nf">toDestination:</code><code class="p">(</code><code class="kt">id</code><code class="p">)</code><code class="nv">theDestination</code><code class="p">;</code>
+<code class="k">-</code> <code class="p">(</code><code class="kt">void</code><code class="p">)</code><code class="nf">turnByAngle:</code><code class="p">(</code><code class="kt">double</code><code class="p">)</code><code class="nv">theAngle</code><code class="p">;</code>
+<code class="k">-</code> <code class="p">(</code><code class="kt">void</code><code class="p">)</code><code class="nf">turnToAngle:</code><code class="p">(</code><code class="kt">double</code><code class="p">)</code><code class="nv">theAngle</code><code class="p">;</code>
+
+<code class="c1">// Error handling methods</code>
+<code class="k">-</code> <code class="p">(</code><code class="kt">BOOL</code><code class="p">)</code><code class="nf">loadPassenger:</code><code class="p">(</code><code class="kt">id</code><code class="p">)</code><code class="nv">aPassenger</code> <code class="nf">error:</code><code class="p">(</code><code class="nb">NSError</code> <code class="o">**</code><code class="p">)</code><code class="nv">error</code><code class="p">;</code>
+
+<code class="c1">// Constructor methods</code>
+<code class="k">-</code> <code class="p">(</code><code class="kt">id</code><code class="p">)</code><code class="nf">initWithModel:</code><code class="p">(</code><code class="nb">NSString</code> <code class="o">*</code><code class="p">)</code><code class="nv">aModel</code><code class="p">;</code>
+<code class="k">-</code> <code class="p">(</code><code class="kt">id</code><code class="p">)</code><code class="nf">initWithModel:</code><code class="p">(</code><code class="nb">NSString</code> <code class="o">*</code><code class="p">)</code><code class="nv">aModel</code> <code class="nf">mileage:</code><code class="p">(</code><code class="kt">double</code><code class="p">)</code><code class="nv">theMileage</code><code class="p">;</code>
+
+<code class="c1">// Comparison methods</code>
+<code class="k">-</code> <code class="p">(</code><code class="kt">BOOL</code><code class="p">)</code><code class="nf">isEqualToCar:</code><code class="p">(</code><code class="n">Car</code> <code class="o">*</code><code class="p">)</code><code class="nv">anotherCar</code><code class="p">;</code>
+<code class="k">-</code> <code class="p">(</code><code class="n">Car</code> <code class="o">*</code><code class="p">)</code><code class="nf">fasterCar:</code><code class="p">(</code><code class="n">Car</code> <code class="o">*</code><code class="p">)</code><code class="nv">anotherCar</code><code class="p">;</code>
+<code class="k">-</code> <code class="p">(</code><code class="n">Car</code> <code class="o">*</code><code class="p">)</code><code class="nf">slowerCar:</code><code class="p">(</code><code class="n">Car</code> <code class="o">*</code><code class="p">)</code><code class="nv">anotherCar</code><code class="p">;</code>
+
+<code class="c1">// Factory methods</code>
+<code class="k">+</code> <code class="p">(</code><code class="n">Car</code> <code class="o">*</code><code class="p">)</code><code class="nf">car</code><code class="p">;</code>
+<code class="k">+</code> <code class="p">(</code><code class="n">Car</code> <code class="o">*</code><code class="p">)</code><code class="nf">carWithModel:</code><code class="p">(</code><code class="nb">NSString</code> <code class="o">*</code><code class="p">)</code><code class="nv">aModel</code><code class="p">;</code>
+<code class="k">+</code> <code class="p">(</code><code class="n">Car</code> <code class="o">*</code><code class="p">)</code><code class="nf">carWithModel:</code><code class="p">(</code><code class="nb">NSString</code> <code class="o">*</code><code class="p">)</code><code class="nv">aModel</code> <code class="nf">mileage:</code><code class="p">(</code><code class="kt">double</code><code class="p">)</code><code class="nv">theMileage</code><code class="p">;</code>
+
+<code class="c1">// Singleton methods</code>
+<code class="k">+</code> <code class="p">(</code><code class="n">Car</code> <code class="o">*</code><code class="p">)</code><code class="nf">sharedCar</code><code class="p">;</code>
+
+<code class="k">@end</code>
+</pre>
+<h3 id="abbreviations">Abbreviations</h3>
+<p>The easiest way to make methods understandable and predictable is to simply
+avoid abbreviations. Most Objective-C programmer <em>expect</em> methods to be
+written out in full, as this is the convention for all of the standard
+frameworks, from <a href="https://developer.apple.com/library/mac/#documentation/Cocoa/Reference/Foundation/ObjC_classic/_index.html">Foundation</a>
+to <a href="http://developer.apple.com/library/ios/#documentation/uikit/reference/UIKit_Framework/_index.html">UIKit</a>.
+This is why the above interface chose <code>maximumSpeed</code> over the more
+concise <code>maxSpeed</code>.</p>
+<h3 id="parameters">Parameters</h3>
+<p>One of the clearest examples of Objective-C’s verbose design
+philosophy is in the naming conventions for method parameters. Whereas C++,
+Java, and other Simula-style languages treat a method as a separate entity
+from its parameters, an Objective-C method name actually contains the names of
+all its parameters.</p>
+<p>For example, to make a <code>Car</code> turn by 90 degrees in C++, you would
+call something like <code>turn(90)</code>. But, Objective-C finds this too
+ambiguous. It’s not clear what kind of argument <code>turn()</code>
+should take—it could be the new orientation, or it could be an angle by
+which to increment your current orientation. Objective-C methods make this
+explicit by describing the argument with a preposition. The resulting API
+ensures the method will never be misinterpreted: it’s either
+<code>turnByAngle:90</code> or <code>turnToAngle:90</code>.</p>
+<p>When a method accepts more than one parameter, the name of each argument is
+also included in the method name. For instance, the above
+<code>initWithModel:mileage:</code> method explicitly labels both the
+<code>Model</code> argument and the <code>mileage</code> argument. As
+we’ll see in a moment, this makes for very informative method
+invocations.</p>
+<h3 id="return-values">Return Values</h3>
+<p>You’ll also notice that any methods returning a value explicitly state
+what that value is. Sometimes this is as simple as stating the class of the
+return type, but other times you’ll need to prefix it with a descriptive
+adjective.</p>
+<p>For example, the factory methods start with <code>car</code>, which clearly
+states that the method will return an instance of the <code>Car</code> class.
+The comparison methods <code>fasterCar:</code> and <code>slowerCar:</code>
+return the faster/slower of the receiver and the argument, and this is also
+clearly expressed in the API. It’s worth noting that singleton methods
+should also follow this pattern (e.g., <code>sharedCar</code>), since the
+conventional <code>instance</code> method name is ambiguous.</p>
+<p>For more information about naming conventions, please visit the official <a href="https://developer.apple.com/library/mac/#documentation/Cocoa/Conceptual/CodingGuidelines/CodingGuidelines.html">Cocoa Coding
+Guidlines</a>.</p>
+<h2 id="calling-methods">Calling Methods</h2>
+<p>As discussed in the <a href="classes.html#instantiation-and-usage">Instantiation and Usage</a>
+section, you invoke a method by placing the object and the desired method in
+square brackets, separated by a space. Arguments are separated from the method
+name using a colon:</p>
+<pre><code class="p">[</code><code class="n">porsche</code> <code class="nf">initWithModel:</code><code class="s">@&quot;Porsche&quot;</code><code class="p">];</code>
+</pre>
+<p>When you have more than one parameter, it comes after the initial argument,
+following the same pattern. Each parameter is paired with a label, separated
+from other arguments by a space, and set off by a colon:</p>
+<pre><code class="p">[</code><code class="n">porsche</code> <code class="nf">initWithModel:</code><code class="s">@&quot;Porsche&quot;</code> <code class="nf">mileage:</code><code class="mf">42000.0</code><code class="p">];</code>
+</pre>
+<p>It’s a lot easier to see the purpose behind the above naming
+conventions when you approach it from an invocation perspective. They make
+method calls read more like a human language than a computer one. For example,
+compare the following method call from Simula-style languages to
+Objective-C’s version:</p>
+<pre><code class="c1">// Python/Java/C++</code>
+<code class="n">porsche</code><code class="p">.</code><code class="n">drive</code><code class="p">(</code><code class="s">&quot;Home&quot;</code><code class="p">,</code> <code class="s">&quot;Airport&quot;</code><code class="p">);</code>
+
+<code class="c1">// Objective-C</code>
+<code class="p">[</code><code class="n">porsche</code> <code class="nf">driveFromOrigin:</code><code class="s">@&quot;Home&quot;</code> <code class="nf">toDestination:</code><code class="s">@&quot;Airport&quot;</code><code class="p">];</code>
+</pre>
+<p>It might be more to type, but that’s why Xcode comes with such a nice
+auto-completion feature. You’ll appreciate the verbosity when you leave
+your code for a few months and come back to fix a bug. This clarity also makes
+it much easier to work with third-party libraries and to maintain large code
+bases.</p>
+<h3 id="nested-method-calls">Nested Method Calls</h3>
+<p>Nesting method calls is a common pattern in Objective-C programs. It’s
+a natural way to pass the result of one call to another. Conceptually,
+it’s the exact same as chaining methods, but the square-bracket syntax
+makes them look a little bit different:</p>
+<pre><code class="c1">// JavaScript</code>
+<code class="n">Car</code><code class="p">.</code><code class="n">alloc</code><code class="p">().</code><code class="n">init</code><code class="p">()</code>
+
+<code class="c1">// Objective-C</code>
+<code class="p">[[</code><code class="n">Car</code> <code class="nf">alloc</code><code class="p">]</code> <code class="nf">init</code><code class="p">];</code>
+</pre>
+<p>First, the <code>[Car alloc]</code> method is invoked, then the
+<code>init</code> method is called on its return value.</p>
+<h2 id="protected-and-private-methods">Protected and Private Methods</h2>
+<p>There are no protected or private access modifiers for Objective-C
+methods—they are all public. However, Objective-C does provide
+alternative organizational paradigms that let you <em>emulate</em> these
+features.</p>
+<p>“Private” methods can be created by defining them in a
+class’s implementation file while omitting them from its interface file.
+Since other objects (including subclasses) are never supposed to import the
+implementation, these methods are effectively hidden from everything but the
+class itself.</p>
+<p>In lieu of protected methods, Objective-C provides <a href="categories.html">categories</a>, which are a more general solution for
+isolating portions of an API. A full example can be found in <a href="categories.html#protected-methods">“Protected”
+Methods</a>.</p>
+<h2 id="selectors">Selectors</h2>
+<p>Selectors are Objective-C’s internal representation of a method name.
+They let you treat a method as an independent entity, enabling you to separate
+an action from the object that needs to perform it. This is the basis of the
+target-action design pattern, which is introduced in the <a href="http://rypress.com/tutorials/cocoa/interface-builder">Interface
+Builder</a> chapter of <a href="http://rypress.com/tutorials/cocoa">Ry’s
+Cocoa Tutorial</a>. It’s also an integral part of Objective-C’s
+dynamic typing system.</p>
+<p>There are two ways to get the selector for a method name. The
+<code>@selector()</code> directive lets you convert a source-code method name
+to a selector, and the <code>NSSelectorFromString()</code> function lets you
+convert a string to a selector (the latter is not as efficient). Both of these
+return a special data type for selectors called <code>SEL</code>. You can use
+<code>SEL</code> the exact same way as <code>BOOL</code>, <code>int</code>, or
+any other data type.</p>
+<pre><code class="c1">// main.m</code>
+<code class="cp">#import</code> <code class="l">&lt;Foundation/Foundation.h&gt;</code><code class="cp"></code>
+<code class="cp">#import</code> <code class="l">&quot;Car.h&quot;</code><code class="cp"></code>
+
+<code class="kt">int</code> <code class="nf">main</code><code class="p">(</code><code class="kt">int</code> <code class="n">argc</code><code class="p">,</code> <code class="kt">const</code> <code class="kt">char</code> <code class="o">*</code> <code class="n">argv</code><code class="p">[])</code> <code class="p">{</code>
+    <code class="k">@autoreleasepool</code> <code class="p">{</code>
+        <code class="n">Car</code> <code class="o">*</code><code class="n">porsche</code> <code class="o">=</code> <code class="p">[[</code><code class="n">Car</code> <code class="nf">alloc</code><code class="p">]</code> <code class="nf">init</code><code class="p">];</code>
+        <code class="n">porsche</code><code class="p">.</code><code class="n">model</code> <code class="o">=</code> <code class="s">@&quot;Porsche 911 Carrera&quot;</code><code class="p">;</code>
+        
+        <code class="kt">SEL</code> <code class="n">stepOne</code> <code class="o">=</code> <code class="nb">NSSelectorFromString</code><code class="p">(</code><code class="s">@&quot;startEngine&quot;</code><code class="p">);</code>
+        <code class="kt">SEL</code> <code class="n">stepTwo</code> <code class="o">=</code> <code class="k">@selector</code><code class="p">(</code><code class="nf">driveForDistance:</code><code class="p">);</code>
+        <code class="kt">SEL</code> <code class="n">stepThree</code> <code class="o">=</code> <code class="k">@selector</code><code class="p">(</code><code class="nf">turnByAngle:quickly:</code><code class="p">);</code>
+        
+        <code class="c1">// This is the same as:</code>
+        <code class="c1">// [porsche startEngine];</code>
+        <code class="p">[</code><code class="n">porsche</code> <code class="nf">performSelector:</code><code class="n">stepOne</code><code class="p">];</code>
+
+        <code class="c1">// This is the same as:</code>
+        <code class="c1">// [porsche driveForDistance:[NSNumber numberWithDouble:5.7]];</code>
+        <code class="p">[</code><code class="n">porsche</code> <code class="nf">performSelector:</code><code class="n">stepTwo</code>
+                      <code class="nf">withObject:</code><code class="p">[</code><code class="nb">NSNumber</code> <code class="nf">numberWithDouble:</code><code class="mf">5.7</code><code class="p">]];</code>
+        
+        <code class="k">if</code> <code class="p">([</code><code class="n">porsche</code> <code class="nf">respondsToSelector:</code><code class="n">stepThree</code><code class="p">])</code> <code class="p">{</code>
+            <code class="c1">// This is the same as:</code>
+            <code class="c1">// [porsche turnByAngle:[NSNumber numberWithDouble:90.0]</code>
+            <code class="c1">//              quickly:[NSNumber numberWithBool:YES]];</code>
+            <code class="p">[</code><code class="n">porsche</code> <code class="nf">performSelector:</code><code class="n">stepThree</code>
+                          <code class="nf">withObject:</code><code class="p">[</code><code class="nb">NSNumber</code> <code class="nf">numberWithDouble:</code><code class="mf">90.0</code><code class="p">]</code>
+                          <code class="nf">withObject:</code><code class="p">[</code><code class="nb">NSNumber</code> <code class="nf">numberWithBool:</code><code class="kc">YES</code><code class="p">]];</code>
+        <code class="p">}</code>
+        <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;Step one: %@&quot;</code><code class="p">,</code> <code class="nb">NSStringFromSelector</code><code class="p">(</code><code class="n">stepOne</code><code class="p">))</code><code class="o">;</code>
+    <code class="p">}</code>
+    <code class="k">return</code> <code class="mi">0</code><code class="p">;</code>
+<code class="p">}</code>
+</pre>
+<p>Selectors can be executed on an arbitrary object via
+<code>performSelector:</code> and related methods. The <code>withObject:</code>
+versions let you pass an argument (or two) to the method, but require those
+arguments to be objects. If this is too limiting for your needs, please see <a href="https://developer.apple.com/library/mac/#documentation/Cocoa/Reference/Foundation/Classes/NSInvocation_Class/Reference/Reference.html"><code>NSInvocation</code></a>
+for advanced usage. When you’re not sure if the target object defines the
+method, you should use the <code>respondsToSelector:</code> check before trying
+to perform the selector.</p>
+<p>The technical name for a method is the primary method name concatenated with
+all of its parameter labels, separated by colons. This makes colons an integral
+aspect of method names, which can be confusing to Objective-C beginners. Their
+usage can be summed up as follows: <em>parameterless methods never contain a
+colon, while methods that take a parameter always end in a colon</em>.</p>
+<p>A sample interface and implementation for the above <code>Car</code> class
+is included below. Notice how we have to use <a href="data-types/nsnumber.html"><code>NSNumber</code></a> instead of
+<code>double</code> for the parameter types, since the
+<code>performSelector:withObject:</code> method doesn’t let you pass
+primitive C data types.</p>
+<pre><code class="c1">// Car.h</code>
+<code class="cp">#import</code> <code class="l">&lt;Foundation/Foundation.h&gt;</code><code class="cp"></code>
+
+<code class="k">@interface</code> <code class="nc">Car</code> : <code class="nc">NSObject</code>
+
+<code class="k">@property</code> <code class="p">(</code><code class="k">copy</code><code class="p">)</code> <code class="nb">NSString</code> <code class="o">*</code><code class="n">model</code><code class="p">;</code>
+
+<code class="k">-</code> <code class="p">(</code><code class="kt">void</code><code class="p">)</code><code class="nf">startEngine</code><code class="p">;</code>
+<code class="k">-</code> <code class="p">(</code><code class="kt">void</code><code class="p">)</code><code class="nf">driveForDistance:</code><code class="p">(</code><code class="nb">NSNumber</code> <code class="o">*</code><code class="p">)</code><code class="nv">theDistance</code><code class="p">;</code>
+<code class="k">-</code> <code class="p">(</code><code class="kt">void</code><code class="p">)</code><code class="nf">turnByAngle:</code><code class="p">(</code><code class="nb">NSNumber</code> <code class="o">*</code><code class="p">)</code><code class="nv">theAngle</code>
+            <code class="nf">quickly:</code><code class="p">(</code><code class="nb">NSNumber</code> <code class="o">*</code><code class="p">)</code><code class="nv">useParkingBrake</code><code class="p">;</code>
+
+<code class="k">@end</code>
+</pre>
+<pre><code class="c1">// Car.m</code>
+<code class="cp">#import</code> <code class="l">&quot;Car.h&quot;</code><code class="cp"></code>
+
+<code class="k">@implementation</code> <code class="nc">Car</code>
+
+<code class="k">@synthesize</code> <code class="n">model</code> <code class="o">=</code> <code class="n">_model</code><code class="p">;</code>
+
+<code class="k">-</code> <code class="p">(</code><code class="kt">void</code><code class="p">)</code><code class="nf">startEngine</code> <code class="p">{</code>
+    <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;Starting the %@&#39;s engine&quot;</code><code class="p">,</code> <code class="n">_model</code><code class="p">);</code>
+<code class="p">}</code>
+
+<code class="k">-</code> <code class="p">(</code><code class="kt">void</code><code class="p">)</code><code class="nf">driveForDistance:</code><code class="p">(</code><code class="nb">NSNumber</code> <code class="o">*</code><code class="p">)</code><code class="nv">theDistance</code> <code class="p">{</code>
+    <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;The %@ just drove %0.1f miles&quot;</code><code class="p">,</code>
+          <code class="n">_model</code><code class="p">,</code> <code class="p">[</code><code class="n">theDistance</code> <code class="nf">doubleValue</code><code class="p">]);</code>
+<code class="p">}</code>
+
+<code class="k">-</code> <code class="p">(</code><code class="kt">void</code><code class="p">)</code><code class="nf">turnByAngle:</code><code class="p">(</code><code class="nb">NSNumber</code> <code class="o">*</code><code class="p">)</code><code class="nv">theAngle</code>
+            <code class="nf">quickly:</code><code class="p">(</code><code class="nb">NSNumber</code> <code class="o">*</code><code class="p">)</code><code class="nv">useParkingBrake</code> <code class="p">{</code>
+    <code class="k">if</code> <code class="p">([</code><code class="n">useParkingBrake</code> <code class="nf">boolValue</code><code class="p">])</code> <code class="p">{</code>
+        <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;The %@ is drifting around the corner!&quot;</code><code class="p">,</code> <code class="n">_model</code><code class="p">);</code>
+    <code class="p">}</code> <code class="k">else</code> <code class="p">{</code>
+        <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;The %@ is making a gentle %0.1f degree turn&quot;</code><code class="p">,</code>
+              <code class="n">_model</code><code class="p">,</code> <code class="p">[</code><code class="n">theAngle</code> <code class="nf">doubleValue</code><code class="p">]);</code>
+    <code class="p">}</code>
+<code class="p">}</code>
+
+<code class="k">@end</code>
+</pre>
+<h2 id="summary">Summary</h2>
+<p>This module explained the reasoning behind Objective-C’s method naming
+conventions. We also learned that there are no access modifiers for Objective-C
+methods, and how to use <code>@selector</code> to dynamically invoke
+methods.</p>
+<p>Adapting to new conventions can be a frustrating process, and the dramatic
+syntactic differences between Objective-C and other OOP languages won’t
+make your life any easier. Instead of forcing Objective-C into your existing
+mental model of the programming universe, it helps to approach it in its own
+right. Try designing a few simple programs before passing judgement on
+Objective-C’s verbose philosophy.</p>
+<p>That covers the basics of object-oriented programming in Objective-C. The
+rest of this tutorial explores more advanced ways to organize your code. First
+on the list are protocols, which let you share an API between several
+classes.</p>
+<div class="divider" style="margin-top: 2em; margin-bottom: 1.3em;"></div><table class="icon-and-text advert"><tr>
+<td><a href="http://rypress.com/tutorials/cocoa"><img src="media/advert-image.png" width="120px" height="165px" class="cover"></a></td>
+<td><p id="advert-text">Be sure to check out <a href="http://rypress.com/tutorials/cocoa">Ry’s Cocoa Tutorial</a>. This
+brand new guide is a complete walkthrough of Mac App development, and it
+leverages all of the Objective-C skills that we just discussed. <a href="http://rypress.com/tutorials/cocoa">Learn more ›</a></p></td>
+</tr></table>
+<div id='mailing-list'>
+<div class='divider' style='margin: 1.8em -22px;'></div>
+<h3>Mailing List</h3>
+<p>Sign up for my low-volume mailing list to find out when new content is
+released. Next up is a comprehensive <a href='https://developer.apple.com/swift/'>Swift</a> tutorial planned for late
+January.</p>
+<form id='mailing-list-form' action='/secure/mailing-list/request-add' method='get'>
+<label>
+<div class='label'>Email Address:</div>
+<div class='input'>
+<input name='email' style='width: 200px;' type='email'/>
+</div>
+</label>
+<input id='mailing-list-button' class='button' style='margin-top: .5em;' type='submit' value='Subscribe'/>
+</form>
+<div style='clear: both'></div>
+<p class='fine-print'>You&rsquo;ll only receive emails when new tutorials are
+released, and your contact information will never be shared with third
+parties. <a href='/secure/mailing-list/unsubscribe'>Click here</a> to
+unsubscribe.</p>
+</div>
+<div class='divider'></div>
+<footer id='footer' class='fine-print'>
+<ul>
+<li><a href='/licensing.php'>&copy; 2012-2014</a></li>
+<li><a href='/'>RyPress.com</a></li>
+<li>
+<a href='/licensing.php'>All Rights Reserved</a>
+</li>
+<li>
+<a href='/tos.php'>Terms&nbsp;of&nbsp;Service</a>
+</li>
+<li>
+<a href='/privacy.php'>Privacy Policy</a>
+</li>
+</ul>
+</footer>
+</div>  
+</div>  
+</body>
+</html>

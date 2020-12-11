@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<title>NSString - Ry’s Objective-C Tutorial - RyPress</title>
+<meta charset='UTF-8'/>
+<meta name='description' content="As we’ve already seen several times throughout this tutorial, the NSString
+class is the basic tool for representing text in an Objective-C application.
+Aside from providing an object-oriented wrapper for strings,
+NSString provides many powerful methods for searching and
+manipulating its contents. It also comes with native Unicode support."/>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'/>
+<link rel="icon" type="image/png" href="/media/favicon.png"/>
+<link rel="stylesheet" href="/media/style.css"/>
+<link rel="stylesheet" href="/media/pygments.css"/>
+<script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  
+    ga('create', 'UA-37121774-2', 'auto');
+    ga('send', 'pageview');
+  </script>
+</head>
+<body>
+<div id='page'>
+<div id='banner'>
+<a href='/tutorials/cocoa/index'>Ry&rsquo;s Cocoa Tutorial</a> is now only $10.
+Happy Holidays! <span style='font-size: .8em'>(Offer extended to Jan 31st, 2016)</span>
+</div>
+<div id='content'>
+<nav id='main-nav'>
+<a href='/'><img src='/media/logo-small.png' width='120px' alt='RyPress - Quality Software Tutorials'/></a>
+<ul>
+<li><a href='/'>Tutorials</a></li>
+<li><a href='/secure/purchases.php'>Purchases</a></li>
+<li><a href='/about.php'>About</a></li>
+</ul>
+</nav>
+<div class='divider'></div>
+<table class="icon-and-text"><tr>
+<td><a href="../index"><img src="../media/icons/index.png" width="40px" height="40px"></a></td>
+<td><p>You’re
+reading
+<a href="../index"><em>Ry’s Objective-C Tutorial</em></a>
+→
+<a href="index"><em>Data Types</em></a></p></td>
+</tr></table><div class="divider"></div>
+<h1 id="nsstring">NSString</h1>
+<p>As we’ve already seen several times throughout this tutorial, the <a href="https://developer.apple.com/library/mac/#documentation/Cocoa/Reference/Foundation/Classes/NSString_Class/Reference/NSString.html"><code>NSString</code></a>
+class is the basic tool for representing text in an Objective-C application.
+Aside from providing an object-oriented wrapper for strings,
+<code>NSString</code> provides many powerful methods for searching and
+manipulating its contents. It also comes with native Unicode support.</p>
+<p>Like <code>NSNumber</code> and <code>NSDecimalNumber</code>,
+<code>NSString</code> is an immutable type, so you cannot change it after
+it’s been instantiated. It does, however, have a mutable counterpart
+called <code>NSMutableString</code>, which will be discussed at the <a href="#nsmutablestring">end of this module</a>.</p>
+<h2 id="creating-strings">Creating Strings</h2>
+<p>The most common way to create strings is using the literal <code>@"Some
+String"</code> syntax, but the <code>stringWithFormat:</code> class method is
+also useful for generating strings that are composed of variable values. It
+takes the same kind of format string as <code>NSLog()</code>:</p>
+<pre><code class="nb">NSString</code> <code class="o">*</code><code class="n">make</code> <code class="o">=</code> <code class="s">@&quot;Porsche&quot;</code><code class="p">;</code>
+<code class="nb">NSString</code> <code class="o">*</code><code class="n">model</code> <code class="o">=</code> <code class="s">@&quot;911&quot;</code><code class="p">;</code>
+<code class="kt">int</code> <code class="n">year</code> <code class="o">=</code> <code class="mi">1968</code><code class="p">;</code>
+<code class="nb">NSString</code> <code class="o">*</code><code class="n">message</code> <code class="o">=</code> <code class="p">[</code><code class="nb">NSString</code> <code class="nf">stringWithFormat:</code><code class="s">@&quot;That&#39;s a %@ %@ from %d!&quot;</code><code class="p">,</code>
+                     <code class="n">make</code><code class="p">,</code> <code class="n">model</code><code class="p">,</code> <code class="n">year</code><code class="p">];</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%@&quot;</code><code class="p">,</code> <code class="n">message</code><code class="p">)</code><code class="o">;</code>
+</pre>
+<p>Notice that we used the <code>@"%@"</code> format specifier in the
+<code>NSLog()</code> call instead of passing the string directly with
+<code>NSLog(message)</code>. Using a literal for the first argument of
+<code>NSLog()</code> is a best practice, as it sidesteps potential bugs when
+the string you want to display contains <code>%</code> signs. Think about what
+would happen when <code>message = @"The tank is 50% full"</code>.</p>
+<p><code>NSString</code> provides built-in support for Unicode, which means
+that you can include UTF-8 characters directly in string literals. For
+example, you can paste the following into Xcode and use it the same way as any
+other <code>NSString</code> object.</p>
+<pre><code class="nb">NSString</code> <code class="o">*</code><code class="n">make</code> <code class="o">=</code> <code class="s">@&quot;Côte d&#39;Ivoire&quot;</code><code class="p">;</code>
+</pre>
+<h2 id="enumerating-strings">Enumerating Strings</h2>
+<p>The two most basic <code>NSString</code> methods are <code>length</code> and
+<code>characterAtIndex:</code>, which return the number of characters in the
+string and the character at a given index, respectively. You probably
+won’t have to use these methods unless you’re doing low-level
+string manipulation, but they’re still good to know:</p>
+<pre><code class="nb">NSString</code> <code class="o">*</code><code class="n">make</code> <code class="o">=</code> <code class="s">@&quot;Porsche&quot;</code><code class="p">;</code>
+<code class="k">for</code> <code class="p">(</code><code class="kt">int</code> <code class="n">i</code><code class="o">=</code><code class="mi">0</code><code class="p">;</code> <code class="n">i</code><code class="o">&lt;</code><code class="p">[</code><code class="n">make</code> <code class="nf">length</code><code class="p">];</code> <code class="n">i</code><code class="o">++</code><code class="p">)</code> <code class="p">{</code>
+    <code class="kt">unichar</code> <code class="n">letter</code> <code class="o">=</code> <code class="p">[</code><code class="n">make</code> <code class="nf">characterAtIndex:</code><code class="n">i</code><code class="p">];</code>
+    <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%d: %hu&quot;</code><code class="p">,</code> <code class="n">i</code><code class="p">,</code> <code class="n">letter</code><code class="p">)</code><code class="o">;</code>
+<code class="p">}</code>
+</pre>
+<p>As you can see, <code>characterAtIndex:</code> has a return type of
+<code>unichar</code>, which is a <a href="../c-basics.html#typedef"><code>typedef</code></a> for <code>unsigned
+short</code>. This value represents the Unicode decimal number for the
+character.</p>
+<h2 id="comparing-strings">Comparing Strings</h2>
+<p>String comparisons present the same issues as <code>NSNumber</code>
+comparisons. Instead of comparing <em>pointers</em> with the <code>==</code>
+operator, you should always use the <code>isEqualToString:</code> method for a
+more robust <em>value</em> comparison. The following example shows you how this
+works, along with the useful <code>hasPrefix:</code> and
+<code>hasSuffix:</code> methods for partial comparisons.</p>
+<pre><code class="nb">NSString</code> <code class="o">*</code><code class="n">car</code> <code class="o">=</code> <code class="s">@&quot;Porsche Boxster&quot;</code><code class="p">;</code>
+<code class="k">if</code> <code class="p">([</code><code class="n">car</code> <code class="nf">isEqualToString:</code><code class="s">@&quot;Porsche Boxster&quot;</code><code class="p">])</code> <code class="p">{</code>
+    <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;That car is a Porsche Boxster&quot;</code><code class="p">);</code>
+<code class="p">}</code>
+<code class="k">if</code> <code class="p">([</code><code class="n">car</code> <code class="nf">hasPrefix:</code><code class="s">@&quot;Porsche&quot;</code><code class="p">])</code> <code class="p">{</code>
+    <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;That car is a Porsche of some sort&quot;</code><code class="p">);</code>
+<code class="p">}</code>
+<code class="k">if</code> <code class="p">([</code><code class="n">car</code> <code class="nf">hasSuffix:</code><code class="s">@&quot;Carrera&quot;</code><code class="p">])</code> <code class="p">{</code>
+    <code class="c1">// This won&#39;t execute</code>
+    <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;That car is a Carrera&quot;</code><code class="p">);</code>
+<code class="p">}</code>
+</pre>
+<p>And, just like <code>NSNumber</code>, <code>NSString</code> has a
+<code>compare:</code> method that can be useful for alphabetically sorting
+strings:</p>
+<pre><code class="nb">NSString</code> <code class="o">*</code><code class="n">otherCar</code> <code class="o">=</code> <code class="s">@&quot;Ferrari&quot;</code><code class="p">;</code>
+<code class="nb">NSComparisonResult</code> <code class="n">result</code> <code class="o">=</code> <code class="p">[</code><code class="n">car</code> <code class="nf">compare:</code><code class="n">otherCar</code><code class="p">];</code>
+<code class="k">if</code> <code class="p">(</code><code class="n">result</code> <code class="o">==</code> <code class="nb">NSOrderedAscending</code><code class="p">)</code> <code class="p">{</code>
+    <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;The letter &#39;P&#39; comes before &#39;F&#39;&quot;</code><code class="p">);</code>
+<code class="p">}</code> <code class="k">else</code> <code class="k">if</code> <code class="p">(</code><code class="n">result</code> <code class="o">==</code> <code class="nb">NSOrderedSame</code><code class="p">)</code> <code class="p">{</code>
+    <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;We&#39;re comparing the same string&quot;</code><code class="p">);</code>
+<code class="p">}</code> <code class="k">else</code> <code class="k">if</code> <code class="p">(</code><code class="n">result</code> <code class="o">==</code> <code class="nb">NSOrderedDescending</code><code class="p">)</code> <code class="p">{</code>
+    <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;The letter &#39;P&#39; comes after &#39;F&#39;&quot;</code><code class="p">);</code>
+<code class="p">}</code>
+</pre>
+<p>Note that this is a case-sensitive comparison, so uppercase letters will
+always be <em>before</em> their lowercase counterparts. If you want to ignore
+case, you can use the related <code>caseInsensitiveCompare:</code> method.</p>
+<h2 id="combining-strings">Combining Strings</h2>
+<p>The two methods presented below are a way to concatenate
+<code>NSString</code> objects. But, remember that <code>NSString</code> is an
+immutable type, so these methods actually return a <em>new</em> string and
+leave the original arguments unchanged.</p>
+<pre><code class="nb">NSString</code> <code class="o">*</code><code class="n">make</code> <code class="o">=</code> <code class="s">@&quot;Ferrari&quot;</code><code class="p">;</code>
+<code class="nb">NSString</code> <code class="o">*</code><code class="n">model</code> <code class="o">=</code> <code class="s">@&quot;458 Spider&quot;</code><code class="p">;</code>
+<code class="nb">NSString</code> <code class="o">*</code><code class="n">car</code> <code class="o">=</code> <code class="p">[</code><code class="n">make</code> <code class="nf">stringByAppendingString:</code><code class="n">model</code><code class="p">];</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%@&quot;</code><code class="p">,</code> <code class="n">car</code><code class="p">)</code><code class="o">;</code>        <code class="c1">// Ferrari458 Spider</code>
+<code class="n">car</code> <code class="o">=</code> <code class="p">[</code><code class="n">make</code> <code class="nf">stringByAppendingFormat:</code><code class="s">@&quot; %@&quot;</code><code class="p">,</code> <code class="n">model</code><code class="p">];</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%@&quot;</code><code class="p">,</code> <code class="n">car</code><code class="p">)</code><code class="o">;</code>        <code class="c1">// Ferrari 458 Spider (note the space)</code>
+</pre>
+<h2 id="searching-strings">Searching Strings</h2>
+<p><code>NSString</code>’s search methods all return an
+<code>NSRange</code> struct, which defines a <code>location</code> and a
+<code>length</code> field. The <code>location</code> is the index of the
+beginning of the match, and the <code>length</code> is the number of characters
+in the match. If no match was found, <code>location</code> will contain
+<code>NSNotFound</code>. For example, the following snippet searches for the
+<code>Cabrio</code> substring.</p>
+<pre><code class="nb">NSString</code> <code class="o">*</code><code class="n">car</code> <code class="o">=</code> <code class="s">@&quot;Maserati GranCabrio&quot;</code><code class="p">;</code>
+<code class="nb">NSRange</code> <code class="n">searchResult</code> <code class="o">=</code> <code class="p">[</code><code class="n">car</code> <code class="nf">rangeOfString:</code><code class="s">@&quot;Cabrio&quot;</code><code class="p">];</code>
+<code class="k">if</code> <code class="p">(</code><code class="n">searchResult</code><code class="p">.</code><code class="n">location</code> <code class="o">==</code> <code class="nb">NSNotFound</code><code class="p">)</code> <code class="p">{</code>
+    <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;Search string was not found&quot;</code><code class="p">);</code>
+<code class="p">}</code> <code class="k">else</code> <code class="p">{</code>
+    <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;&#39;Cabrio&#39; starts at index %lu and is %lu characters long&quot;</code><code class="p">,</code>
+          <code class="n">searchResult</code><code class="p">.</code><code class="n">location</code><code class="p">,</code>        <code class="c1">// 13</code>
+          <code class="n">searchResult</code><code class="p">.</code><code class="n">length</code><code class="p">);</code>         <code class="c1">// 6</code>
+<code class="p">}</code>
+</pre>
+<p>The next section shows you how to create <code>NSRange</code> structs from
+scratch.</p>
+<h2 id="subdividing-strings">Subdividing Strings</h2>
+<p>You can divide an existing string by specifying the first/last index of the
+desired substring. Again, since <code>NSString</code> is immutable, the
+following methods return a new object, leaving the original intact.</p>
+<pre><code class="nb">NSString</code> <code class="o">*</code><code class="n">car</code> <code class="o">=</code> <code class="s">@&quot;Maserati GranTurismo&quot;</code><code class="p">;</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%@&quot;</code><code class="p">,</code> <code class="p">[</code><code class="n">car</code> <code class="nf">substringToIndex:</code><code class="mi">8</code><code class="p">])</code><code class="o">;</code>               <code class="c1">// Maserati</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%@&quot;</code><code class="p">,</code> <code class="p">[</code><code class="n">car</code> <code class="nf">substringFromIndex:</code><code class="mi">9</code><code class="p">])</code><code class="o">;</code>             <code class="c1">// GranTurismo</code>
+<code class="nb">NSRange</code> <code class="n">range</code> <code class="o">=</code> <code class="nb">NSMakeRange</code><code class="p">(</code><code class="mi">9</code><code class="p">,</code> <code class="mi">4</code><code class="p">);</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%@&quot;</code><code class="p">,</code> <code class="p">[</code><code class="n">car</code> <code class="nf">substringWithRange:</code><code class="n">range</code><code class="p">])</code><code class="o">;</code>         <code class="c1">// Gran</code>
+</pre>
+<p>The global <code>NSMakeRange()</code> method creates an <code>NSRange</code>
+struct. The first argument specifies the <code>location</code> field, and the
+second defines the <code>length</code> field. The
+<code>substringWithRange:</code> method interprets these as the first index of
+the substring and the number of characters to include, respectively.</p>
+<p>It’s also possible to split a string into an <code>NSArray</code>
+using the <code>componentsSeparatedByString:</code> method, as shown below.</p>
+<pre><code class="nb">NSString</code> <code class="o">*</code><code class="n">models</code> <code class="o">=</code> <code class="s">@&quot;Porsche,Ferrari,Maserati&quot;</code><code class="p">;</code>
+<code class="nb">NSArray</code> <code class="o">*</code><code class="n">modelsAsArray</code> <code class="o">=</code> <code class="p">[</code><code class="n">models</code> <code class="nf">componentsSeparatedByString:</code><code class="s">@&quot;,&quot;</code><code class="p">];</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%@&quot;</code><code class="p">,</code> <code class="p">[</code><code class="n">modelsAsArray</code> <code class="nf">objectAtIndex:</code><code class="mi">1</code><code class="p">])</code><code class="o">;</code>        <code class="c1">// Ferrari</code>
+</pre>
+<h2 id="replacing-substrings">Replacing Substrings</h2>
+<p>Replacing part of a string is just like subdividing a string, except you
+provide a replacement along with the substring you’re looking for. The
+following snippet demonstrates the two most common substring replacement
+methods.</p>
+<pre><code class="nb">NSString</code> <code class="o">*</code><code class="n">elise</code> <code class="o">=</code> <code class="s">@&quot;Lotus Elise&quot;</code><code class="p">;</code>
+<code class="nb">NSRange</code> <code class="n">range</code> <code class="o">=</code> <code class="nb">NSMakeRange</code><code class="p">(</code><code class="mi">6</code><code class="p">,</code> <code class="mi">5</code><code class="p">);</code>
+<code class="nb">NSString</code> <code class="o">*</code><code class="n">exige</code> <code class="o">=</code> <code class="p">[</code><code class="n">elise</code> <code class="nf">stringByReplacingCharactersInRange:</code><code class="n">range</code>
+                                                 <code class="nf">withString:</code><code class="s">@&quot;Exige&quot;</code><code class="p">];</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%@&quot;</code><code class="p">,</code> <code class="n">exige</code><code class="p">)</code><code class="o">;</code>          <code class="c1">// Lotus Exige</code>
+<code class="nb">NSString</code> <code class="o">*</code><code class="n">evora</code> <code class="o">=</code> <code class="p">[</code><code class="n">exige</code> <code class="nf">stringByReplacingOccurrencesOfString:</code><code class="s">@&quot;Exige&quot;</code>
+                                                   <code class="nf">withString:</code><code class="s">@&quot;Evora&quot;</code><code class="p">];</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%@&quot;</code><code class="p">,</code> <code class="n">evora</code><code class="p">)</code><code class="o">;</code>          <code class="c1">// Lotus Evora</code>
+</pre>
+<h2 id="changing-case">Changing Case</h2>
+<p>The <code>NSString</code> class also provides a few convenient methods for
+changing the case of a string. This can be used to normalize user-submitted
+values. As with all <code>NSString</code> manipulation methods, these return
+new strings instead of changing the existing instance.</p>
+<pre><code class="nb">NSString</code> <code class="o">*</code><code class="n">car</code> <code class="o">=</code> <code class="s">@&quot;lotUs beSpoKE&quot;</code><code class="p">;</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%@&quot;</code><code class="p">,</code> <code class="p">[</code><code class="n">car</code> <code class="nf">lowercaseString</code><code class="p">])</code><code class="o">;</code>      <code class="c1">// lotus bespoke</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%@&quot;</code><code class="p">,</code> <code class="p">[</code><code class="n">car</code> <code class="nf">uppercaseString</code><code class="p">])</code><code class="o">;</code>      <code class="c1">// LOTUS BESPOKE</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%@&quot;</code><code class="p">,</code> <code class="p">[</code><code class="n">car</code> <code class="nf">capitalizedString</code><code class="p">])</code><code class="o">;</code>    <code class="c1">// Lotus Bespoke</code>
+</pre>
+<h2 id="numerical-conversions">Numerical Conversions</h2>
+<p><code>NSString</code> defines several conversion methods for interpreting
+strings as primitive values. These are occasionally useful for very simple
+string processing, but you should really consider <a href="https://developer.apple.com/library/mac/#documentation/Cocoa/Reference/Foundation/Classes/NSScanner_Class/Reference/Reference.html"><code>NSScanner</code></a>
+or <a href="https://developer.apple.com/library/mac/#documentation/Cocoa/Reference/Foundation/Classes/NSNumberFormatter_Class/Reference/Reference.html"><code>NSNumberFormatter</code></a>
+if you need a robust string-to-number conversion tool.</p>
+<pre><code class="nb">NSString</code> <code class="o">*</code><code class="n">year</code> <code class="o">=</code> <code class="s">@&quot;2012&quot;</code><code class="p">;</code>
+<code class="kt">BOOL</code> <code class="n">asBool</code> <code class="o">=</code> <code class="p">[</code><code class="n">year</code> <code class="nf">boolValue</code><code class="p">];</code>
+<code class="kt">int</code> <code class="n">asInt</code> <code class="o">=</code> <code class="p">[</code><code class="n">year</code> <code class="nf">intValue</code><code class="p">];</code>
+<code class="nb">NSInteger</code> <code class="n">asInteger</code> <code class="o">=</code> <code class="p">[</code><code class="n">year</code> <code class="nf">integerValue</code><code class="p">];</code>
+<code class="kt">long</code> <code class="kt">long</code> <code class="n">asLongLong</code> <code class="o">=</code> <code class="p">[</code><code class="n">year</code> <code class="nf">longLongValue</code><code class="p">];</code>
+<code class="kt">float</code> <code class="n">asFloat</code> <code class="o">=</code> <code class="p">[</code><code class="n">year</code> <code class="nf">floatValue</code><code class="p">];</code>
+<code class="kt">double</code> <code class="n">asDouble</code> <code class="o">=</code> <code class="p">[</code><code class="n">year</code> <code class="nf">doubleValue</code><code class="p">];</code>
+</pre>
+<h1 id="nsmutablestring">NSMutableString</h1>
+<p>The <a href="https://developer.apple.com/library/mac/#documentation/Cocoa/Reference/Foundation/Classes/NSMutableString_Class/Reference/Reference.html"><code>NSMutableString</code></a>
+class is a mutable version of <code>NSString</code>. Unlike immutable strings,
+it’s possible to alter individual characters of a mutable string without
+creating a brand new object. This makes <code>NSMutableString</code> the
+preferred data structure when you’re performing several small edits on
+the same string.</p>
+<p><code>NSMutableString</code> inherits from <code>NSString</code>, so aside
+from the ability to manipulate it in place, you can use a mutable string just
+like you would an immutable string. That is to say, the API discussed above
+will still work with an <code>NSMutableString</code> instance, although methods
+like <code>stringByAppendingString:</code> will still return a
+<code>NSString</code> object—not an <code>NSMutableString</code>.</p>
+<p>The remaining sections present several methods defined by the
+<code>NSMutableString</code> class. You’ll notice that the fundamental
+workflow for mutable strings is different than that of immutable ones. Instead
+of creating a new object and replacing the old value,
+<code>NSMutableString</code> methods operate directly on the existing
+instance.</p>
+<h2 id="creating-mutable-strings">Creating Mutable Strings</h2>
+<p>Mutable strings can be created through the <code>stringWithString:</code>
+class method, which turns a literal string or an existing <code>NSString</code>
+object into a mutable one:</p>
+<pre><code class="nb">NSMutableString</code> <code class="o">*</code><code class="n">car</code> <code class="o">=</code> <code class="p">[</code><code class="nb">NSMutableString</code> <code class="nf">stringWithString:</code><code class="s">@&quot;Porsche 911&quot;</code><code class="p">];</code>
+</pre>
+<p>After you’ve created a mutable string, the <code>setString:</code>
+method lets you assign a new value to the instance:</p>
+<pre><code class="p">[</code><code class="n">car</code> <code class="nf">setString:</code><code class="s">@&quot;Porsche Boxster&quot;</code><code class="p">];</code>
+</pre>
+<p>Compare this to <code>NSString</code>, where you re-assign a new value to
+the variable. With mutable strings, we don’t change the instance
+reference, but rather manipulate its contents through the mutable API.</p>
+<h2 id="expanding-mutable-strings">Expanding Mutable Strings</h2>
+<p><code>NSMutableString</code> provides mutable alternatives to many of the
+<code>NSString</code> manipulation methods discussed above. Again, the mutable
+versions don’t need to copy the resulting string into a new memory
+location and return a new reference to it. Instead, they directly change the
+existing object’s underlying value.</p>
+<pre><code class="nb">NSMutableString</code> <code class="o">*</code><code class="n">car</code> <code class="o">=</code> <code class="p">[</code><code class="nb">NSMutableString</code> <code class="nf">stringWithCapacity:</code><code class="mi">20</code><code class="p">];</code>
+<code class="nb">NSString</code> <code class="o">*</code><code class="n">model</code> <code class="o">=</code> <code class="s">@&quot;458 Spider&quot;</code><code class="p">;</code>
+
+<code class="p">[</code><code class="n">car</code> <code class="nf">setString:</code><code class="s">@&quot;Ferrari&quot;</code><code class="p">];</code>
+<code class="p">[</code><code class="n">car</code> <code class="nf">appendString:</code><code class="n">model</code><code class="p">];</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%@&quot;</code><code class="p">,</code> <code class="n">car</code><code class="p">)</code><code class="o">;</code>                    <code class="c1">// Ferrari458 Spider</code>
+
+<code class="p">[</code><code class="n">car</code> <code class="nf">setString:</code><code class="s">@&quot;Ferrari&quot;</code><code class="p">];</code>
+<code class="p">[</code><code class="n">car</code> <code class="nf">appendFormat:</code><code class="s">@&quot; %@&quot;</code><code class="p">,</code> <code class="n">model</code><code class="p">];</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%@&quot;</code><code class="p">,</code> <code class="n">car</code><code class="p">)</code><code class="o">;</code>                    <code class="c1">// Ferrari 458 Spider</code>
+
+<code class="p">[</code><code class="n">car</code> <code class="nf">setString:</code><code class="s">@&quot;Ferrari Spider&quot;</code><code class="p">];</code>
+<code class="p">[</code><code class="n">car</code> <code class="nf">insertString:</code><code class="s">@&quot;458 &quot;</code> <code class="nf">atIndex:</code><code class="mi">8</code><code class="p">];</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%@&quot;</code><code class="p">,</code> <code class="n">car</code><code class="p">)</code><code class="o">;</code>                    <code class="c1">// Ferrari 458 Spider</code>
+</pre>
+<p>Also note that, like any well-designed Objective-C class, the method names
+of <code>NSString</code> and <code>NSMutableString</code> reflect exactly what
+they do. The former creates and returns a brand new string, so it uses names
+like <code>stringByAppendingString:</code>. On the other hand, the latter
+operates on the object itself, so it uses verbs like
+<code>appendString:</code>.</p>
+<h2 id="replacing-deleting-substrings">Replacing/Deleting Substrings</h2>
+<p>It’s possible to replace or delete substrings via the
+<code>replaceCharactersInRange:withString:</code> and
+<code>deleteCharactersInRange:</code> methods, as shown below.</p>
+<pre><code class="nb">NSMutableString</code> <code class="o">*</code><code class="n">car</code> <code class="o">=</code> <code class="p">[</code><code class="nb">NSMutableString</code> <code class="nf">stringWithCapacity:</code><code class="mi">20</code><code class="p">];</code>
+<code class="p">[</code><code class="n">car</code> <code class="nf">setString:</code><code class="s">@&quot;Lotus Elise&quot;</code><code class="p">];</code>
+<code class="p">[</code><code class="n">car</code> <code class="nf">replaceCharactersInRange:</code><code class="nb">NSMakeRange</code><code class="p">(</code><code class="mi">6</code><code class="p">,</code> <code class="mi">5</code><code class="p">)</code>
+                   <code class="nf">withString:</code><code class="s">@&quot;Exige&quot;</code><code class="p">];</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%@&quot;</code><code class="p">,</code> <code class="n">car</code><code class="p">)</code><code class="o">;</code>                               <code class="c1">// Lotus Exige</code>
+<code class="p">[</code><code class="n">car</code> <code class="nf">deleteCharactersInRange:</code><code class="nb">NSMakeRange</code><code class="p">(</code><code class="mi">5</code><code class="p">,</code> <code class="mi">6</code><code class="p">)];</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%@&quot;</code><code class="p">,</code> <code class="n">car</code><code class="p">)</code><code class="o">;</code>                               <code class="c1">// Lotus</code>
+</pre>
+<h2 id="when-to-use-mutable-strings">When To Use Mutable Strings</h2>
+<p>Since <code>NSString</code> and <code>NSMutableString</code> provide such
+similar functionality, it can be hard to know when to use one over the other.
+In general, the static nature of <code>NSString</code> makes it more efficient
+for most tasks; however, the fact that an immutable string can’t be
+changed without generating a new object makes it less than ideal when
+you’re trying to perform several small edits.</p>
+<p>The two examples presented in this section demonstrate the advantages of
+mutable strings. First, let’s take a look at an anti-pattern for
+immutable strings. The following loop generates a string containing all of the
+numbers between 0 and 999 using <code>NSString</code>.</p>
+<pre><code class="c1">// DO NOT DO THIS. EVER.</code>
+<code class="nb">NSString</code> <code class="o">*</code><code class="n">indices</code> <code class="o">=</code> <code class="s">@&quot;&quot;</code><code class="p">;</code>
+<code class="k">for</code> <code class="p">(</code><code class="kt">int</code> <code class="n">i</code><code class="o">=</code><code class="mi">0</code><code class="p">;</code> <code class="n">i</code><code class="o">&lt;</code><code class="mi">1000</code><code class="p">;</code> <code class="n">i</code><code class="o">++</code><code class="p">)</code> <code class="p">{</code>
+    <code class="n">indices</code> <code class="o">=</code> <code class="p">[</code><code class="n">indices</code> <code class="nf">stringByAppendingFormat:</code><code class="s">@&quot;%d&quot;</code><code class="p">,</code> <code class="n">i</code><code class="p">];</code>
+<code class="p">}</code>
+</pre>
+<p>Remember that <code>stringByAppendingFormat:</code> creates a new
+<code>NSString</code> instance, which means that in each iteration, the entire
+string gets copied to a new block of memory. The above code allocates 999
+string objects that serve only as intermediary values, resulting in an
+application that requires a whopping 1.76 MB of memory. Needless to say, this
+is incredibly inefficient.</p>
+<p>Now, let’s take a look at the mutable version of this snippet:</p>
+<pre><code class="nb">NSMutableString</code> <code class="o">*</code><code class="n">indices</code> <code class="o">=</code> <code class="p">[</code><code class="nb">NSMutableString</code> <code class="nf">stringWithCapacity:</code><code class="mi">1</code><code class="p">];</code>
+<code class="k">for</code> <code class="p">(</code><code class="kt">int</code> <code class="n">i</code><code class="o">=</code><code class="mi">0</code><code class="p">;</code> <code class="n">i</code><code class="o">&lt;</code><code class="mi">1000</code><code class="p">;</code> <code class="n">i</code><code class="o">++</code><code class="p">)</code> <code class="p">{</code>
+    <code class="p">[</code><code class="n">indices</code> <code class="nf">appendFormat:</code><code class="s">@&quot;%d&quot;</code><code class="p">,</code> <code class="n">i</code><code class="p">];</code>
+<code class="p">}</code>
+</pre>
+<p>Since mutable strings manipulate their contents in place, no copying is
+involved, and we completely avoid the 999 unnecessary allocations. Internally,
+the mutable string’s storage dynamically expands to accommodate longer
+values. This reduces the memory footprint to around 19 KB, which is much more
+reasonable.</p>
+<p>So, a good rule of thumb is to use a mutable string whenever you’re
+running any kind of algorithm that edits or assembles a string in several
+passes and to use an immutable string for everything else. This also applies to
+<a href="nsset.html">sets</a>, <a href="nsarray.html">arrays</a>, and <a href="nsdictionary.html">dictionaries</a>.</p>
+<div class="divider" style="margin-top: 2em; margin-bottom: 1.3em;"></div><table class="icon-and-text advert"><tr>
+<td><a href="http://rypress.com/tutorials/cocoa"><img src="../media/advert-image.png" width="120px" height="165px" class="cover"></a></td>
+<td><p id="advert-text">Be sure to check out <a href="http://rypress.com/tutorials/cocoa">Ry’s Cocoa Tutorial</a>. This
+brand new guide is a complete walkthrough of Mac App development, and it
+leverages all of the Objective-C skills that we just discussed. <a href="http://rypress.com/tutorials/cocoa">Learn more ›</a></p></td>
+</tr></table>
+<div id='mailing-list'>
+<div class='divider' style='margin: 1.8em -22px;'></div>
+<h3>Mailing List</h3>
+<p>Sign up for my low-volume mailing list to find out when new content is
+released. Next up is a comprehensive <a href='https://developer.apple.com/swift/'>Swift</a> tutorial planned for late
+January.</p>
+<form id='mailing-list-form' action='/secure/mailing-list/request-add' method='get'>
+<label>
+<div class='label'>Email Address:</div>
+<div class='input'>
+<input name='email' style='width: 200px;' type='email'/>
+</div>
+</label>
+<input id='mailing-list-button' class='button' style='margin-top: .5em;' type='submit' value='Subscribe'/>
+</form>
+<div style='clear: both'></div>
+<p class='fine-print'>You&rsquo;ll only receive emails when new tutorials are
+released, and your contact information will never be shared with third
+parties. <a href='/secure/mailing-list/unsubscribe'>Click here</a> to
+unsubscribe.</p>
+</div>
+<div class='divider'></div>
+<footer id='footer' class='fine-print'>
+<ul>
+<li><a href='/licensing.php'>&copy; 2012-2014</a></li>
+<li><a href='/'>RyPress.com</a></li>
+<li>
+<a href='/licensing.php'>All Rights Reserved</a>
+</li>
+<li>
+<a href='/tos.php'>Terms&nbsp;of&nbsp;Service</a>
+</li>
+<li>
+<a href='/privacy.php'>Privacy Policy</a>
+</li>
+</ul>
+</footer>
+</div>  
+</div>  
+</body>
+</html>

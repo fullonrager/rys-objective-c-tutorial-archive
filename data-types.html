@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+  <title>Objective-C Data Types | Ry's Objective-C Tutorial | RyPress</title>
+  <meta charset='UTF-8' />
+  <meta name='description' content="RyPress.com creates
+  high-quality software tutorials and publishes them completely free of
+  charge." />
+  <meta name='viewport'
+  	    content='width=device-width, initial-scale=1.0, maximum-scale=1.0' />
+  <link rel="stylesheet" href="../..media/style.css" />
+  <link rel="icon" type="image/png" href="../..media/favicon.png" />
+
+  
+  <link rel="stylesheet" href="../..media/pygments.css" />
+
+
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-37121774-2']);
+	trackImpression('Balsamiq Sponsorship')
+    _gaq.push(['_trackPageview']);
+  
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+
+	function trackImpression(category) {
+		try {
+			_gaq.push(['_trackEvent', category, 'Impression', '', 0, true]); 
+		} catch(err){}
+	}
+
+	function trackOutboundLink(link, category, label) { 
+		try { 
+			_gaq.push(['_trackEvent', category, 'Click', label, 0, true]); 
+		} catch(err){}
+		window.open(link.href);
+	}
+  </script>
+</head>
+<body>
+
+<div id='page'>
+
+<nav id='main-nav'>
+  <ul>
+  	<li><a href='../../index.html'>RyPress</a></li><li><a href='../../tutorials.html'>Tutorials</a></li><li><a href='../../sponsors.html'>Sponsors</a></li><li><a href='../../about.html'>About</a></li><li><a href='../../contact.html'>Contact</a>
+	</li>
+  </ul>
+</nav>
+
+<div id='sidebar'>
+
+
+<p class='youre-reading'>You&rsquo;re reading:</p>
+<a class='tutorial-cover' href='index.html'>
+	<p>Ry&rsquo;s<br/>Objective-C<br/> Tutorial</p>
+	<img src='../..media/icons/objective-c.png'/>
+</a>
+
+<ul class='sidebar-tutorial-nav'>
+	<li><img
+	src='media/icons/introduction.png' /><a href='introduction.html'>Introduction</a></li>
+	<li><img
+	src='media/icons/c-basics.png' /><a href='c-basics.html'>C Basics</a></li>
+	<li><img
+	src='media/icons/functions.png' /><a href='functions.html'>Functions</a></li>
+	<li><img
+	src='media/icons/classes.png' /><a href='classes.html'>Classes</a></li>
+	<li><img
+	src='media/icons/properties.png' /><a href='properties.html'>Properties</a></li>
+	<li><img
+	src='media/icons/methods.png' /><a href='methods.html'>Methods</a></li>
+	<li><img
+	src='media/icons/protocols.png' /><a href='protocols.html'>Protocols</a></li>
+	<li><img
+	src='media/icons/categories.png' /><a href='categories.html'>Categories</a></li>
+	<li><img
+	src='media/icons/blocks.png' /><a href='blocks.html'>Blocks</a></li>
+	<li><img
+	src='media/icons/exceptions.png' /><a href='exceptions.html'>Exceptions</a></li>
+	<li><img src='media/icons/memory.png' /><a href='memory-management.html'>Memory Mgmt</a></li>
+	<li class='selected'><img
+	src='media/icons/data-types.png' /><a href='data-types.html'>Data Types</a></li>
+</ul>
+
+<div id='sponsor-side'>
+
+<a href='http://balsamiq.com/' target='_blank'
+onClick="trackOutboundLink(this, 'Balsamiq Sponsorship', 'Side Link');
+return false;"><img src='/sponsors/objective-c/ad.png' /></a>
+
+<p>Sponsored by<br /><a href='http://balsamiq.com/' target='_blank'
+onClick="trackOutboundLink(this, 'Balsamiq Sponsorship', 'Side Link');
+return false;">Balsamiq Mockups</a></p>
+
+</div>
+
+
+</div>
+
+<div id='content'>
+<p id='tutorial-back-link'>
+	<a href='index.html'><span>&lsaquo;</span> Back to <em>Ry&rsquo;s Objective-C
+	Tutorial</em></a>
+</p>
+
+<h1 class='back-heading'>Objective-C Data Types</h1>
+
+<div class='tutorial-nav'>
+	<div class='left-col'>
+		<a href='data-types/primitives.html'>
+			<img src='media/icons/data-types/primitives.png'/>
+			<span>Primitives</span>
+		</a>
+		<a href='data-types/nsnumber.html'>
+			<img src='media/icons/data-types/nsnumber.png'/>
+			<span>NSNumber</span>
+		</a>
+		<a href='data-types/nsdecimalnumber.html'>
+			<img src='media/icons/data-types/nsdecimalnumber.png'/>
+			<span>NSDecimalNumber</span>
+		</a>
+		<a href='data-types/nsstring.html'>
+			<img src='media/icons/data-types/nsstring.png'/>
+			<span>NSString</span>
+		</a>
+	</div>
+	<div class='right-col'>
+		<a href='data-types/nsset.html'>
+			<img src='media/icons/data-types/nsset.png'/>
+			<span>NSSet</span>
+		</a>
+		<a href='data-types/nsarray.html'>
+			<img src='media/icons/data-types/nsarray.png'/>
+			<span>NSArray</span>
+		</a>
+		<a href='data-types/nsdictionary.html'>
+			<img src='media/icons/data-types/nsdictionary.png'/>
+			<span>NSDictionary</span>
+		</a>
+		<a href='data-types/dates.html'>
+			<img src='media/icons/data-types/nsdate.png'/>
+			<span>Dates</span>
+		</a>
+	</div>
+</div>
+
+
+<p>Objective-C inherits all of the primitive types of C, and defines a few of
+its own, too. But, applications also require higher-level tools like strings,
+dictionaries, and dates. The <a
+href='https://developer.apple.com/library/mac/#documentation/Cocoa/Reference/Foundation/ObjC_classic/_index.html'>Foundation
+Framework</a> defines several classes that provide the standard,
+object-oriented data structures found in typical high-level programming
+languages.</p>
+
+<p>The <a href='data-types/primitives.html'>Primitives</a> module introduces
+Objective-C&rsquo;s native types, and the rest of the above modules cover the
+fundamental Foundation classes. Below, you&rsquo;ll find general information
+about interacting with these classes.</p>
+
+<p id='sponsor-top'>This tutorial is made possible by <strong><a href='http://balsamiq.com/' target='_blank' onClick="trackOutboundLink(this, 'Balsamiq Sponsorship', 'Top Link');
+return false;">Balsamiq Mockups</a></strong>. This rapid wireframing tool makes
+designing apps as easy as sketching.</p>
+
+
+<h2>Creating Objects</h2>
+
+<p>There are two ways to instantiate objects in Objective-C. First, you have
+the standard <code>alloc</code>/<code>init</code> pattern introduced in the <a
+href='classes.html'>Classes</a> module. For example, you can create a new
+<code>NSNumber</code> object with the following:</p>
+
+<div class="highlight"><pre><span class="nb">NSNumber</span> <span class="o">*</span><span class="n">twentySeven</span> <span class="o">=</span> <span class="p">[[</span><span class="n">NSNumber</span> <span class="nf">alloc</span><span class="p">]</span> <span class="nf">initWithInt:</span><span class="mi">27</span><span class="p">];</span>
+</pre></div>
+
+
+<p>But, most of the Foundation Framework classes also provide corresponding
+factory methods, like so:</p>
+
+<div class="highlight"><pre><span class="nb">NSNumber</span> <span class="o">*</span><span class="n">twentySeven</span> <span class="o">=</span> <span class="p">[</span><span class="nb">NSNumber</span> <span class="nf">numberWithInt:</span><span class="mi">27</span><span class="p">];</span>
+</pre></div>
+
+
+<p>This allocates a new <code>NSNumber</code> object for you, <a
+href='memory-management.html#the-autorelease-method'>autoreleases</a> it, and
+returns it. Before <a
+href='memory-management.html#automatic-reference-counting'>ARC</a>, this was a
+convenient way to create objects, but in modern programs, there is no practical
+difference between these two instantiation patterns.</p>
+
+<p>In addition, numbers, strings, arrays, and dictionaries can be created as
+literals (e.g., <code>@"Bill"</code>). You&rsquo;ll see all three notations
+throughout the Objective-C literature, as well as in this tutorial.</p>
+
+
+<h2>Comparing Objects</h2>
+
+<p>Comparing objects is one of the biggest pitfalls for Objective-C beginners.
+There are two distinct types of equality comparisons in Objective-C:
+
+<ul>
+	<li><strong>Pointer comparison</strong> uses the <code>==</code> operator
+	to see if two pointers refer to the same memory address (i.e., the same
+	object). It&rsquo;s not possible for different objects to compare equal
+	with this kind of comparison.</li>
+	<li><strong>Value comparison</strong> uses methods like
+	<code>isEqualToNumber:</code> to see if two objects represent the same
+	value. It <em>is</em> possible for different objects to compare equal with
+	this kind of comparison.</li>
+</ul>
+
+<p>Generally, you&rsquo;ll want to use the second option for more robust
+comparisons. The relevant methods are introduced alongside each data type
+(e.g., <code>NSNumber</code>&rsquo;s <a
+href='data-types/nsnumber.html#comparing-numbers'>Comparing Numbers</a>
+section).</p>
+
+<div id='sponsor-bottom' class='icon-text'>
+
+	<a href='http://balsamiq.com/' target='_blank'
+	onClick="trackOutboundLink(this, 'Balsamiq Sponsorship', 'Bottom Link');
+	return false;"><img src='/sponsors/objective-c/logo.png' /></a>
+
+	<p style='width: 70%; margin-top: 0'>Can&rsquo;t wait until the end of this tutorial to start working on your app?
+	<strong><a href='http://balsamiq.com/' target='_blank'
+	onClick="trackOutboundLink(this, 'Balsamiq Sponsorship', 'Bottom Link');
+	return false;">Balsamiq Mockups</a></strong> helps you get honest feedback on
+	your ideas without writing a line of code.</p>
+	
+	<div style='clear: both'></div>
+</div>
+
+
+<p class='sequential-nav'>
+	<a href='data-types/primitives.html'>Continue to <em>Primitives</em>&nbsp;&rsaquo;</a>
+</p>
+
+
+
+</div> <!-- #content -->
+
+<div style='clear: both'></div>
+
+<footer id='footer'>
+  <ul id='copyright'>
+  	<li>
+			&copy; 2012-2013 <a href='../../index.html'>RyPress.com</a>
+		</li>
+		<li>
+			<a href='../../licensing.html'>All Rights Reserved</a>
+		</li>
+		<li>
+			<a href='../../tos.html'>Terms of Service</a>
+		</li>
+		<li>
+			<a href='../../privacy.html'>Privacy Policy</a>
+		</li>
+  </ul>
+</footer>
+
+</div> <!-- #page -->
+
+</body>
+</html>

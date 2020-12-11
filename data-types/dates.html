@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+  <title>Date Programming - Ry’s Objective-C Tutorial - RyPress</title>
+  <meta charset='UTF-8' />
+  <meta name='description' content="Date programming is a complex topic in any language, and Objective-C is no
+different. The Foundation Framework provides extensive support for working with
+dates in various calendrical systems. Unfortunately, the associated
+abstractions and dependencies give rise to a plethora of date-related classes
+that can be hard to navigate if you don’t know where to start." />
+  <meta name='viewport'
+  	    content='width=device-width, initial-scale=1.0, maximum-scale=1.0' />
+  <link rel="icon" type="image/png" href="/media/favicon.png" />
+  <link rel="stylesheet" href="/media/style.css" />
+  <link rel="stylesheet" href="/media/pygments.css" />
+
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  
+    ga('create', 'UA-37121774-2', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+  
+</head>
+<body>
+
+<div id='page'>
+
+<div id='content'>
+
+<nav id='main-nav'>
+	<a href='/'><img src='/media/logo-small.png'
+		 width='120px'
+		 alt='RyPress - Quality Software Tutorials'/></a>
+	<ul>
+	<li><a href='/'>Tutorials</a></li>
+	<li><a href='/secure/purchases.php'>Purchases</a></li>
+	<li><a href='/about.php'>About</a></li>
+	</ul>
+</nav>
+
+<div class='divider'></div>
+<table class="icon-and-text"><tr>
+<td><a href="../index"><img src="../media/icons/index.png" width="40px" height="40px"></a></td>
+<td><p>You’re
+
+			
+					reading
+				<a href="../index"><em>Ry’s Objective-C Tutorial</em></a>
+				→
+				
+				<a href="index"><em>Data Types</em></a></p></td>
+</tr></table><div class="divider"></div>
+
+<h1 id="date-programming">Date Programming</h1>
+
+<p>Date programming is a complex topic in any language, and Objective-C is no
+different. The Foundation Framework provides extensive support for working with
+dates in various calendrical systems. Unfortunately, the associated
+abstractions and dependencies give rise to a plethora of date-related classes
+that can be hard to navigate if you don’t know where to start.</p>
+
+<figure>
+    <img style="max-width: 500px" src="media/dates-overview.png">
+    <figcaption>The essential classes for representing and manipulating
+    dates</figcaption>
+</figure>
+
+<p>The above diagram provides a high-level overview of Objective-C’s
+date-handling capabilities. The <code>NSDate</code> class represents a specific
+point in time, which can be reduced to <code>NSDateComponent</code>’s
+(e.g., days, weeks, years) by interpreting it in the context of an
+<code>NSCalendar</code> object. The <code>NSDateFormatter</code> class provides
+a human-readable version of an <code>NSDate</code>, and <code>NSLocale</code>
+and <code>NSTimeZone</code> encapsulate essential localization information
+for many calendrical operations.</p>
+
+<p>This module explains all of this in much more detail using several hands-on
+examples. By the end of this module, you should be able to perform any kind of
+date operation that you’ll ever need.</p>
+
+
+<h2 id="nsdate">NSDate</h2>
+
+<p>An <code>NSDate</code> object represents a specific point in time,
+independent of any particular calendrical system, time zone, or locale.
+Internally, it just records the number of seconds from an arbitrary reference
+point (January 1st, 2001 GMT). For a date to be useful, it generally needs to
+be interpreted in the context of an <a href="#nscalendar"><code>NSCalendar</code></a> object.</p>
+
+<figure>
+    <img style="max-width: 480px" src="media/nsdate.png">
+    <figcaption><code>NSDate</code> recording the number of seconds from its
+    reference point</figcaption>
+</figure>
+
+<p>You’ll typically want to create date objects using a calendar or a <a href="#nsdateformatter">date formatter</a>, as the <code>NSDate</code> class
+only provides a few low-level methods for creating dates from scratch. The
+<code>date</code> method returns an object representing the current date and
+time, and <code>dateWithTimeInterval:sinceDate:</code> generates a relative
+date using an <code>NSTimeInterval</code>, which is a <code>double</code>
+storing the number of seconds from the specified date. As you can see in the
+following example, a positive interval goes forward in time, and a negative one
+goes backwards.</p>
+
+<pre><code class="nb">NSDate</code> <code class="o">*</code><code class="n">now</code> <code class="o">=</code> <code class="p">[</code><code class="n">NSDate</code> <code class="nf">date</code><code class="p">];</code>
+<code class="nb">NSTimeInterval</code> <code class="n">secondsInWeek</code> <code class="o">=</code> <code class="mi">7</code> <code class="o">*</code> <code class="mi">24</code> <code class="o">*</code> <code class="mi">60</code> <code class="o">*</code> <code class="mi">60</code><code class="p">;</code>
+<code class="nb">NSDate</code> <code class="o">*</code><code class="n">lastWeek</code> <code class="o">=</code> <code class="p">[</code><code class="nb">NSDate</code> <code class="nf">dateWithTimeInterval:</code><code class="o">-</code><code class="n">secondsInWeek</code>
+                                      <code class="nf">sinceDate:</code><code class="n">now</code><code class="p">];</code>
+<code class="nb">NSDate</code> <code class="o">*</code><code class="n">nextWeek</code> <code class="o">=</code> <code class="p">[</code><code class="nb">NSDate</code> <code class="nf">dateWithTimeInterval:</code><code class="n">secondsInWeek</code>
+                                      <code class="nf">sinceDate:</code><code class="n">now</code><code class="p">];</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;Last Week: %@&quot;</code><code class="p">,</code> <code class="n">lastWeek</code><code class="p">)</code><code class="o">;</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;Right Now: %@&quot;</code><code class="p">,</code> <code class="n">now</code><code class="p">)</code><code class="o">;</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;Next Week: %@&quot;</code><code class="p">,</code> <code class="n">nextWeek</code><code class="p">)</code><code class="o">;</code>
+</pre>
+
+
+<p>This will output three datetime strings that look something like
+<code>2012-11-06 02:24:00 +0000</code>. They contain the date (expressed as
+year-month-date), the time of day (expressed as hours:minutes:seconds) and the
+time zone (expressed as an offset from Greenwich Mean Time (GMT)).</p>
+
+<p>Aside from capturing an absolute point in time, the only real job of
+<code>NSDate</code> is to facilitate comparisons. It defines
+<code>isEqualToDate:</code> and <code>compare:</code> methods, which work just
+like the ones provided by <a href="nsnumber.html"><code>NSNumber</code></a>. In
+addition, the <code>earlierDate:</code> and <code>laterDate:</code> methods can
+be used as a convenient shortcut.</p>
+
+<pre><code class="nb">NSComparisonResult</code> <code class="n">result</code> <code class="o">=</code> <code class="p">[</code><code class="n">now</code> <code class="nf">compare:</code><code class="n">nextWeek</code><code class="p">];</code>
+<code class="k">if</code> <code class="p">(</code><code class="n">result</code> <code class="o">==</code> <code class="nb">NSOrderedAscending</code><code class="p">)</code> <code class="p">{</code>
+    <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;now &lt; nextWeek&quot;</code><code class="p">);</code>
+<code class="p">}</code> <code class="k">else</code> <code class="k">if</code> <code class="p">(</code><code class="n">result</code> <code class="o">==</code> <code class="nb">NSOrderedSame</code><code class="p">)</code> <code class="p">{</code>
+    <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;now == nextWeek&quot;</code><code class="p">);</code>
+<code class="p">}</code> <code class="k">else</code> <code class="k">if</code> <code class="p">(</code><code class="n">result</code> <code class="o">==</code> <code class="nb">NSOrderedDescending</code><code class="p">)</code> <code class="p">{</code>
+    <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;now &gt; nextWeek&quot;</code><code class="p">);</code>
+<code class="p">}</code>
+<code class="nb">NSDate</code> <code class="o">*</code><code class="n">earlierDate</code> <code class="o">=</code> <code class="p">[</code><code class="n">now</code> <code class="nf">earlierDate:</code><code class="n">lastWeek</code><code class="p">];</code>
+<code class="nb">NSDate</code> <code class="o">*</code><code class="n">laterDate</code> <code class="o">=</code> <code class="p">[</code><code class="n">now</code> <code class="nf">laterDate:</code><code class="n">lastWeek</code><code class="p">];</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%@ is earlier than %@&quot;</code><code class="p">,</code> <code class="n">earlierDate</code><code class="p">,</code> <code class="n">laterDate</code><code class="p">)</code><code class="o">;</code>
+</pre>
+
+
+
+<h2 id="nsdatecomponents">NSDateComponents</h2>
+
+<p>The <code>NSDateComponents</code> class is a simple data structure for
+representing the various time periods used by a calendrical system (days,
+weeks, months, years, etc). Unlike <code>NSDate</code>, the meaning of these
+components are entirely dependent on how it’s used.</p>
+
+<p>Consider an <code>NSDateComponents</code> object with its <code>year</code>
+property set to <code>2012</code>. This could be interpreted as the year
+<code>2012</code> by a Gregorian calendar, the year <code>1469</code> by a
+Buddhist calendar, or two thousand and twelve years relative to some other
+date.</p>
+
+<p>We’ll work more with date components in the next section, but as a
+simple example, here’s how you would create an
+<code>NSDateComponents</code> instance that could be interpreted as November
+4th, 2012:</p>
+
+<pre><code class="nb">NSDateComponents</code> <code class="o">*</code><code class="n">november4th2012</code> <code class="o">=</code> <code class="p">[[</code><code class="n">NSDateComponents</code> <code class="nf">alloc</code><code class="p">]</code> <code class="nf">init</code><code class="p">];</code>
+<code class="p">[</code><code class="n">november4th2012</code> <code class="nf">setYear:</code><code class="mi">2012</code><code class="p">];</code>
+<code class="p">[</code><code class="n">november4th2012</code> <code class="nf">setMonth:</code><code class="mi">11</code><code class="p">];</code>
+<code class="p">[</code><code class="n">november4th2012</code> <code class="nf">setDay:</code><code class="mi">4</code><code class="p">];</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%@&quot;</code><code class="p">,</code> <code class="n">november4th2012</code><code class="p">)</code><code class="o">;</code>
+</pre>
+
+
+<p>Again, it’s important to understand that these components don’t
+<em>actually</em> represent November 4th, 2012 until it is interpreted by a
+Gregorian calendar object as such.</p>
+
+<p>The complete list of component fields can be found below. Note that
+it’s perfectly legal to set only the properties you need and leave the
+rest as <code>NSUndefinedDateComponent</code>, which is the default value for
+all fields.</p>
+
+<table>
+<tr>
+    <td><code>era</code></td>
+    <td><code>week</code></td>
+</tr>
+<tr>
+    <td><code>year</code></td>
+    <td><code>weekday</code></td>
+</tr>
+<tr>
+    <td><code>month</code></td>
+    <td><code>weekdayOrdinal</code></td>
+</tr>
+<tr>
+    <td><code>day</code></td>
+    <td><code>quarter</code></td>
+</tr>
+<tr>
+    <td><code>hour</code></td>
+    <td><code>weekOfMonth</code></td>
+</tr>
+<tr>
+    <td><code>minute</code></td>
+    <td><code>weekOfYear</code></td>
+</tr>
+<tr>
+    <td><code>second</code></td>
+    <td><code>yearForWeekOfYear</code></td>
+</tr>
+</table>
+
+
+<h2 id="nscalendar">NSCalendar</h2>
+
+<p>A calendrical system is a way of breaking down time into manageable units
+like years, months, weeks, etc. These units are represented as
+<code>NSDateComponents</code> objects; however, not all systems use the same
+units or interpret them in the same way. So, an <code>NSCalendar</code> object
+is required to give meaning to these components by defining the exact length of
+a year/month/week/etc.</p>
+
+<p>This provides the necessary context for translating absolute
+<code>NSDate</code> instances into <code>NSDateComponents</code>. This is a
+very important ability, as it lets you work with dates on an intuitive,
+cultural level instead of a mathematical one. That is, it’s much easier
+to say, “November 4th, 2012” than “373698000 seconds after
+January 1st, 2001.”</p>
+
+<figure>
+    <img style="max-width: 480px" src="media/nscalendar.png">
+    <figcaption>Using <code>NSCalendar</code> to convert between dates and date
+    components</figcaption>
+</figure>
+
+<p>This section explains how to create different types of calendars, then
+covers the three main responsibilities of <code>NSCalendar</code>: converting
+<code>NSDate</code> objects to components, creating <code>NSDate</code> objects
+from components, and performing calendrical calculations. We’ll also take
+a brief look at <code>NSCalendarUnit</code>.</p>
+
+
+<h3 id="creating-calendars">Creating Calendars</h3>
+
+<p><code>NSCalendar</code>’s <code>initWithCalendarIdentifier:</code>
+initializer accepts an identifier that defines the calendrical system to use.
+In addition, the <code>currentCalendar</code> class method returns the
+user’s preferred calendar. For most applications, you should opt for
+<code>currentCalendar</code> instead of manually defining one, since it
+reflects the user’s device settings.</p>
+
+<pre><code class="nb">NSCalendar</code> <code class="o">*</code><code class="n">gregorian</code> <code class="o">=</code> <code class="p">[[</code><code class="n">NSCalendar</code> <code class="nf">alloc</code><code class="p">]</code>
+                    <code class="nf">initWithCalendarIdentifier:</code><code class="nb">NSGregorianCalendar</code><code class="p">];</code>
+<code class="nb">NSCalendar</code> <code class="o">*</code><code class="n">buddhist</code> <code class="o">=</code> <code class="p">[[</code><code class="n">NSCalendar</code> <code class="nf">alloc</code><code class="p">]</code>
+                    <code class="nf">initWithCalendarIdentifier:</code><code class="nb">NSBuddhistCalendar</code><code class="p">];</code>
+<code class="nb">NSCalendar</code> <code class="o">*</code><code class="n">preferred</code> <code class="o">=</code> <code class="p">[</code><code class="n">NSCalendar</code> <code class="nf">currentCalendar</code><code class="p">];</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%@&quot;</code><code class="p">,</code> <code class="n">gregorian</code><code class="p">.</code><code class="n">calendarIdentifier</code><code class="p">)</code><code class="o">;</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%@&quot;</code><code class="p">,</code> <code class="n">buddhist</code><code class="p">.</code><code class="n">calendarIdentifier</code><code class="p">)</code><code class="o">;</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%@&quot;</code><code class="p">,</code> <code class="n">preferred</code><code class="p">.</code><code class="n">calendarIdentifier</code><code class="p">)</code><code class="o">;</code>
+</pre>
+
+
+<p>The <code>calendarIdentifier</code> method lets you display the
+string-representation of the calendar ID, but it is read-only (you can’t
+change the calendrical system after instantiation). The rest of Cocoa’s
+built-in calendar identifiers can be accessed via the following constants:</p>
+
+<table>
+<tr>
+    <td><code>NSGregorianCalendar</code></td>
+    <td><code>NSBuddhistCalendar</code></td>
+</tr>
+<tr>
+    <td><code>NSChineseCalendar</code></td>
+    <td><code>NSHebrewCalendar</code></td>
+</tr>
+<tr>
+    <td><code>NSIslamicCalendar</code></td>
+    <td><code>NSIslamicCivilCalendar</code></td>
+</tr>
+<tr>
+    <td><code>NSJapaneseCalendar</code></td>
+    <td><code>NSRepublicOfChinaCalendar</code></td>
+</tr>
+<tr>
+    <td><code>NSPersianCalendar</code></td>
+    <td><code>NSIndianCalendar</code></td>
+</tr>
+<tr>
+    <td><code>NSISO8601Calendar</code></td>
+</tr>
+</table>
+
+<p>The next few sections walk through the basic usage of
+<code>NSCalendar</code>. If you change the identifier, you can see how
+different calendars have different interpretations of date components.</p>
+
+
+<h3 id="from-dates-to-components">From Dates to Components</h3>
+
+<p>The following example shows you how to convert an <code>NSDate</code> into a
+culturally significant <code>NSDateComponents</code> object.</p>
+
+<pre><code class="nb">NSDate</code> <code class="o">*</code><code class="n">now</code> <code class="o">=</code> <code class="p">[</code><code class="n">NSDate</code> <code class="nf">date</code><code class="p">];</code>
+<code class="nb">NSCalendar</code> <code class="o">*</code><code class="n">calendar</code> <code class="o">=</code> <code class="p">[[</code><code class="n">NSCalendar</code> <code class="nf">alloc</code><code class="p">]</code>
+                        <code class="nf">initWithCalendarIdentifier:</code><code class="nb">NSGregorianCalendar</code><code class="p">];</code>
+<code class="nb">NSCalendarUnit</code> <code class="n">units</code> <code class="o">=</code> <code class="nb">NSYearCalendarUnit</code> <code class="o">|</code> <code class="nb">NSMonthCalendarUnit</code> <code class="o">|</code> <code class="nb">NSDayCalendarUnit</code><code class="p">;</code>
+<code class="nb">NSDateComponents</code> <code class="o">*</code><code class="n">components</code> <code class="o">=</code> <code class="p">[</code><code class="n">calendar</code> <code class="nf">components:</code><code class="n">units</code> <code class="nf">fromDate:</code><code class="n">now</code><code class="p">];</code>
+
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;Day: %ld&quot;</code><code class="p">,</code> <code class="p">[</code><code class="n">components</code> <code class="nf">day</code><code class="p">])</code><code class="o">;</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;Month: %ld&quot;</code><code class="p">,</code> <code class="p">[</code><code class="n">components</code> <code class="nf">month</code><code class="p">])</code><code class="o">;</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;Year: %ld&quot;</code><code class="p">,</code> <code class="p">[</code><code class="n">components</code> <code class="nf">year</code><code class="p">])</code><code class="o">;</code>
+</pre>
+
+
+<p>First, this creates an <code>NSCalendar</code> object that represents a
+Gregorian calendar. Then, it creates a bitmask defining the units to include in
+the conversion (see <a href="#nscalendarunit"><code>NSCalendarUnits</code></a>
+for details). Finally, it passes these units and an <code>NSDate</code> to the
+<code>components:fromDate:</code> method.</p>
+
+
+<h3 id="from-components-to-dates">From Components to Dates</h3>
+
+<p>A calendar can also convert in the other direction, which offers a much more
+intuitive way to create <code>NSDate</code> objects. It lets you define a date
+using the components of your native calendrical system:</p>
+
+<pre><code class="nb">NSCalendar</code> <code class="o">*</code><code class="n">calendar</code> <code class="o">=</code> <code class="p">[[</code><code class="n">NSCalendar</code> <code class="nf">alloc</code><code class="p">]</code>
+                    <code class="nf">initWithCalendarIdentifier:</code><code class="nb">NSGregorianCalendar</code><code class="p">];</code>
+<code class="nb">NSDateComponents</code> <code class="o">*</code><code class="n">components</code> <code class="o">=</code> <code class="p">[[</code><code class="n">NSDateComponents</code> <code class="nf">alloc</code><code class="p">]</code> <code class="nf">init</code><code class="p">];</code>
+<code class="p">[</code><code class="n">components</code> <code class="nf">setYear:</code><code class="mi">2012</code><code class="p">];</code>
+<code class="p">[</code><code class="n">components</code> <code class="nf">setMonth:</code><code class="mi">11</code><code class="p">];</code>
+<code class="p">[</code><code class="n">components</code> <code class="nf">setDay:</code><code class="mi">4</code><code class="p">];</code>
+
+<code class="nb">NSDate</code> <code class="o">*</code><code class="n">november4th2012</code> <code class="o">=</code> <code class="p">[</code><code class="n">calendar</code> <code class="nf">dateFromComponents:</code><code class="n">components</code><code class="p">];</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%0.0f seconds between Jan 1st, 2001 and Nov 4th, 2012&quot;</code><code class="p">,</code>
+          <code class="p">[</code><code class="n">november4th2012</code> <code class="nf">timeIntervalSinceReferenceDate</code><code class="p">]);</code>
+</pre>
+
+
+<p>It’s not necessary to define the units to include in the conversion,
+so this is a little more straightforward than translating dates to components.
+Simply instantiate an <code>NSDateComponents</code> object, populate it with
+the desired components, and pass it to the <code>dateFromComponents:</code>
+method.</p>
+
+<p>Remember that <code>NSDate</code> represents an absolute point in time,
+independent of any particular calendrical system. So, by calling
+<code>dateFromComponents:</code> on different <code>NSCalendar</code> objects,
+you can reliably compare dates from incompatible systems.</p>
+
+
+<h3 id="calendrical-calculations">Calendrical Calculations</h3>
+
+<p>The third job of <code>NSCalendar</code> is to provide a high-level API for
+date-related calculations. First, we’ll take a look at how calendars let
+you add components to a given <code>NSDate</code> instance. The following
+example generates a date object that is exactly one month away from the current
+date.</p>
+
+<pre><code class="nb">NSDate</code> <code class="o">*</code><code class="n">now</code> <code class="o">=</code> <code class="p">[</code><code class="n">NSDate</code> <code class="nf">date</code><code class="p">];</code>
+<code class="nb">NSCalendar</code> <code class="o">*</code><code class="n">calendar</code> <code class="o">=</code> <code class="p">[[</code><code class="n">NSCalendar</code> <code class="nf">alloc</code><code class="p">]</code>
+                    <code class="nf">initWithCalendarIdentifier:</code><code class="nb">NSGregorianCalendar</code><code class="p">];</code>
+<code class="nb">NSDateComponents</code> <code class="o">*</code><code class="n">components</code> <code class="o">=</code> <code class="p">[[</code><code class="n">NSDateComponents</code> <code class="nf">alloc</code><code class="p">]</code> <code class="nf">init</code><code class="p">];</code>
+<code class="p">[</code><code class="n">components</code> <code class="nf">setMonth:</code><code class="mi">1</code><code class="p">];</code>
+<code class="nb">NSDate</code> <code class="o">*</code><code class="n">oneMonthFromNow</code> <code class="o">=</code> <code class="p">[</code><code class="n">calendar</code> <code class="nf">dateByAddingComponents:</code><code class="n">components</code>
+                                                    <code class="nf">toDate:</code><code class="n">now</code>
+                                                   <code class="nf">options:</code><code class="mi">0</code><code class="p">];</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%@&quot;</code><code class="p">,</code> <code class="n">oneMonthFromNow</code><code class="p">)</code><code class="o">;</code>
+</pre>
+
+
+<p>All you have to do is create an <code>NSDateComponents</code> object, record
+the components you want to add, and pass it to
+<code>dateByAddingComponents:toDate:options:</code>. This is a good example of
+how the meaning of date components is entirely dependent on how it’s
+used. Instead of representing a date, the above components represent a
+<em>duration</em>.</p>
+
+<p>The <code>options</code> argument should either be <code>0</code> to let
+components overflow into higher units or <code>NSWrapCalendarComponents</code>
+to prevent this behavior. For example, if you set <code>month</code> to
+<code>14</code>, passing <code>0</code> as an option tells the calendar to
+interpret it as 1 year and 2 months, whereas
+<code>NSWrapCalendarComponents</code> interprets it as 2 months and completely
+ignores the extra year.</p>
+
+<p>Also note that <code>dateByAddingComponents:toDate:options:</code> is a
+calendar-aware operation, so it compensates for 30 vs. 31 day months (in the
+Gregorian calendar). This makes <code>NSCalendar</code> a more robust way of
+adding dates than <code>NSDate</code>’s low-level
+<code>dateWithTimeInterval:sinceDate:</code> method.</p>
+
+<p>The other major calendrical operation provided by <code>NSCalendar</code> is
+<code>components:fromDate:toDate:options:</code>, which calculates the interval
+between two <code>NSDate</code> objects. For example, you can determine the
+number of weeks since <code>NSDate</code>’s internal reference point as
+follows:</p>
+
+<pre><code class="nb">NSDate</code> <code class="o">*</code><code class="n">start</code> <code class="o">=</code> <code class="p">[</code><code class="nb">NSDate</code> <code class="nf">dateWithTimeIntervalSinceReferenceDate:</code><code class="mi">0</code><code class="p">];</code>
+<code class="nb">NSDate</code> <code class="o">*</code><code class="n">end</code> <code class="o">=</code> <code class="p">[</code><code class="n">NSDate</code> <code class="nf">date</code><code class="p">];</code>
+<code class="nb">NSCalendar</code> <code class="o">*</code><code class="n">calendar</code> <code class="o">=</code> <code class="p">[</code><code class="n">NSCalendar</code> <code class="nf">currentCalendar</code><code class="p">];</code>
+<code class="nb">NSCalendarUnit</code> <code class="n">units</code> <code class="o">=</code> <code class="nb">NSWeekCalendarUnit</code><code class="p">;</code>
+<code class="nb">NSDateComponents</code> <code class="o">*</code><code class="n">components</code> <code class="o">=</code> <code class="p">[</code><code class="n">calendar</code> <code class="nf">components:</code><code class="n">units</code>
+                                           <code class="nf">fromDate:</code><code class="n">start</code>
+                                             <code class="nf">toDate:</code><code class="n">end</code>
+                                            <code class="nf">options:</code><code class="mi">0</code><code class="p">];</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;It has been %ld weeks since January 1st, 2001&quot;</code><code class="p">,</code>
+      <code class="p">[</code><code class="n">components</code> <code class="nf">week</code><code class="p">]);</code>
+</pre>
+
+
+
+<h3 id="nscalendarunit">NSCalendarUnit</h3>
+
+<p>The first argument of <code>components:fromDate:</code> and
+<code>components:fromDate:toDate:options:</code> determine the properties that
+will be populated on the resulting <code>NSDateComponents</code> object. The
+possible values are defined by <code>NSCalendarUnit</code>, which enumerates
+the following constants:</p>
+
+<table>
+<tr>
+    <td><code>NSEraCalendarUnit</code></td>
+    <td><code>NSWeekdayCalendarUnit</code></td>
+</tr>
+<tr>
+    <td><code>NSYearCalendarUnit</code></td>
+    <td><code>NSWeekdayOrdinalCalendarUnit</code></td>
+</tr>
+<tr>
+    <td><code>NSMonthCalendarUnit</code></td>
+    <td><code>NSQuarterCalendarUnit</code></td>
+</tr>
+<tr>
+    <td><code>NSDayCalendarUnit</code></td>
+    <td><code>NSWeekOfMonthCalendarUnit</code></td>
+</tr>
+<tr>
+    <td><code>NSHourCalendarUnit</code></td>
+    <td><code>NSWeekOfYearCalendarUnit</code></td>
+</tr>
+<tr>
+    <td><code>NSMinuteCalendarUnit</code></td>
+    <td><code>NSYearForWeekOfYearCalendarUnit</code></td>
+</tr>
+<tr>
+    <td><code>NSSecondCalendarUnit</code></td>
+    <td><code>NSCalendarCalendarUnit</code></td>
+</tr>
+<tr>
+    <td><code>NSWeekCalendarUnit</code></td>
+    <td><code>NSTimeZoneCalendarUnit</code></td>
+</tr>
+</table>
+
+<p>When you need more than one of these units, you should combine them into a
+bitmask using the bitwise <code>OR</code> operator (<code>|</code>). For
+example, to include the day, hour, and minute, you would use the following
+value for the first parameter of <code>components:fromDate:</code>.</p>
+
+<pre><code class="nb">NSDayCalendarUnit</code> <code class="o">|</code> <code class="nb">NSHourCalendarUnit</code> <code class="o">|</code> <code class="nb">NSMinuteCalendarUnit</code>
+</pre>
+
+
+
+<h2 id="nsdateformatter">NSDateFormatter</h2>
+
+<p>The <code>NSDateFormatter</code> class makes it easy to work with the
+human-readable form of a date. Whereas calendars decompose a date into an
+<code>NSDateComponents</code> object, date formatters convert between
+<code>NSDate</code>’s and <code>NSString</code>’s.</p>
+
+<figure>
+    <img style="max-width: 450px" src="media/nsdateformatter.png">
+    <figcaption>Using a <code>NSDateFormatter</code> to convert between dates
+    and strings</figcaption>
+</figure>
+
+<p>There are two ways to use a date formatter: 1) with localized styles or 2)
+with a custom format string. The former method is a better choice if
+you’re displaying content to users, since it incorporates their
+preferences and device settings. The latter is useful when you need to know
+<em>exactly</em> what the resulting string representations will look like.</p>
+
+
+<h3 id="localized-styles">Localized Styles</h3>
+
+<p>Localized styles define how a date should look using abstract descriptions
+instead of specific date components. For example, instead of defining a date as
+<code>MM/dd/yy</code>, a style would say it should be displayed in its
+“short” form. This lets the system adapt the representation to the
+user’s language, region, and preferences while still offering a level of
+control to the developer.</p>
+
+<p>The following snippet formats a date using the “short” style. As
+you can see, separate styles are used for the date and the time. The
+<code>stringFromDate:</code> method formats an <code>NSDate</code> object
+according to the provided styles.</p>
+
+<pre><code class="nb">NSDateFormatter</code> <code class="o">*</code><code class="n">formatter</code> <code class="o">=</code> <code class="p">[[</code><code class="n">NSDateFormatter</code> <code class="nf">alloc</code><code class="p">]</code> <code class="nf">init</code><code class="p">];</code>
+<code class="p">[</code><code class="n">formatter</code> <code class="nf">setDateStyle:</code><code class="nb">NSDateFormatterShortStyle</code><code class="p">];</code>
+<code class="p">[</code><code class="n">formatter</code> <code class="nf">setTimeStyle:</code><code class="nb">NSDateFormatterShortStyle</code><code class="p">];</code>
+
+<code class="nb">NSDate</code> <code class="o">*</code><code class="n">now</code> <code class="o">=</code> <code class="p">[</code><code class="n">NSDate</code> <code class="nf">date</code><code class="p">];</code>
+<code class="nb">NSString</code> <code class="o">*</code><code class="n">prettyDate</code> <code class="o">=</code> <code class="p">[</code><code class="n">formatter</code> <code class="nf">stringFromDate:</code><code class="n">now</code><code class="p">];</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%@&quot;</code><code class="p">,</code> <code class="n">prettyDate</code><code class="p">)</code><code class="o">;</code>
+</pre>
+
+
+<p>I’m an English speaker from the United States, so this will output
+<code>11/4/2012 8:09 PM</code>. If you have different default settings,
+you’ll see the traditional date formatting used in your particular
+language/region. We’ll take a closer look at this behavior in the <a href="#nslocale">NSLocale</a> section. The complete list of formatting styles
+are included below.</p>
+
+<table>
+<tr>
+    <td><code>NSDateFormatterNoStyle</code></td>
+</tr>
+<tr>
+    <td><code>NSDateFormatterShortStyle</code></td>
+</tr>
+<tr>
+    <td><code>NSDateFormatterMediumStyle</code></td>
+</tr>
+<tr>
+    <td><code>NSDateFormatterLongStyle</code></td>
+</tr>
+<tr>
+    <td><code>NSDateFormatterFullStyle</code></td>
+</tr>
+</table>
+
+<p>Note that the <code>NSDateFormatterNoStyle</code> constant can be used to
+omit the date or time from the output string.</p>
+
+
+<h3 id="custom-format-strings">Custom Format Strings</h3>
+
+<p>Again, the styles discussed above are the preferred way to define
+user-visible dates. However, if you’re working with dates on a
+programmatic level, you may find the <code>setDateFormat:</code> method useful.
+This accepts a format string that defines precisely how the date will appear.
+For example, you can use <code>M.d.y</code> to output the month, date, and year
+separated by periods as follows:</p>
+
+<pre><code class="c1">// Formatter configuration</code>
+<code class="nb">NSDateFormatter</code> <code class="o">*</code><code class="n">formatter</code> <code class="o">=</code> <code class="p">[[</code><code class="n">NSDateFormatter</code> <code class="nf">alloc</code><code class="p">]</code> <code class="nf">init</code><code class="p">];</code>
+<code class="nb">NSLocale</code> <code class="o">*</code><code class="n">posix</code> <code class="o">=</code> <code class="p">[[</code><code class="n">NSLocale</code> <code class="nf">alloc</code><code class="p">]</code> <code class="nf">initWithLocaleIdentifier:</code><code class="s">@&quot;en_US_POSIX&quot;</code><code class="p">];</code>
+<code class="p">[</code><code class="n">formatter</code> <code class="nf">setLocale:</code><code class="n">posix</code><code class="p">];</code>
+<code class="p">[</code><code class="n">formatter</code> <code class="nf">setDateFormat:</code><code class="s">@&quot;M.d.y&quot;</code><code class="p">];</code>
+<code class="c1">// Date to string</code>
+<code class="nb">NSDate</code> <code class="o">*</code><code class="n">now</code> <code class="o">=</code> <code class="p">[</code><code class="n">NSDate</code> <code class="nf">date</code><code class="p">];</code>
+<code class="nb">NSString</code> <code class="o">*</code><code class="n">prettyDate</code> <code class="o">=</code> <code class="p">[</code><code class="n">formatter</code> <code class="nf">stringFromDate:</code><code class="n">now</code><code class="p">];</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%@&quot;</code><code class="p">,</code> <code class="n">prettyDate</code><code class="p">)</code><code class="o">;</code>
+</pre>
+
+
+<p>As a best practice, you should always set the <code>locale</code> property
+of the <code>NSDateFormatter</code> before using custom format strings. This
+ensures that the user’s default locale won’t affect the output,
+which would result in subtle, hard-to-reproduce bugs. In the above case, the
+POSIX locale ensures that the date is displayed as <code>11.4.2012</code>,
+regardless of the user’s settings.</p>
+
+<p>Custom date formats also present an alternative way to create date objects.
+Using the above configuration, it’s possible to convert the string
+<code>11.4.2012</code> into an <code>NSDate</code> with the
+<code>dateFromString:</code> method. If the string can’t be parsed, it
+will return <code>nil</code>.</p>
+
+<pre><code class="c1">// String to date</code>
+<code class="nb">NSString</code> <code class="o">*</code><code class="n">dateString</code> <code class="o">=</code> <code class="s">@&quot;11.4.2012&quot;</code><code class="p">;</code>
+<code class="nb">NSDate</code> <code class="o">*</code><code class="n">november4th2012</code> <code class="o">=</code> <code class="p">[</code><code class="n">formatter</code> <code class="nf">dateFromString:</code><code class="n">dateString</code><code class="p">];</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%@&quot;</code><code class="p">,</code> <code class="n">november4th2012</code><code class="p">)</code><code class="o">;</code>
+</pre>
+
+
+<p>In addition to <code>M</code>, <code>d</code>, and <code>y</code>, the <a href="http://www.unicode.org/reports/tr35/tr35-25.html#Date_Format_Patterns">Unicode
+Technical Standard #35</a> defines a plethora of other date format
+specifiers. This document contains a lot of information not really necessary to
+use <code>NSDateFormatter</code> correctly, so you may find the following list
+of sample format strings to be a more practical quick-reference. The date used
+to generate the output string is November 4th, 2012 8:09 PM Central Standard
+Time.</p>
+
+<table>
+<thead>
+<tr>
+    <th class="format-string">Format String</th>
+    <th>Output String</th>
+</tr>
+</thead>
+<tbody>
+<tr class="first-row">
+    <td class="format-string"><code>M/d/y</code></td>
+    <td><code>11/4/2012</code></td>
+</tr>
+<tr>
+    <td class="format-string"><code>MM/dd/yy</code></td>
+    <td><code>11/04/12</code></td>
+</tr>
+<tr>
+    <td class="format-string"><code>MMM d, ''yy</code></td>
+    <td><code>Nov 4, '12</code></td>
+</tr>
+<tr>
+    <td class="format-string"><code>MMMM</code></td>
+    <td><code>November</code></td>
+</tr>
+<tr>
+    <td class="format-string"><code>E</code></td>
+    <td><code>Sun</code></td>
+</tr>
+<tr>
+    <td class="format-string"><code>EEEE</code></td>
+    <td><code>Sunday</code></td>
+</tr>
+<tr>
+    <td class="format-string"><code>'Week' w 'of 52'</code></td>
+    <td><code>Week 45 of 52</code></td>
+</tr>
+<tr>
+    <td class="format-string"><code>'Day' D 'of 365'</code></td>
+    <td><code>Day 309 of 365</code></td>
+</tr>
+<tr>
+    <td class="format-string"><code>QQQ</code></td>
+    <td><code>Q4</code></td>
+</tr>
+<tr>
+    <td class="format-string"><code>QQQQ</code></td>
+    <td><code>4th quarter</code></td>
+</tr>
+<tr>
+    <td class="format-string"><code>m 'minutes past' h</code></td>
+    <td><code>9 minutes past 8</code></td>
+</tr>
+<tr>
+    <td class="format-string"><code>h:mm a</code></td>
+    <td><code>8:09 PM</code></td>
+</tr>
+<tr>
+    <td class="format-string"><code>HH:mm:ss's'</code></td>
+    <td><code>20:09:00s</code></td>
+</tr>
+<tr>
+    <td class="format-string"><code>HH:mm:ss:SS</code></td>
+    <td><code>20:09:00:00</code></td>
+</tr>
+<tr>
+    <td class="format-string"><code>h:mm a zz</code></td>
+    <td><code>8:09 PM CST</code></td>
+</tr>
+<tr>
+    <td class="format-string"><code>h:mm a zzzz</code></td>
+    <td><code>8:09 PM Central Standard Time</code></td>
+</tr>
+<tr>
+    <td class="format-string"><code>yyyy-MM-dd HH:mm:ss Z</code></td>
+    <td><code>2012-11-04 20:09:00 -0600</code></td>
+</tr>
+</tbody>
+</table>
+
+<p>Notice that literal text needs to be wrapped in single quotes to prevent it
+from being parsed by the formatter.</p>
+
+
+<h2 id="nslocale">NSLocale</h2>
+
+<p>An <code>NSLocale</code> object represents a set of conventions for a
+particular language, region, or culture. Both <code>NSCalendar</code> and
+<code>NSDateFormatter</code> rely on this information to localize many of their
+core operations.</p>
+
+<p>The previous section already showed you how to create a custom locale via
+the <code>initWithLocaleIdentifier:</code> initializer. Let’s take a look
+at the impact a locale change can have on an <code>NSDateFormatter</code> by
+running the same example using Egyptian Arabic instead of POSIX:</p>
+
+<pre><code class="nb">NSDateFormatter</code> <code class="o">*</code><code class="n">formatter</code> <code class="o">=</code> <code class="p">[[</code><code class="n">NSDateFormatter</code> <code class="nf">alloc</code><code class="p">]</code> <code class="nf">init</code><code class="p">];</code>
+<code class="nb">NSLocale</code> <code class="o">*</code><code class="n">egyptianArabic</code> <code class="o">=</code> <code class="p">[[</code><code class="n">NSLocale</code> <code class="nf">alloc</code><code class="p">]</code> <code class="nf">initWithLocaleIdentifier:</code><code class="s">@&quot;ar_EG&quot;</code><code class="p">];</code>
+<code class="p">[</code><code class="n">formatter</code> <code class="nf">setLocale:</code><code class="n">egyptianArabic</code><code class="p">];</code>
+<code class="p">[</code><code class="n">formatter</code> <code class="nf">setDateFormat:</code><code class="s">@&quot;M.d.y&quot;</code><code class="p">];</code>
+
+<code class="nb">NSDate</code> <code class="o">*</code><code class="n">now</code> <code class="o">=</code> <code class="p">[</code><code class="n">NSDate</code> <code class="nf">date</code><code class="p">];</code>
+<code class="nb">NSString</code> <code class="o">*</code><code class="n">prettyDate</code> <code class="o">=</code> <code class="p">[</code><code class="n">formatter</code> <code class="nf">stringFromDate:</code><code class="n">now</code><code class="p">];</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%@&quot;</code><code class="p">,</code> <code class="n">prettyDate</code><code class="p">)</code><code class="o">;</code>
+</pre>
+
+
+<p>Instead of <code>11.4.2012</code>, the date is now displayed with Arabic
+digits: ١١.٤.٢٠١٢. This is why
+setting the locale before using custom format strings is so important—if
+you don’t, <code>NSDateFormatter</code> will use the system default, and
+your format strings will return unexpected results for international users.</p>
+
+<p>Locale identifiers are composed of a language abbreviation followed by a
+country abbreviation. In the above example, <code>ar</code> stands for Arabic,
+and <code>EG</code> represents the Egyptian dialect. You can obtain a complete
+list of available locale identifiers with the following (it’s a very long
+list):</p>
+
+<pre><code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%@&quot;</code><code class="p">,</code> <code class="p">[</code><code class="n">NSLocale</code> <code class="nf">availableLocaleIdentifiers</code><code class="p">])</code><code class="o">;</code>
+</pre>
+
+
+<p>But, whenever possible, you’ll want to stick with the user’s
+preferred locale. This makes sure that your app conforms to their expectations
+(you don’t want to force an Arabic speaker to read English). You can
+access the preferred locale through the <code>currentLocale</code> class
+method, as shown below. Note that this is the default used by
+<code>NSCalendar</code> and <code>NSDateFormatter</code>.</p>
+
+<pre><code class="nb">NSLocale</code> <code class="o">*</code><code class="n">preferredLocale</code> <code class="o">=</code> <code class="p">[</code><code class="n">NSLocale</code> <code class="nf">currentLocale</code><code class="p">]);</code>
+</pre>
+
+
+<p>Custom <code>NSLocale</code> objects are usually only required for
+specialized applications or testing purposes, but it’s still good to
+understand how iOS and OS X applications automatically translate your data
+for an international audience.</p>
+
+
+<h2 id="nstimezone">NSTimeZone</h2>
+
+<p>It’s very important to understand that a string like <code>11.4.2012
+8:09 PM</code> does <em>not</em> specify a precise point in time—8:09 PM
+in Chicago occurs 8 hours after 8:09 PM in Cairo. The time zone is a required
+piece of information for creating an absolute <code>NSDate</code> instance.
+Accordingly, <code>NSCalendar</code> and <code>NSDateFormatter</code> both
+require an <code>NSTimeZone</code> object to offset their calculations
+appropriately.</p>
+
+<p>A time zone can be created explicitly with either its full name or its
+abbreviated one. The following example demonstrates both methods and shows how
+a time zone can alter the <code>NSDate</code> produced by a formatter. The
+generated dates are displayed in Greenwich Mean Time, and you can see that 8:09
+PM in Chicago is indeed 8 hours after 8:09 PM in Cairo.</p>
+
+<pre><code class="nb">NSTimeZone</code> <code class="o">*</code><code class="n">centralStandardTime</code> <code class="o">=</code> <code class="p">[</code><code class="nb">NSTimeZone</code> <code class="nf">timeZoneWithAbbreviation:</code><code class="s">@&quot;CST&quot;</code><code class="p">];</code>
+<code class="nb">NSTimeZone</code> <code class="o">*</code><code class="n">cairoTime</code> <code class="o">=</code> <code class="p">[</code><code class="nb">NSTimeZone</code> <code class="nf">timeZoneWithName:</code><code class="s">@&quot;Africa/Cairo&quot;</code><code class="p">];</code>
+
+<code class="nb">NSDateFormatter</code> <code class="o">*</code><code class="n">formatter</code> <code class="o">=</code> <code class="p">[[</code><code class="n">NSDateFormatter</code> <code class="nf">alloc</code><code class="p">]</code> <code class="nf">init</code><code class="p">];</code>
+<code class="nb">NSLocale</code> <code class="o">*</code><code class="n">posix</code> <code class="o">=</code> <code class="p">[[</code><code class="n">NSLocale</code> <code class="nf">alloc</code><code class="p">]</code> <code class="nf">initWithLocaleIdentifier:</code><code class="s">@&quot;en_US_POSIX&quot;</code><code class="p">];</code>
+<code class="p">[</code><code class="n">formatter</code> <code class="nf">setLocale:</code><code class="n">posix</code><code class="p">];</code>
+<code class="p">[</code><code class="n">formatter</code> <code class="nf">setDateFormat:</code><code class="s">@&quot;M.d.y h:mm a&quot;</code><code class="p">];</code>
+<code class="nb">NSString</code> <code class="o">*</code><code class="n">dateString</code> <code class="o">=</code> <code class="s">@&quot;11.4.2012 8:09 PM&quot;</code><code class="p">;</code>
+
+<code class="p">[</code><code class="n">formatter</code> <code class="nf">setTimeZone:</code><code class="n">centralStandardTime</code><code class="p">];</code>
+<code class="nb">NSDate</code> <code class="o">*</code><code class="n">eightPMInChicago</code> <code class="o">=</code> <code class="p">[</code><code class="n">formatter</code> <code class="nf">dateFromString:</code><code class="n">dateString</code><code class="p">];</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%@&quot;</code><code class="p">,</code> <code class="n">eightPMInChicago</code><code class="p">)</code><code class="o">;</code>      <code class="c1">// 2012-11-05 02:09:00 +0000</code>
+
+<code class="p">[</code><code class="n">formatter</code> <code class="nf">setTimeZone:</code><code class="n">cairoTime</code><code class="p">];</code>
+<code class="nb">NSDate</code> <code class="o">*</code><code class="n">eightPMInCairo</code> <code class="o">=</code> <code class="p">[</code><code class="n">formatter</code> <code class="nf">dateFromString:</code><code class="n">dateString</code><code class="p">];</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%@&quot;</code><code class="p">,</code> <code class="n">eightPMInCairo</code><code class="p">)</code><code class="o">;</code>        <code class="c1">// 2012-11-04 18:09:00 +0000</code>
+</pre>
+
+
+<p>Note that the <code>NSDateFormatter</code>’s <code>timeZone</code>
+property is a fallback, so format strings that contain one of the
+<code>z</code> specifiers will use the parsed value as expected. You can use
+<code>NSCalendar</code>’s <code>timeZone</code> property to the same
+effect.</p>
+
+<p>Complete lists of time zone names and abbreviations can be accessed via
+<code>knownTimeZoneNames</code> and <code>abbreviationDictionary</code>,
+respectively. However, the latter does not necessarily provide values for
+<em>every</em> time zone.</p>
+
+<pre><code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%@&quot;</code><code class="p">,</code> <code class="p">[</code><code class="n">NSTimeZone</code> <code class="nf">knownTimeZoneNames</code><code class="p">])</code><code class="o">;</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%@&quot;</code><code class="p">,</code> <code class="p">[</code><code class="n">NSTimeZone</code> <code class="nf">abbreviationDictionary</code><code class="p">])</code><code class="o">;</code>
+</pre>
+
+
+<p>All users have a preferred time zone, whether it’s configured
+explicitly or determined automatically based on their region. The
+<code>localTimeZone</code> class method is the best option for accessing the
+current time zone.</p>
+
+<pre><code class="nb">NSTimeZone</code> <code class="o">*</code><code class="n">preferredTimeZone</code> <code class="o">=</code> <code class="p">[</code><code class="n">NSTimeZone</code> <code class="nf">localTimeZone</code><code class="p">];</code>
+</pre>
+
+
+<p>As with locales, it’s generally a better idea to stick with the
+default time zone. Custom <code>NSTimeZone</code> objects are typically only
+necessary for scheduling applications where time zones need to be explicitly
+associated with individual events.</p>
+
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>We hope that you’ve enjoyed <em>Ry’s Objective-C Tutorial</em>.
+Our goal was to walk you through the language behind iOS and OS X
+application development, and if you’ve been following along from the
+beginning of this tutorial, you should be feeling pretty comfortable with
+classes, properties, methods, protocols, categories, blocks, and the major data
+types in both C and Objective-C.</p>
+
+<p>The next step is to take your fantastic Objective-C foundation and combine
+it with the <a href="https://developer.apple.com/library/mac/#documentation/MacOSX/Conceptual/OSX_Technology_Overview/About/About.html">Cocoa</a>/<a href="http://developer.apple.com/library/ios/#documentation/miscellaneous/conceptual/iphoneostechoverview/Introduction/Introduction.html">Cocoa
+Touch</a> frameworks to build some awesome OS X and iOS apps.
+Apple’s <a href="http://developer.apple.com/library/ios/#referencelibrary/GettingStarted/RoadMapiOS/chapters/Introduction.html">Start Developing iOS Apps Today</a> guide is a great
+jumping-off point for new iOS developers, but if you’re interested in
+game development, be sure to check back here in March 2013 for
+<em>Ry’s Cocos2d Tutorial</em>.</p>
+
+<p>Please feel free to <a href="http://rypress.com/contact.html">contact us</a>
+with any questions or comments about this tutorial or Objective-C in general.
+If you’ve created an app using the skills you learned here, we’d
+love to hear about that, too.</p>
+
+<div class="divider" style="margin-top: 2em; margin-bottom: 1.3em;"></div><table class="icon-and-text advert"><tr>
+<td><a href="http://rypress.com/tutorials/cocoa"><img src="../media/advert-image.png" width="120px" height="165px" class="cover"></a></td>
+<td><p id="advert-text">Be sure to check out <a href="http://rypress.com/tutorials/cocoa">Ry’s Cocoa Tutorial</a>. This
+brand new guide is a complete walkthrough of Mac App development, and it
+leverages all of the Objective-C skills that we just discussed. <a href="http://rypress.com/tutorials/cocoa">Learn more ›</a></p></td>
+</tr></table>
+<div id='mailing-list'>
+
+<div class='divider' style='margin: 1.8em -22px;'></div>
+
+<h3>Mailing List</h3>
+
+<p>Sign up for my low-volume mailing list to find out when new content is
+released. Next up is a comprehensive <a
+href='https://developer.apple.com/swift/'>Swift</a> tutorial planned for late
+January.</p>
+
+<form id='mailing-list-form'
+	  action='/secure/mailing-list/request-add' method='get'>
+<label>
+	<div class='label'>Email Address:</div>
+	<div class='input'>
+	<input name='email'
+		   style='width: 200px;'
+		   type='email' />
+	</div>
+</label>
+
+<input id='mailing-list-button'
+	   class='button'
+	   style='margin-top: .5em;'
+	   type='submit' value='Subscribe'/>
+
+</form>
+
+<div style='clear: both'></div>
+
+<p class='fine-print'>You&rsquo;ll only receive emails when new tutorials are
+released, and your contact information will never be shared with third
+parties. <a href='/secure/mailing-list/unsubscribe'>Click here</a> to
+unsubscribe.</p>
+
+</div>
+
+
+<div class='divider'></div>
+
+<footer id='footer' class='fine-print'>
+  <ul>
+  	<li><a href='/licensing.php'>&copy; 2012-2014</a></li>
+	<li><a href='/'>RyPress.com</a></li>
+	<li>
+		<a href='/licensing.php'>All Rights Reserved</a>
+	</li>
+	<li>
+		<a href='/tos.php'>Terms&nbsp;of&nbsp;Service</a>
+	</li>
+	<li>
+		<a href='/privacy.php'>Privacy Policy</a>
+	</li>
+  </ul>
+</footer>
+
+</div>		<!-- .content -->
+</div>		<!-- .page -->
+</body>
+</html>

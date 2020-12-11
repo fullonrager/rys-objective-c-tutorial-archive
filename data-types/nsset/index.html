@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<title>NSSet - Ry’s Objective-C Tutorial - RyPress</title>
+<meta charset='UTF-8'/>
+<meta name='description' content="NSSet, NSArray, and NSDictionary are
+the three core collection classes defined by the Foundation Framework. An
+NSSet object represents a static, unordered collection of distinct
+objects. Sets are optimized for membership checking, so if you’re asking
+a lot of “is this object part of this group?” kind of questions,
+you should be using a set—not an array."/>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'/>
+<link rel="icon" type="image/png" href="/media/favicon.png"/>
+<link rel="stylesheet" href="/media/style.css"/>
+<link rel="stylesheet" href="/media/pygments.css"/>
+<script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  
+    ga('create', 'UA-37121774-2', 'auto');
+    ga('send', 'pageview');
+  </script>
+</head>
+<body>
+<div id='page'>
+<div id='banner'>
+<a href='/tutorials/cocoa/index'>Ry&rsquo;s Cocoa Tutorial</a> is now only $10.
+Happy Holidays! <span style='font-size: .8em'>(Offer extended to Jan 31st, 2016)</span>
+</div>
+<div id='content'>
+<nav id='main-nav'>
+<a href='/'><img src='/media/logo-small.png' width='120px' alt='RyPress - Quality Software Tutorials'/></a>
+<ul>
+<li><a href='/'>Tutorials</a></li>
+<li><a href='/secure/purchases.php'>Purchases</a></li>
+<li><a href='/about.php'>About</a></li>
+</ul>
+</nav>
+<div class='divider'></div>
+<table class="icon-and-text"><tr>
+<td><a href="../index"><img src="../media/icons/index.png" width="40px" height="40px"></a></td>
+<td><p>You’re
+reading
+<a href="../index"><em>Ry’s Objective-C Tutorial</em></a>
+→
+<a href="index"><em>Data Types</em></a></p></td>
+</tr></table><div class="divider"></div>
+<h1 id="nsset">NSSet</h1>
+<p><code>NSSet</code>, <code>NSArray</code>, and <code>NSDictionary</code> are
+the three core collection classes defined by the Foundation Framework. An
+<code>NSSet</code> object represents a static, unordered collection of distinct
+objects. Sets are optimized for membership checking, so if you’re asking
+a lot of “is this object part of this group?” kind of questions,
+you should be using a set—not an <a href="nsarray.html">array</a>.</p>
+<figure>
+<img style="max-width: 500px" src="media/nsset.png">
+<figcaption>The basic collection classes of the Foundation
+Framework</figcaption>
+</figure>
+<p>Collections can only interact with Objective-C objects. As a result,
+primitive C types like <code>int</code> need to be wrapped in an <a href="nsnumber.html"><code>NSNumber</code></a> before you can store them in a
+set, array, or dictionary.</p>
+<p><code>NSSet</code> is immutable, so you cannot add or remove elements from a
+set after it’s been created. You can, however, alter mutable objects that
+are contained in the set. For example, if you stored an
+<code>NSMutableString</code>, you’re free to call
+<code>setString:</code>, <code>appendFormat:</code>, and the other manipulation
+methods on that object. This module also covers <a href="#nsmutableset"><code>NSMutableSet</code></a> and <a href="#nscountedset"><code>NSCountedSet</code></a>.</p>
+<h2 id="creating-sets">Creating Sets</h2>
+<p>An <code>NSSet</code> can be created through the
+<code>setWithObjects:</code> class method, which accepts a
+<code>nil</code>-terminated list of objects. Most of the examples in this
+module utilize strings, but an <code>NSSet</code> instance can record
+<em>any</em> kind of Objective-C object, and it does not have to be
+homogeneous.</p>
+<pre><code class="nb">NSSet</code> <code class="o">*</code><code class="n">americanMakes</code> <code class="o">=</code> <code class="p">[</code><code class="nb">NSSet</code> <code class="nf">setWithObjects:</code><code class="s">@&quot;Chrysler&quot;</code><code class="p">,</code> <code class="s">@&quot;Ford&quot;</code><code class="p">,</code>
+                                             <code class="s">@&quot;General Motors&quot;</code><code class="p">,</code> <code class="kc">nil</code><code class="p">];</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%@&quot;</code><code class="p">,</code> <code class="n">americanMakes</code><code class="p">)</code><code class="o">;</code>
+</pre>
+<p><code>NSSet</code> also includes a <code>setWithArray:</code> method, which
+turns an <code>NSArray</code> into an <code>NSSet</code>. Remember that sets
+are composed of <em>unique</em> elements, so this serves as a convenient way to
+remove all duplicates in an array. For example:</p>
+<pre><code class="nb">NSArray</code> <code class="o">*</code><code class="n">japaneseMakes</code> <code class="o">=</code> <code class="p">@[</code><code class="s">@&quot;Honda&quot;</code><code class="p">,</code> <code class="s">@&quot;Mazda&quot;</code><code class="p">,</code>
+                           <code class="s">@&quot;Mitsubishi&quot;</code><code class="p">,</code> <code class="s">@&quot;Honda&quot;</code><code class="p">];</code>
+<code class="nb">NSSet</code> <code class="o">*</code><code class="n">uniqueMakes</code> <code class="o">=</code> <code class="p">[</code><code class="nb">NSSet</code> <code class="nf">setWithArray:</code><code class="n">japaneseMakes</code><code class="p">];</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%@&quot;</code><code class="p">,</code> <code class="n">uniqueMakes</code><code class="p">)</code><code class="o">;</code>    <code class="c1">// Honda, Mazda, Mitsubishi</code>
+</pre>
+<p>Sets maintain a <a href="../properties.html#the-strong-attribute">strong
+relationship</a> with their elements. That is to say, a set owns each item that
+it contains. You should be careful to avoid retain cycles when creating sets of
+custom objects by ensuring that an element in the set never has a strong
+reference to the set itself.</p>
+<h2 id="enumerating-sets">Enumerating Sets</h2>
+<p>Fast-enumeration is the preferred method of iterating through the contents
+of a set, and the <code>count</code> method can be used to calculate the total
+number of items. For example:</p>
+<pre><code class="nb">NSSet</code> <code class="o">*</code><code class="n">models</code> <code class="o">=</code> <code class="p">[</code><code class="nb">NSSet</code> <code class="nf">setWithObjects:</code><code class="s">@&quot;Civic&quot;</code><code class="p">,</code> <code class="s">@&quot;Accord&quot;</code><code class="p">,</code>
+                                      <code class="s">@&quot;Odyssey&quot;</code><code class="p">,</code> <code class="s">@&quot;Pilot&quot;</code><code class="p">,</code> <code class="s">@&quot;Fit&quot;</code><code class="p">,</code> <code class="kc">nil</code><code class="p">];</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;The set has %li elements&quot;</code><code class="p">,</code> <code class="p">[</code><code class="n">models</code> <code class="nf">count</code><code class="p">])</code><code class="o">;</code>
+<code class="k">for</code> <code class="p">(</code><code class="kt">id</code> <code class="n">item</code> <code class="k">in</code> <code class="n">models</code><code class="p">)</code> <code class="p">{</code>
+    <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%@&quot;</code><code class="p">,</code> <code class="n">item</code><code class="p">);</code>
+<code class="p">}</code>
+</pre>
+<p>If you’re interested in a <a href="../blocks.html">block</a>-based
+solution, you can also use the <code>enumerateObjectsUsingBlock:</code> method
+to process the contents of a set. The method’s only parameter is a
+<code>^(id obj, BOOL *stop)</code> block. <code>obj</code> is the current
+object, and the <code>*stop</code> pointer lets you prematurely exit the
+iteration by setting its value to <code>YES</code>, as demonstrated below.</p>
+<pre><code class="p">[</code><code class="n">models</code> <code class="nf">enumerateObjectsUsingBlock:</code><code class="o">^</code><code class="p">(</code><code class="kt">id</code> <code class="n">obj</code><code class="p">,</code> <code class="kt">BOOL</code> <code class="o">*</code><code class="n">stop</code><code class="p">)</code> <code class="p">{</code>
+    <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;Current item: %@&quot;</code><code class="p">,</code> <code class="n">obj</code><code class="p">);</code>
+    <code class="k">if</code> <code class="p">([</code><code class="n">obj</code> <code class="nf">isEqualToString:</code><code class="s">@&quot;Fit&quot;</code><code class="p">])</code> <code class="p">{</code>
+        <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;I was looking for a Honda Fit, and I found it!&quot;</code><code class="p">);</code>
+        <code class="o">*</code><code class="n">stop</code> <code class="o">=</code> <code class="kc">YES</code><code class="p">;</code>    <code class="c1">// Stop enumerating items</code>
+    <code class="p">}</code>
+<code class="p">}];</code>
+</pre>
+<p>The <code>*stop = YES</code> line tells the set to stop enumerating once it
+reaches the <code>@"Fit"</code> element. This the block equivalent of the
+<code>break</code> statement.</p>
+<p>Note that since sets are unordered, it usually doesn’t make sense to
+access an element outside of an enumeration. Accordingly, <code>NSSet</code>
+does <em>not</em> support subscripting syntax for accessing individual elements
+(e.g., <code>models[i]</code>). This is one of the primary differences between
+sets and <a href="nsarray.html">arrays</a>/<a href="nsdictionary.html">dictionaries</a>.</p>
+<h2 id="comparing-sets">Comparing Sets</h2>
+<p>In addition to equality, two <code>NSSet</code> objects can be checked for
+subset and intersection status. All three of these comparisons are demonstrated
+in the following example.</p>
+<pre><code class="nb">NSSet</code> <code class="o">*</code><code class="n">japaneseMakes</code> <code class="o">=</code> <code class="p">[</code><code class="nb">NSSet</code> <code class="nf">setWithObjects:</code><code class="s">@&quot;Honda&quot;</code><code class="p">,</code> <code class="s">@&quot;Nissan&quot;</code><code class="p">,</code>
+                              <code class="s">@&quot;Mitsubishi&quot;</code><code class="p">,</code> <code class="s">@&quot;Toyota&quot;</code><code class="p">,</code> <code class="kc">nil</code><code class="p">];</code>
+<code class="nb">NSSet</code> <code class="o">*</code><code class="n">johnsFavoriteMakes</code> <code class="o">=</code> <code class="p">[</code><code class="nb">NSSet</code> <code class="nf">setWithObjects:</code><code class="s">@&quot;Honda&quot;</code><code class="p">,</code> <code class="kc">nil</code><code class="p">];</code>
+<code class="nb">NSSet</code> <code class="o">*</code><code class="n">marysFavoriteMakes</code> <code class="o">=</code> <code class="p">[</code><code class="nb">NSSet</code> <code class="nf">setWithObjects:</code><code class="s">@&quot;Toyota&quot;</code><code class="p">,</code>
+                                                  <code class="s">@&quot;Alfa Romeo&quot;</code><code class="p">,</code> <code class="kc">nil</code><code class="p">];</code>
+
+<code class="k">if</code> <code class="p">([</code><code class="n">johnsFavoriteMakes</code> <code class="nf">isEqualToSet:</code><code class="n">japaneseMakes</code><code class="p">])</code> <code class="p">{</code>
+    <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;John likes all the Japanese auto makers and no others&quot;</code><code class="p">);</code>
+<code class="p">}</code>
+<code class="k">if</code> <code class="p">([</code><code class="n">johnsFavoriteMakes</code> <code class="nf">intersectsSet:</code><code class="n">japaneseMakes</code><code class="p">])</code> <code class="p">{</code>
+    <code class="c1">// You&#39;ll see this message</code>
+    <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;John likes at least one Japanese auto maker&quot;</code><code class="p">);</code>
+<code class="p">}</code>
+<code class="k">if</code> <code class="p">([</code><code class="n">johnsFavoriteMakes</code> <code class="nf">isSubsetOfSet:</code><code class="n">japaneseMakes</code><code class="p">])</code> <code class="p">{</code>
+    <code class="c1">// And this one, too</code>
+    <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;All of the auto makers that John likes are Japanese&quot;</code><code class="p">);</code>
+<code class="p">}</code>
+<code class="k">if</code> <code class="p">([</code><code class="n">marysFavoriteMakes</code> <code class="nf">isSubsetOfSet:</code><code class="n">japaneseMakes</code><code class="p">])</code> <code class="p">{</code>
+    <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;All of the auto makers that Mary likes are Japanese&quot;</code><code class="p">);</code>
+<code class="p">}</code>
+</pre>
+<h2 id="membership-checking">Membership Checking</h2>
+<p>Like all Foundation Framework collections, it’s possible to check if
+an object is in a particular <code>NSSet</code>. The
+<code>containsObject:</code> method returns a <code>BOOL</code> indicating the
+membership status of the argument. As an alternative, the <code>member:</code>
+returns a reference to the object if it’s in the set, otherwise
+<code>nil</code>. This can be convenient depending on how you’re using
+the set.</p>
+<pre><code class="nb">NSSet</code> <code class="o">*</code><code class="n">selectedMakes</code> <code class="o">=</code> <code class="p">[</code><code class="nb">NSSet</code> <code class="nf">setWithObjects:</code><code class="s">@&quot;Maserati&quot;</code><code class="p">,</code>
+                                             <code class="s">@&quot;Porsche&quot;</code><code class="p">,</code> <code class="kc">nil</code><code class="p">];</code>
+<code class="c1">// BOOL checking</code>
+<code class="k">if</code> <code class="p">([</code><code class="n">selectedMakes</code> <code class="nf">containsObject:</code><code class="s">@&quot;Maserati&quot;</code><code class="p">])</code> <code class="p">{</code>
+    <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;The user seems to like expensive cars&quot;</code><code class="p">);</code>
+<code class="p">}</code>
+<code class="c1">// nil checking</code>
+<code class="nb">NSString</code> <code class="o">*</code><code class="n">result</code> <code class="o">=</code> <code class="p">[</code><code class="n">selectedMakes</code> <code class="nf">member:</code><code class="s">@&quot;Maserati&quot;</code><code class="p">];</code>
+<code class="k">if</code> <code class="p">(</code><code class="n">result</code> <code class="o">!=</code> <code class="kc">nil</code><code class="p">)</code> <code class="p">{</code>
+    <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%@ is one of the selected makes&quot;</code><code class="p">,</code> <code class="n">result</code><code class="p">);</code>
+<code class="p">}</code>
+</pre>
+<p>Again, this is one of the strong suits of sets, so if you’re doing a
+lot of membership checking, you should be using <code>NSSet</code> instead of
+<code>NSArray</code> (unless you have a compelling reason not to).</p>
+<h2 id="filtering-sets">Filtering Sets</h2>
+<p>You can filter the contents of a set using the
+<code>objectsPassingTest:</code> method, which accepts a block that is called
+using each item in the set. The block should return <code>YES</code> if the
+current object should be included in the new set, and <code>NO</code> if it
+shouldn’t. The following example finds all items that begin with an
+uppercase letter <code>C</code>.</p>
+<pre><code class="nb">NSSet</code> <code class="o">*</code><code class="n">toyotaModels</code> <code class="o">=</code> <code class="p">[</code><code class="nb">NSSet</code> <code class="nf">setWithObjects:</code><code class="s">@&quot;Corolla&quot;</code><code class="p">,</code> <code class="s">@&quot;Sienna&quot;</code><code class="p">,</code>
+                       <code class="s">@&quot;Camry&quot;</code><code class="p">,</code> <code class="s">@&quot;Prius&quot;</code><code class="p">,</code>
+                       <code class="s">@&quot;Highlander&quot;</code><code class="p">,</code> <code class="s">@&quot;Sequoia&quot;</code><code class="p">,</code> <code class="kc">nil</code><code class="p">];</code>
+<code class="nb">NSSet</code> <code class="o">*</code><code class="n">cModels</code> <code class="o">=</code> <code class="p">[</code><code class="n">toyotaModels</code> <code class="nf">objectsPassingTest:</code><code class="o">^</code><code class="kt">BOOL</code><code class="p">(</code><code class="kt">id</code> <code class="n">obj</code><code class="p">,</code> <code class="kt">BOOL</code> <code class="o">*</code><code class="n">stop</code><code class="p">)</code> <code class="p">{</code>
+    <code class="k">if</code> <code class="p">([</code><code class="n">obj</code> <code class="nf">hasPrefix:</code><code class="s">@&quot;C&quot;</code><code class="p">])</code> <code class="p">{</code>
+        <code class="k">return</code> <code class="kc">YES</code><code class="p">;</code>
+    <code class="p">}</code> <code class="k">else</code> <code class="p">{</code>
+        <code class="k">return</code> <code class="kc">NO</code><code class="p">;</code>
+    <code class="p">}</code>
+<code class="p">}];</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%@&quot;</code><code class="p">,</code> <code class="n">cModels</code><code class="p">)</code><code class="o">;</code>    <code class="c1">// Corolla, Camry</code>
+</pre>
+<p>Because <code>NSSet</code> is immutable, the
+<code>objectsPassingTest:</code> method returns a <em>new</em> set instead of
+altering the existing one. This is the same behavior as many of the
+<code>NSString</code> manipulation operations. But, while the <em>set</em> is a
+new instance, it still refers to the same <em>elements</em> as the original
+set. That is to say, filtered elements are not copied—they are
+referenced.</p>
+<h2 id="combining-sets">Combining Sets</h2>
+<p>Sets can be combined using the <code>setByAddingObjectsFromSet:</code>
+method. Since sets are unique, duplicates will be ignored if both sets contain
+the same object.</p>
+<pre><code class="nb">NSSet</code> <code class="o">*</code><code class="n">affordableMakes</code> <code class="o">=</code> <code class="p">[</code><code class="nb">NSSet</code> <code class="nf">setWithObjects:</code><code class="s">@&quot;Ford&quot;</code><code class="p">,</code> <code class="s">@&quot;Honda&quot;</code><code class="p">,</code>
+                                     <code class="s">@&quot;Nissan&quot;</code><code class="p">,</code> <code class="s">@&quot;Toyota&quot;</code><code class="p">,</code> <code class="kc">nil</code><code class="p">];</code>
+<code class="nb">NSSet</code> <code class="o">*</code><code class="n">fancyMakes</code> <code class="o">=</code> <code class="p">[</code><code class="nb">NSSet</code> <code class="nf">setWithObjects:</code><code class="s">@&quot;Ferrari&quot;</code><code class="p">,</code> <code class="s">@&quot;Maserati&quot;</code><code class="p">,</code>
+                                          <code class="s">@&quot;Porsche&quot;</code><code class="p">,</code> <code class="kc">nil</code><code class="p">];</code>
+<code class="nb">NSSet</code> <code class="o">*</code><code class="n">allMakes</code> <code class="o">=</code> <code class="p">[</code><code class="n">affordableMakes</code> <code class="nf">setByAddingObjectsFromSet:</code><code class="n">fancyMakes</code><code class="p">];</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%@&quot;</code><code class="p">,</code> <code class="n">allMakes</code><code class="p">)</code><code class="o">;</code>
+</pre>
+<h1 id="nsmutableset">NSMutableSet</h1>
+<p>Mutable sets allow you to add or delete objects dynamically, which affords a
+whole lot more flexibility than the static <code>NSSet</code>. In addition to
+membership checking, mutable sets are also more efficient at inserting and
+removing elements than <code>NSMutableArray</code>.</p>
+<p><code>NSMutableSet</code> can be very useful for recording the state of a
+system. For example, if you were writing an application to manage an auto
+repair shop, you might maintain a mutable set called <code>repairedCars</code>
+and add/remove cars to reflect whether or not they have been fixed yet.</p>
+<h2 id="creating-mutable-sets">Creating Mutable Sets</h2>
+<p>Mutable sets can be created with the exact same methods as
+<code>NSSet</code>. Or, you can create an empty set with the
+<code>setWithCapacity:</code> class method. The argument defines the initial
+amount of space allocated for the set, but it in no way limits the number of
+items it can hold.</p>
+<pre><code class="nb">NSMutableSet</code> <code class="o">*</code><code class="n">brokenCars</code> <code class="o">=</code> <code class="p">[</code><code class="nb">NSMutableSet</code> <code class="nf">setWithObjects:</code>
+                            <code class="s">@&quot;Honda Civic&quot;</code><code class="p">,</code> <code class="s">@&quot;Nissan Versa&quot;</code><code class="p">,</code> <code class="kc">nil</code><code class="p">];</code>
+<code class="nb">NSMutableSet</code> <code class="o">*</code><code class="n">repairedCars</code> <code class="o">=</code> <code class="p">[</code><code class="nb">NSMutableSet</code> <code class="nf">setWithCapacity:</code><code class="mi">5</code><code class="p">];</code>
+</pre>
+<h2 id="adding-and-removing-objects">Adding and Removing Objects</h2>
+<p>The big additions provided by <code>NSMutableSet</code> are the
+<code>addObject:</code> and <code>removeObject:</code> methods. Note that
+<code>addObject:</code> won’t actually do anything if the object is
+already a member of the collection because sets are composed of unique
+items.</p>
+<pre><code class="nb">NSMutableSet</code> <code class="o">*</code><code class="n">brokenCars</code> <code class="o">=</code> <code class="p">[</code><code class="nb">NSMutableSet</code> <code class="nf">setWithObjects:</code>
+                            <code class="s">@&quot;Honda Civic&quot;</code><code class="p">,</code> <code class="s">@&quot;Nissan Versa&quot;</code><code class="p">,</code> <code class="kc">nil</code><code class="p">];</code>
+<code class="nb">NSMutableSet</code> <code class="o">*</code><code class="n">repairedCars</code> <code class="o">=</code> <code class="p">[</code><code class="nb">NSMutableSet</code> <code class="nf">setWithCapacity:</code><code class="mi">5</code><code class="p">];</code>
+<code class="c1">// &quot;Fix&quot; the Honda Civic</code>
+<code class="p">[</code><code class="n">brokenCars</code> <code class="nf">removeObject:</code><code class="s">@&quot;Honda Civic&quot;</code><code class="p">];</code>
+<code class="p">[</code><code class="n">repairedCars</code> <code class="nf">addObject:</code><code class="s">@&quot;Honda Civic&quot;</code><code class="p">];</code>
+
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;Broken cars: %@&quot;</code><code class="p">,</code> <code class="n">brokenCars</code><code class="p">)</code><code class="o">;</code>     <code class="c1">// Nissan Versa</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;Repaired cars: %@&quot;</code><code class="p">,</code> <code class="n">repairedCars</code><code class="p">)</code><code class="o">;</code> <code class="c1">// Honda Civic</code>
+</pre>
+<p>Just like mutable strings, <code>NSMutableSet</code> has a different
+workflow than the static <code>NSSet</code>. Instead of generating a new set
+and re-assigning it to the variable, you can operate directly on the existing
+set.</p>
+<p>You may also find the <code>removeAllObjects</code> method useful for
+completely clearing a set.</p>
+<h2 id="filtering-with-predicates">Filtering With Predicates</h2>
+<p>There is no mutable version of the <code>objectsPassingTest:</code> method,
+but you can still filter items with <code>filterUsingPredicate:</code>.
+Predicates are somewhat outside the scope of this tutorial, but suffice it to
+say that they are designed to make it easier to define search/filter rules.
+Fortunately, the <a href="https://developer.apple.com/library/mac/#documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html"><code>NSPredicate</code></a>
+class can be initialized with a block, so we don’t need to learn an
+entirely new format syntax.</p>
+<p>The following code snippet is the mutable, predicate-based version of the
+example from the <a href="#filtering-sets">Filtering Sets</a> section
+above. Again, this operates directly on the existing set.</p>
+<pre><code class="nb">NSMutableSet</code> <code class="o">*</code><code class="n">toyotaModels</code> <code class="o">=</code> <code class="p">[</code><code class="nb">NSMutableSet</code> <code class="nf">setWithObjects:</code><code class="s">@&quot;Corolla&quot;</code><code class="p">,</code> <code class="s">@&quot;Sienna&quot;</code><code class="p">,</code>
+                              <code class="s">@&quot;Camry&quot;</code><code class="p">,</code> <code class="s">@&quot;Prius&quot;</code><code class="p">,</code>
+                              <code class="s">@&quot;Highlander&quot;</code><code class="p">,</code> <code class="s">@&quot;Sequoia&quot;</code><code class="p">,</code> <code class="kc">nil</code><code class="p">];</code>
+<code class="nb">NSPredicate</code> <code class="o">*</code><code class="n">startsWithC</code> <code class="o">=</code> <code class="p">[</code><code class="nb">NSPredicate</code> <code class="nf">predicateWithBlock:</code>
+                            <code class="o">^</code><code class="kt">BOOL</code><code class="p">(</code><code class="kt">id</code> <code class="n">evaluatedObject</code><code class="p">,</code> <code class="nb">NSDictionary</code> <code class="o">*</code><code class="n">bindings</code><code class="p">)</code> <code class="p">{</code>
+                                <code class="k">if</code> <code class="p">([</code><code class="n">evaluatedObject</code> <code class="nf">hasPrefix:</code><code class="s">@&quot;C&quot;</code><code class="p">])</code> <code class="p">{</code>
+                                    <code class="k">return</code> <code class="kc">YES</code><code class="p">;</code>
+                                <code class="p">}</code> <code class="k">else</code> <code class="p">{</code>
+                                    <code class="k">return</code> <code class="kc">NO</code><code class="p">;</code>
+                                <code class="p">}</code>
+                            <code class="p">}];</code>
+<code class="p">[</code><code class="n">toyotaModels</code> <code class="nf">filterUsingPredicate:</code><code class="n">startsWithC</code><code class="p">];</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%@&quot;</code><code class="p">,</code> <code class="n">toyotaModels</code><code class="p">)</code><code class="o">;</code>    <code class="c1">// Corolla, Camry</code>
+</pre>
+<p>For more information about predicates, please visit the official <a href="https://developer.apple.com/library/mac/documentation/cocoa/conceptual/Predicates/AdditionalChapters/Introduction.html">Predicate
+Programming Guide</a>.</p>
+<h2 id="set-theory-operations">Set Theory Operations</h2>
+<p><code>NSMutableSet</code> also provides an API for the basic operations in
+set theory. These methods let you take the union, intersection, and relative
+complement of two sets. In addition, the <code>setSet:</code> method is also
+useful for creating a shallow copy of a different set. All of these are
+included in the following example.</p>
+<pre><code class="nb">NSSet</code> <code class="o">*</code><code class="n">japaneseMakes</code> <code class="o">=</code> <code class="p">[</code><code class="nb">NSSet</code> <code class="nf">setWithObjects:</code><code class="s">@&quot;Honda&quot;</code><code class="p">,</code> <code class="s">@&quot;Nissan&quot;</code><code class="p">,</code>
+                        <code class="s">@&quot;Mitsubishi&quot;</code><code class="p">,</code> <code class="s">@&quot;Toyota&quot;</code><code class="p">,</code> <code class="kc">nil</code><code class="p">];</code>
+<code class="nb">NSSet</code> <code class="o">*</code><code class="n">johnsFavoriteMakes</code> <code class="o">=</code> <code class="p">[</code><code class="nb">NSSet</code> <code class="nf">setWithObjects:</code><code class="s">@&quot;Honda&quot;</code><code class="p">,</code> <code class="kc">nil</code><code class="p">];</code>
+<code class="nb">NSSet</code> <code class="o">*</code><code class="n">marysFavoriteMakes</code> <code class="o">=</code> <code class="p">[</code><code class="nb">NSSet</code> <code class="nf">setWithObjects:</code><code class="s">@&quot;Toyota&quot;</code><code class="p">,</code>
+                             <code class="s">@&quot;Alfa Romeo&quot;</code><code class="p">,</code> <code class="kc">nil</code><code class="p">];</code>
+
+<code class="nb">NSMutableSet</code> <code class="o">*</code><code class="n">result</code> <code class="o">=</code> <code class="p">[</code><code class="nb">NSMutableSet</code> <code class="nf">setWithCapacity:</code><code class="mi">5</code><code class="p">];</code>
+<code class="c1">// Union</code>
+<code class="p">[</code><code class="n">result</code> <code class="nf">setSet:</code><code class="n">johnsFavoriteMakes</code><code class="p">];</code>
+<code class="p">[</code><code class="n">result</code> <code class="nf">unionSet:</code><code class="n">marysFavoriteMakes</code><code class="p">];</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;Either John&#39;s or Mary&#39;s favorites: %@&quot;</code><code class="p">,</code> <code class="n">result</code><code class="p">)</code><code class="o">;</code>
+<code class="c1">// Intersection</code>
+<code class="p">[</code><code class="n">result</code> <code class="nf">setSet:</code><code class="n">johnsFavoriteMakes</code><code class="p">];</code>
+<code class="p">[</code><code class="n">result</code> <code class="nf">intersectSet:</code><code class="n">japaneseMakes</code><code class="p">];</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;John&#39;s favorite Japanese makes: %@&quot;</code><code class="p">,</code> <code class="n">result</code><code class="p">)</code><code class="o">;</code>
+<code class="c1">// Relative Complement</code>
+<code class="p">[</code><code class="n">result</code> <code class="nf">setSet:</code><code class="n">japaneseMakes</code><code class="p">];</code>
+<code class="p">[</code><code class="n">result</code> <code class="nf">minusSet:</code><code class="n">johnsFavoriteMakes</code><code class="p">];</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;Japanese makes that are not John&#39;s favorites: %@&quot;</code><code class="p">,</code>
+      <code class="n">result</code><code class="p">);</code>
+</pre>
+<h2 id="enumeration-considerations">Enumeration Considerations</h2>
+<p>Iterating over a mutable set works the same as a static set, with one very
+important caveat: you aren’t allowed to change the set while you’re
+enumerating it. This is a general rule for any collection class.</p>
+<p>The following example demonstrates the <em>wrong</em> way to mutate a set in
+the middle of a for-in loop. We’ll be using the rather contrived scenario
+of removing <code>@"Toyota"</code> if any element in the set begins with the
+letter <code>T</code>.</p>
+<pre><code class="c1">// DO NOT DO THIS. EVER.</code>
+<code class="nb">NSMutableSet</code> <code class="o">*</code><code class="n">makes</code> <code class="o">=</code> <code class="p">[</code><code class="nb">NSMutableSet</code> <code class="nf">setWithObjects:</code><code class="s">@&quot;Ford&quot;</code><code class="p">,</code> <code class="s">@&quot;Honda&quot;</code><code class="p">,</code>
+                       <code class="s">@&quot;Nissan&quot;</code><code class="p">,</code> <code class="s">@&quot;Toyota&quot;</code><code class="p">,</code> <code class="kc">nil</code><code class="p">];</code>
+<code class="k">for</code> <code class="p">(</code><code class="nb">NSString</code> <code class="o">*</code><code class="n">make</code> <code class="k">in</code> <code class="n">makes</code><code class="p">)</code> <code class="p">{</code>
+    <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%@&quot;</code><code class="p">,</code> <code class="n">make</code><code class="p">);</code>
+    <code class="k">if</code> <code class="p">([</code><code class="n">make</code> <code class="nf">hasPrefix:</code><code class="s">@&quot;T&quot;</code><code class="p">])</code> <code class="p">{</code>
+        <code class="c1">// Throws an NSGenericException:</code>
+        <code class="c1">// &quot;Collection was mutated while being enumerated&quot;</code>
+        <code class="p">[</code><code class="n">makes</code> <code class="nf">removeObject:</code><code class="s">@&quot;Toyota&quot;</code><code class="p">];</code>
+    <code class="p">}</code>
+<code class="p">}</code>
+</pre>
+<p>The proper way to do this is shown below. Instead of iterating over the set
+directly, you should create a temporary copy of it with the
+<code>allObjects</code> method and iterate over that. This frees you to alter
+the original set without any unintended consequences:</p>
+<pre><code class="nb">NSMutableSet</code> <code class="o">*</code><code class="n">makes</code> <code class="o">=</code> <code class="p">[</code><code class="nb">NSMutableSet</code> <code class="nf">setWithObjects:</code><code class="s">@&quot;Ford&quot;</code><code class="p">,</code> <code class="s">@&quot;Honda&quot;</code><code class="p">,</code>
+                       <code class="s">@&quot;Nissan&quot;</code><code class="p">,</code> <code class="s">@&quot;Toyota&quot;</code><code class="p">,</code> <code class="kc">nil</code><code class="p">];</code>
+<code class="nb">NSArray</code> <code class="o">*</code><code class="n">snapshot</code> <code class="o">=</code> <code class="p">[</code><code class="n">makes</code> <code class="nf">allObjects</code><code class="p">];</code>
+<code class="k">for</code> <code class="p">(</code><code class="nb">NSString</code> <code class="o">*</code><code class="n">make</code> <code class="k">in</code> <code class="n">snapshot</code><code class="p">)</code> <code class="p">{</code>
+    <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%@&quot;</code><code class="p">,</code> <code class="n">make</code><code class="p">);</code>
+    <code class="k">if</code> <code class="p">([</code><code class="n">make</code> <code class="nf">hasPrefix:</code><code class="s">@&quot;T&quot;</code><code class="p">])</code> <code class="p">{</code>
+        <code class="p">[</code><code class="n">makes</code> <code class="nf">removeObject:</code><code class="s">@&quot;Toyota&quot;</code><code class="p">];</code>
+    <code class="p">}</code>
+<code class="p">}</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%@&quot;</code><code class="p">,</code> <code class="n">makes</code><code class="p">);</code>
+</pre>
+<h1 id="nscountedset">NSCountedSet</h1>
+<p>The <code>NSCountedSet</code> class (also called a “bag”) is
+worth a brief mention. It’s a subclass of <code>NSMutableSet</code>, but
+instead of being limited to <em>unique</em> values, it counts the number of
+times an object has been added to the collection. This is a very efficient way
+to keep object tallies, as it requires only one instance of an object
+regardless of how many times it’s been added to the bag.</p>
+<p>The main difference between a mutable set and <code>NSCountedSet</code> is
+the <code>countForObject:</code> method. This will often be used in place of
+<code>containsObject:</code> (which still works as expected). For example:</p>
+<pre><code class="nb">NSCountedSet</code> <code class="o">*</code><code class="n">inventory</code> <code class="o">=</code> <code class="p">[</code><code class="nb">NSCountedSet</code> <code class="nf">setWithCapacity:</code><code class="mi">5</code><code class="p">];</code>
+<code class="p">[</code><code class="n">inventory</code> <code class="nf">addObject:</code><code class="s">@&quot;Honda Accord&quot;</code><code class="p">];</code>
+<code class="p">[</code><code class="n">inventory</code> <code class="nf">addObject:</code><code class="s">@&quot;Honda Accord&quot;</code><code class="p">];</code>
+<code class="p">[</code><code class="n">inventory</code> <code class="nf">addObject:</code><code class="s">@&quot;Nissan Altima&quot;</code><code class="p">];</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;There are %li Accords in stock and %li Altima&quot;</code><code class="p">,</code>
+      <code class="p">[</code><code class="n">inventory</code> <code class="nf">countForObject:</code><code class="s">@&quot;Honda Accord&quot;</code><code class="p">],</code>    <code class="c1">// 2</code>
+      <code class="p">[</code><code class="n">inventory</code> <code class="nf">countForObject:</code><code class="s">@&quot;Nissan Altima&quot;</code><code class="p">]);</code>  <code class="c1">// 1</code>
+</pre>
+<p>Please see the <a href="http://developer.apple.com/library/ios/#documentation/cocoa/reference/foundation/Classes/NSCountedSet_Class/Reference/Reference.html">official
+documentation</a> for more details.</p>
+<div class="divider" style="margin-top: 2em; margin-bottom: 1.3em;"></div><table class="icon-and-text advert"><tr>
+<td><a href="http://rypress.com/tutorials/cocoa"><img src="../media/advert-image.png" width="120px" height="165px" class="cover"></a></td>
+<td><p id="advert-text">Be sure to check out <a href="http://rypress.com/tutorials/cocoa">Ry’s Cocoa Tutorial</a>. This
+brand new guide is a complete walkthrough of Mac App development, and it
+leverages all of the Objective-C skills that we just discussed. <a href="http://rypress.com/tutorials/cocoa">Learn more ›</a></p></td>
+</tr></table>
+<div id='mailing-list'>
+<div class='divider' style='margin: 1.8em -22px;'></div>
+<h3>Mailing List</h3>
+<p>Sign up for my low-volume mailing list to find out when new content is
+released. Next up is a comprehensive <a href='https://developer.apple.com/swift/'>Swift</a> tutorial planned for late
+January.</p>
+<form id='mailing-list-form' action='/secure/mailing-list/request-add' method='get'>
+<label>
+<div class='label'>Email Address:</div>
+<div class='input'>
+<input name='email' style='width: 200px;' type='email'/>
+</div>
+</label>
+<input id='mailing-list-button' class='button' style='margin-top: .5em;' type='submit' value='Subscribe'/>
+</form>
+<div style='clear: both'></div>
+<p class='fine-print'>You&rsquo;ll only receive emails when new tutorials are
+released, and your contact information will never be shared with third
+parties. <a href='/secure/mailing-list/unsubscribe'>Click here</a> to
+unsubscribe.</p>
+</div>
+<div class='divider'></div>
+<footer id='footer' class='fine-print'>
+<ul>
+<li><a href='/licensing.php'>&copy; 2012-2014</a></li>
+<li><a href='/'>RyPress.com</a></li>
+<li>
+<a href='/licensing.php'>All Rights Reserved</a>
+</li>
+<li>
+<a href='/tos.php'>Terms&nbsp;of&nbsp;Service</a>
+</li>
+<li>
+<a href='/privacy.php'>Privacy Policy</a>
+</li>
+</ul>
+</footer>
+</div>  
+</div>  
+</body>
+</html>

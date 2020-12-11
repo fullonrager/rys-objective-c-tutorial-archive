@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<title>Exceptions &amp; Errors - Ry’s Objective-C Tutorial - RyPress</title>
+<meta charset='UTF-8'/>
+<meta name='description' content="Two distinct types of problems can arise while an iOS or OS X
+application is running. Exceptions represent programmer-level
+bugs like trying to access an array element that doesn’t exist. They are
+designed to inform the developer that an unexpected condition
+occurred. Since they usually result in the program crashing, exceptions should
+rarely occur in your production code."/>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'/>
+<link rel="icon" type="image/png" href="/media/favicon.png"/>
+<link rel="stylesheet" href="/media/style.css"/>
+<link rel="stylesheet" href="/media/pygments.css"/>
+<script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  
+    ga('create', 'UA-37121774-2', 'auto');
+    ga('send', 'pageview');
+  </script>
+</head>
+<body>
+<div id='page'>
+<div id='banner'>
+<a href='/tutorials/cocoa/index'>Ry&rsquo;s Cocoa Tutorial</a> is now only $10.
+Happy Holidays! <span style='font-size: .8em'>(Offer extended to Jan 31st, 2016)</span>
+</div>
+<div id='content'>
+<nav id='main-nav'>
+<a href='/'><img src='/media/logo-small.png' width='120px' alt='RyPress - Quality Software Tutorials'/></a>
+<ul>
+<li><a href='/'>Tutorials</a></li>
+<li><a href='/secure/purchases.php'>Purchases</a></li>
+<li><a href='/about.php'>About</a></li>
+</ul>
+</nav>
+<div class='divider'></div>
+<table class="icon-and-text"><tr>
+<td><a href="index"><img src="media/icons/index.png" width="40px" height="40px"></a></td>
+<td><p>You’re
+reading
+<a href="index"><em>Ry’s Objective-C Tutorial</em></a></p></td>
+</tr></table><div class="divider"></div>
+<h1 id="exceptions-errors">Exceptions &amp; Errors</h1>
+<p>Two distinct types of problems can arise while an iOS or OS X
+application is running. <strong>Exceptions</strong> represent programmer-level
+bugs like trying to access an array element that doesn’t exist. They are
+designed to inform the developer that an <em>unexpected</em> condition
+occurred. Since they usually result in the program crashing, exceptions should
+rarely occur in your production code.</p>
+<p>On the other hand, <strong>errors</strong> are user-level issues like trying
+load a file that doesn’t exist. Because errors are <em>expected</em>
+during the normal execution of a program, you should manually check for these
+kinds of conditions and inform the user when they occur. Most of the time, they
+should not cause your application to crash.</p>
+<figure>
+<img style="max-width: 500px" src="media/exceptions/exceptions-vs-errors.png">
+<figcaption>Exceptions vs. errors</figcaption>
+</figure>
+<p>This module provides a thorough introduction to exceptions and errors.
+Conceptually, working with exceptions is very similar to working with errors.
+First you need to detect the problem, and then you need to handle it. But, as
+we’re about to find out, the underlying mechanics are slightly
+different</p>
+<h1 id="exceptions">Exceptions</h1>
+<p>Exceptions are represented by the <a href="https://developer.apple.com/library/mac/#documentation/Cocoa/Reference/Foundation/Classes/NSException_Class/Reference/Reference.html"><code>NSException</code></a>
+class. It’s designed to be a universal way to encapsulate exception data,
+so you should rarely need to subclass it or otherwise define a custom exception
+object. <code>NSException</code>’s three main properties are listed
+below.</p>
+<table class="multiline">
+<thead>
+<tr>
+<th>Property</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>name</code></td>
+<td>An <code>NSString</code> that uniquely identifies the exception.</td>
+</tr>
+<tr>
+<td><code>reason</code></td>
+<td>An <code>NSString</code> that contains a human-readable description of
+the exception.</td>
+</tr>
+<tr>
+<td><code>userInfo</code></td>
+<td>An <code>NSDictionary</code> whose key-value pairs contain extra
+information about the exception. This varies based on the type of
+exception.</td>
+</tr>
+</tbody>
+</table>
+<p>It’s important to understand that exceptions are only used for serious
+programming errors. The idea is to let you know that something has gone wrong
+early in the development cycle, after which you’re expected to fix it so
+it never occurs again. If you’re trying to handle a problem that’s
+<em>supposed</em> to occur, you should be using an <a href="#errors">error
+object</a>, not an exception.</p>
+<h2 id="handling-exceptions">Handling Exceptions</h2>
+<p>Exceptions can be handled using the standard try-catch-finally pattern found
+in most other high-level programming languages. First, you need to place any
+code that <em>might</em> result in an exception in an <code>@try</code> block.
+Then, if an exception is thrown, the corresponding <code>@catch()</code> block
+is executed to handle the problem. The <code>@finally</code> block is called
+afterwards, regardless of whether or not an exception occurred.</p>
+<p>The following <code>main.m</code> file raises an exception by trying to
+access an array element that doesn’t exist. In the <code>@catch()</code>
+block, we simply display the exception details. The <code>NSException
+*theException</code> in the parentheses defines the name of the variable
+containing the exception object.</p>
+<pre><code class="c1">// main.m</code>
+<code class="cp">#import</code> <code class="l">&lt;Foundation/Foundation.h&gt;</code><code class="cp"></code>
+
+<code class="kt">int</code> <code class="nf">main</code><code class="p">(</code><code class="kt">int</code> <code class="n">argc</code><code class="p">,</code> <code class="kt">const</code> <code class="kt">char</code> <code class="o">*</code> <code class="n">argv</code><code class="p">[])</code> <code class="p">{</code>
+    <code class="k">@autoreleasepool</code> <code class="p">{</code>
+        <code class="nb">NSArray</code> <code class="o">*</code><code class="n">inventory</code> <code class="o">=</code> <code class="p">@[</code><code class="s">@&quot;Honda Civic&quot;</code><code class="p">,</code>
+                               <code class="s">@&quot;Nissan Versa&quot;</code><code class="p">,</code>
+                               <code class="s">@&quot;Ford F-150&quot;</code><code class="p">];</code>
+        <code class="kt">int</code> <code class="n">selectedIndex</code> <code class="o">=</code> <code class="mi">3</code><code class="p">;</code>
+        <code class="k">@try</code> <code class="p">{</code>
+            <code class="nb">NSString</code> <code class="o">*</code><code class="n">car</code> <code class="o">=</code> <code class="n">inventory</code><code class="p">[</code><code class="n">selectedIndex</code><code class="p">];</code>
+            <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;The selected car is: %@&quot;</code><code class="p">,</code> <code class="n">car</code><code class="p">);</code>
+        <code class="p">}</code> <code class="k">@catch</code><code class="p">(</code><code class="nb">NSException</code> <code class="o">*</code><code class="n">theException</code><code class="p">)</code> <code class="p">{</code>
+            <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;An exception occurred: %@&quot;</code><code class="p">,</code> <code class="n">theException</code><code class="p">.</code><code class="n">name</code><code class="p">);</code>
+            <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;Here are some details: %@&quot;</code><code class="p">,</code> <code class="n">theException</code><code class="p">.</code><code class="n">reason</code><code class="p">)</code><code class="o">;</code>
+        <code class="p">}</code> <code class="k">@finally</code> <code class="p">{</code>
+            <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;Executing finally block&quot;</code><code class="p">);</code>
+        <code class="p">}</code>
+    <code class="p">}</code>
+    <code class="k">return</code> <code class="mi">0</code><code class="p">;</code>
+<code class="p">}</code>
+</pre>
+<p>In the real world, you’ll want your <code>@catch()</code> block to
+actually handle the exception by logging the problem, correcting it, or
+possibly even promoting the exception to an error object so it can be displayed
+to the user. The default behavior for uncaught exceptions is to output a
+message to the console and exit the program.</p>
+<p>Objective-C’s exception-handling capabilities are not the most
+efficient, so you should only use <code>@try</code>/<code>@catch()</code>
+blocks to test for truly exceptional circumstances. Do <em>not</em> use it in
+place of ordinary control flow tools. Instead, check for predictable conditions
+using standard <code>if</code> statements.</p>
+<p>This means that the above snippet is actually a very poor use of exceptions.
+A much better route would have been to make sure that the
+<code>selectedIndex</code> was smaller than the
+<code>[inventory count]</code> using a traditional comparison:</p>
+<pre><code class="k">if</code> <code class="p">(</code><code class="n">selectedIndex</code> <code class="o">&lt;</code> <code class="p">[</code><code class="n">inventory</code> <code class="nf">count</code><code class="p">])</code> <code class="p">{</code>
+    <code class="nb">NSString</code> <code class="o">*</code><code class="n">car</code> <code class="o">=</code> <code class="n">inventory</code><code class="p">[</code><code class="n">selectedIndex</code><code class="p">];</code>
+    <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;The selected car is: %@&quot;</code><code class="p">,</code> <code class="n">car</code><code class="p">)</code><code class="o">;</code>
+<code class="p">}</code> <code class="k">else</code> <code class="p">{</code>
+    <code class="c1">// Handle the error</code>
+<code class="p">}</code>
+</pre>
+<h2 id="built-in-exceptions">Built-In Exceptions</h2>
+<p>The standard iOS and OS X frameworks define several built-in
+exceptions. The complete list can be found <a href="https://developer.apple.com/library/mac/documentation/Cocoa/Conceptual/Exceptions/Concepts/PredefinedExceptions.html#//apple_ref/doc/uid/20000057-BCIGHECA">here</a>,
+but the most common ones are described below.</p>
+<table class="multiline">
+<thead>
+<tr>
+<th>Exception Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>NSRangeException</code></td>
+<td>Occurs when you try to access an element that’s outside the bounds of
+a collection.</td>
+</tr>
+<tr>
+<td><code>NSInvalidArgumentException</code></td>
+<td>Occurs when you pass an invalid argument to a method.</td>
+</tr>
+<tr>
+<td><code>NSInternalInconsistencyException</code></td>
+<td>Occurs when an unexpected condition arises internally.</td>
+</tr>
+<tr>
+<td><code>NSGenericException</code></td>
+<td>Occurs when you don’t know what else to call the exception.</td>
+</tr>
+</tbody>
+</table>
+<p>Note that these values are <em>strings</em>, not <code>NSException</code>
+subclasses. So, when you’re looking for a specific type of exception,
+you need to check the <code>name</code> property, like so:</p>
+<pre><code class="p">...</code>
+<code class="p">}</code> <code class="k">@catch</code><code class="p">(</code><code class="nb">NSException</code> <code class="o">*</code><code class="n">theException</code><code class="p">)</code> <code class="p">{</code>
+    <code class="k">if</code> <code class="p">(</code><code class="n">theException</code><code class="p">.</code><code class="n">name</code> <code class="o">==</code> <code class="nb">NSRangeException</code><code class="p">)</code> <code class="p">{</code>
+        <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;Caught an NSRangeException&quot;</code><code class="p">);</code>
+    <code class="p">}</code> <code class="k">else</code> <code class="p">{</code>
+        <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;Ignored a %@ exception&quot;</code><code class="p">,</code> <code class="n">theException</code><code class="p">);</code>
+        <code class="k">@throw</code><code class="p">;</code>
+    <code class="p">}</code>
+<code class="p">}</code> <code class="p">...</code>
+</pre>
+<p>In an <code>@catch()</code> block, the <code>@throw</code> directive
+re-raises the caught exception. We used this in the above snippet to ignore all
+of the exceptions we didn’t want by throwing it up to the next highest
+<code>@try</code> block. But again, a simple <code>if</code>-statement would be
+preferred.</p>
+<h2 id="custom-exceptions">Custom Exceptions</h2>
+<p>You can also use <code>@throw</code> to raise <code>NSException</code>
+objects that contain custom data. The easiest way to create an
+<code>NSException</code> instance is through the
+<code>exceptionWithName:reason:userInfo:</code> factory method. The following
+example throws an exception inside of a top-level function and catches it in
+the <code>main()</code> function.</p>
+<pre><code class="c1">// main.m</code>
+<code class="cp">#import</code> <code class="l">&lt;Foundation/Foundation.h&gt;</code><code class="cp"></code>
+
+<code class="nb">NSString</code> <code class="o">*</code><code class="nf">getRandomCarFromInventory</code><code class="p">(</code><code class="nb">NSArray</code> <code class="o">*</code><code class="n">inventory</code><code class="p">)</code> <code class="p">{</code>
+    <code class="kt">int</code> <code class="n">maximum</code> <code class="o">=</code> <code class="p">(</code><code class="kt">int</code><code class="p">)[</code><code class="n">inventory</code> <code class="nf">count</code><code class="p">];</code>
+    <code class="k">if</code> <code class="p">(</code><code class="n">maximum</code> <code class="o">==</code> <code class="mi">0</code><code class="p">)</code> <code class="p">{</code>
+        <code class="nb">NSException</code> <code class="o">*</code><code class="n">e</code> <code class="o">=</code> <code class="p">[</code><code class="nb">NSException</code>
+                          <code class="nf">exceptionWithName:</code><code class="s">@&quot;EmptyInventoryException&quot;</code>
+                          <code class="nf">reason:</code><code class="s">@&quot;*** The inventory has no cars!&quot;</code>
+                          <code class="nf">userInfo:</code><code class="kc">nil</code><code class="p">];</code>
+        <code class="k">@throw</code> <code class="n">e</code><code class="p">;</code>
+    <code class="p">}</code>
+    <code class="kt">int</code> <code class="n">randomIndex</code> <code class="o">=</code> <code class="nb">arc4random_uniform</code><code class="p">(</code><code class="n">maximum</code><code class="p">);</code>
+    <code class="k">return</code> <code class="n">inventory</code><code class="p">[</code><code class="n">randomIndex</code><code class="p">];</code>
+<code class="p">}</code>
+
+<code class="kt">int</code> <code class="n">main</code><code class="p">(</code><code class="kt">int</code> <code class="n">argc</code><code class="p">,</code> <code class="kt">const</code> <code class="kt">char</code> <code class="o">*</code> <code class="n">argv</code><code class="p">[])</code> <code class="p">{</code>
+    <code class="k">@autoreleasepool</code> <code class="p">{</code>
+        <code class="k">@try</code> <code class="p">{</code>
+            <code class="nb">NSString</code> <code class="o">*</code><code class="n">car</code> <code class="o">=</code> <code class="n">getRandomCarFromInventory</code><code class="p">(@[]);</code>
+            <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;The selected car is: %@&quot;</code><code class="p">,</code> <code class="n">car</code><code class="p">)</code><code class="o">;</code>
+        <code class="p">}</code> <code class="k">@catch</code><code class="p">(</code><code class="nb">NSException</code> <code class="o">*</code><code class="n">theException</code><code class="p">)</code> <code class="p">{</code>
+            <code class="k">if</code> <code class="p">(</code><code class="n">theException</code><code class="p">.</code><code class="n">name</code> <code class="o">==</code> <code class="s">@&quot;EmptyInventoryException&quot;</code><code class="p">)</code> <code class="p">{</code>
+                <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;Caught an EmptyInventoryException&quot;</code><code class="p">);</code>
+            <code class="p">}</code> <code class="k">else</code> <code class="p">{</code>
+                <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;Ignored a %@ exception&quot;</code><code class="p">,</code> <code class="n">theException</code><code class="p">);</code>
+                <code class="k">@throw</code><code class="p">;</code>
+            <code class="p">}</code>
+        <code class="p">}</code>
+    <code class="p">}</code>
+    <code class="k">return</code> <code class="mi">0</code><code class="p">;</code>
+<code class="p">}</code>
+</pre>
+<p>While occasionally necessary, you shouldn’t really need to throw
+custom exceptions like this in normal applications. For one, exceptions
+represent programmer errors, and there are very few times when you should be
+planning for serious coding mistakes. Second, <code>@throw</code> is an
+expensive operation, so it’s always better to use errors if possible.</p>
+<h1 id="errors">Errors</h1>
+<p>Since errors represent <em>expected</em> problems, and there are several
+types of operations that can fail without causing the program to crash, they
+are much more common than exceptions. Unlike exceptions, this kind of error
+checking is a normal aspect of production-quality code.</p>
+<p>The <a href="https://developer.apple.com/library/mac/#documentation/Cocoa/Reference/Foundation/Classes/NSError_Class/Reference/Reference.html"><code>NSError</code></a>
+class encapsulates the details surrounding a failed operation. Its main
+properties are similar to <code>NSException</code>.</p>
+<table class="multiline">
+<thead>
+<tr>
+<th>Property</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>domain</code></td>
+<td>An <code>NSString</code> containing the error’s domain. This is
+used to organize errors into a hierarchy and ensure that error codes
+don’t conflict.</td>
+</tr>
+<tr>
+<td><code>code</code></td>
+<td>An <code>NSInteger</code> representing the ID of the error. Each error
+in the same domain must have a unique value.</td>
+</tr>
+<tr>
+<td><code>userInfo</code></td>
+<td>An <code>NSDictionary</code> whose key-value pairs contain extra
+information about the error. This varies based on the type of
+error.</td>
+</tr>
+</tbody>
+</table>
+<p>The <code>userInfo</code> dictionary for <code>NSError</code> objects
+typically contains more information than <code>NSException</code>’s
+version. Some of the pre-defined keys, which are defined as named constants,
+are listed below.</p>
+<table class="multiline">
+<thead>
+<tr>
+<th>Key</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>NSLocalizedDescriptionKey</code></td>
+<td>An <code>NSString</code> representing the full description of the
+error. This usually includes the failure reason, too.</td>
+</tr>
+<tr>
+<td><code>NSLocalizedFailureReasonErrorKey</code></td>
+<td>A brief <code>NSString</code> isolating the reason for the
+failure.</td>
+</tr>
+<tr>
+<td><code>NSUnderlyingErrorKey</code></td>
+<td>A reference to another <code>NSError</code> object that represents the
+error in the next-highest domain.</td>
+</tr>
+</tbody>
+</table>
+<p>Depending on the error, this dictionary will also contain other
+domain-specific information. For example, file-loading errors will have a key
+called <code>NSFilePathErrorKey</code> that contains the path to the requested
+file.</p>
+<p>Note that the <code>localizedDescription</code> and
+<code>localizedFailureReason</code> methods are an alternative way to access
+the first two keys, respectively. These are used in the next section’s
+example.</p>
+<h2 id="handling-errors">Handling Errors</h2>
+<p>Errors don’t require any dedicated language constructs like
+<code>@try</code> and <code>@catch()</code>. Instead, functions or methods that
+<em>may</em> fail accept an additional argument (typically called
+<code>error</code>) that is a reference to an <code>NSError</code> object. If
+the operation fails, it returns <code>NO</code> or <code>nil</code> to indicate
+failure and populates this argument with the error details. If it succeeds, it
+simply returns the requested value as normal.</p>
+<p>Many methods are configured to accept an <strong>indirect reference</strong>
+to an <code>NSError</code> object. An indirect reference is a pointer to a
+pointer, and it allows the method to point the argument to a brand new
+<code>NSError</code> instance. You can determine if a method’s
+<code>error</code> argument accepts an indirect reference by its double-pointer
+notation: <code>(NSError **)error</code>.</p>
+<p>The following snippet demonstrates this error-handling pattern by trying to
+load a file that doesn’t exist via <code>NSString</code>’s
+<code>stringWithContentsOfFile:encoding:error:</code> method. When the file
+loads successfully, the method returns the contents of the file as an
+<code>NSString</code>, but when it fails, it directly returns <code>nil</code>
+and <em>indirectly</em> returns the error by populating the <code>error</code>
+argument with a new <code>NSError</code> object.</p>
+<pre><code class="c1">// main.m</code>
+<code class="cp">#import</code> <code class="l">&lt;Foundation/Foundation.h&gt;</code><code class="cp"></code>
+
+<code class="kt">int</code> <code class="nf">main</code><code class="p">(</code><code class="kt">int</code> <code class="n">argc</code><code class="p">,</code> <code class="kt">const</code> <code class="kt">char</code> <code class="o">*</code> <code class="n">argv</code><code class="p">[])</code> <code class="p">{</code>
+    <code class="k">@autoreleasepool</code> <code class="p">{</code>
+        <code class="nb">NSString</code> <code class="o">*</code><code class="n">fileToLoad</code> <code class="o">=</code> <code class="s">@&quot;/path/to/non-existent-file.txt&quot;</code><code class="p">;</code>
+        
+        <code class="nb">NSError</code> <code class="o">*</code><code class="n">error</code><code class="p">;</code>
+        <code class="nb">NSString</code> <code class="o">*</code><code class="n">content</code> <code class="o">=</code> <code class="p">[</code><code class="nb">NSString</code> <code class="nf">stringWithContentsOfFile:</code><code class="n">fileToLoad</code>
+                                                      <code class="nf">encoding:</code><code class="nb">NSUTF8StringEncoding</code>
+                                                         <code class="nf">error:</code><code class="o">&amp;</code><code class="n">error</code><code class="p">];</code>
+        
+        <code class="k">if</code> <code class="p">(</code><code class="n">content</code> <code class="o">==</code> <code class="kc">nil</code><code class="p">)</code> <code class="p">{</code>
+            <code class="c1">// Method failed</code>
+            <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;Error loading file %@!&quot;</code><code class="p">,</code> <code class="n">fileToLoad</code><code class="p">);</code>
+            <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;Domain: %@&quot;</code><code class="p">,</code> <code class="n">error</code><code class="p">.</code><code class="n">domain</code><code class="p">);</code>
+            <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;Error Code: %ld&quot;</code><code class="p">,</code> <code class="n">error</code><code class="p">.</code><code class="n">code</code><code class="p">);</code>
+            <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;Description: %@&quot;</code><code class="p">,</code> <code class="p">[</code><code class="n">error</code> <code class="nf">localizedDescription</code><code class="p">]);</code>
+            <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;Reason: %@&quot;</code><code class="p">,</code> <code class="p">[</code><code class="n">error</code> <code class="nf">localizedFailureReason</code><code class="p">]);</code>
+        <code class="p">}</code> <code class="k">else</code> <code class="p">{</code>
+            <code class="c1">// Method succeeded</code>
+            <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;Content loaded!&quot;</code><code class="p">);</code>
+            <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%@&quot;</code><code class="p">,</code> <code class="n">content</code><code class="p">)</code><code class="o">;</code>
+        <code class="p">}</code>
+    <code class="p">}</code>
+    <code class="k">return</code> <code class="mi">0</code><code class="p">;</code>
+<code class="p">}</code>
+</pre>
+<p>Notice how the we had to pass the <code>error</code> variable to the method
+using the <a href="c-basics.html#pointers">reference operator</a>. This is
+because the <code>error</code> argument accepts a double-pointer. Also notice
+how we checked the return value of the method for success with an ordinary
+<code>if</code> statement. You should only try to access the
+<code>NSError</code> reference if the method directly returns <code>nil</code>,
+and you should never use the presence of an <code>NSError</code> object to
+indicate success or failure.</p>
+<p>Of course, if you only care about the success of the operation and
+aren’t concern with <em>why</em> it failed, you can just pass
+<code>NULL</code> for the <code>error</code> argument and it will be
+ignored.</p>
+<h2 id="built-in-errors">Built-In Errors</h2>
+<p>Like <code>NSException</code>, <code>NSError</code> is designed to be a
+universal object for representing errors. Instead of subclassing it, the
+various iOS and OS X frameworks define their own constants for the
+<code>domain</code> and <code>code</code> fields. There are several built-in
+error domains, but the main four are as follows:</p>
+<ul style="list-style-type: none">
+<li><code>NSMachErrorDomain</code></li>
+<li><code>NSPOSIXErrorDomain</code></li>
+<li><code>NSOSStatusErrorDomain</code></li>
+<li><code>NSCocoaErrorDomain</code></li>
+</ul>
+<p>Most of the errors you’ll be working with are in the
+<code>NSCocoaErrorDomain</code>, but if you drill down to the lower-level
+domains, you’ll see some of the other ones. For example, if you add the
+following line to <code>main.m</code>, you’ll find an error with
+<code>NSPOSIXErrorDomain</code> for its domain.</p>
+<pre><code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;Underlying Error: %@&quot;</code><code class="p">,</code> <code class="n">error</code><code class="p">.</code><code class="n">userInfo</code><code class="p">[</code><code class="nb">NSUnderlyingErrorKey</code><code class="p">])</code><code class="o">;</code>
+</pre>
+<p>For most applications, you shouldn’t need to do this, but it can come
+in handy when you need to get at the root cause of an error.</p>
+<p>After you’ve determined your error domain, you can check for a
+specific error code. The <a href="https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Miscellaneous/Foundation_Constants/Reference/reference.html#//apple_ref/doc/uid/TP40003793">Foundation
+Constants Reference</a> describes several <code>enum</code>’s that define
+most of the error codes in the <code>NSCocoaErrorDomain</code>. For example,
+the following code searches for a <code>NSFileReadNoSuchFileError</code>
+error.</p>
+<pre><code class="p">...</code>
+<code class="k">if</code> <code class="p">(</code><code class="n">content</code> <code class="o">==</code> <code class="kc">nil</code><code class="p">)</code> <code class="p">{</code>
+    <code class="k">if</code> <code class="p">([</code><code class="n">error</code><code class="p">.</code><code class="n">domain</code> <code class="nf">isEqualToString:</code><code class="s">@&quot;NSCocoaErrorDomain&quot;</code><code class="p">]</code> <code class="o">&amp;&amp;</code>
+        <code class="n">error</code><code class="p">.</code><code class="n">code</code> <code class="o">==</code> <code class="nb">NSFileReadNoSuchFileError</code><code class="p">)</code> <code class="p">{</code>
+        <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;That file doesn&#39;t exist!&quot;</code><code class="p">);</code>
+        <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;Path: %@&quot;</code><code class="p">,</code> <code class="p">[[</code><code class="n">error</code> <code class="nf">userInfo</code><code class="p">]</code> <code class="nf">objectForKey:</code><code class="nb">NSFilePathErrorKey</code><code class="p">])</code><code class="o">;</code>
+    <code class="p">}</code> <code class="k">else</code> <code class="p">{</code>
+        <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;Some other kind of read occurred&quot;</code><code class="p">);</code>
+    <code class="p">}</code>
+<code class="p">}</code> <code class="p">...</code>
+</pre>
+<p>Other frameworks should include any custom domains and error codes in their
+documentation.</p>
+<h2 id="custom-errors">Custom Errors</h2>
+<p>If you’re working on a large project, you’ll probably have at
+least a few functions or methods that can result in an error. This section
+explains how to configure them to use the canonical error-handling pattern
+discussed above.</p>
+<p>As a best practice, you should define all of your errors in a dedicated
+header. For instance, a file called <code>InventoryErrors.h</code> might define
+a domain containing various error codes related to fetching items from an
+inventory.</p>
+<pre><code class="c1">// InventoryErrors.h</code>
+
+<code class="nb">NSString</code> <code class="o">*</code><code class="n">InventoryErrorDomain</code> <code class="o">=</code> <code class="s">@&quot;com.RyPress.Inventory.ErrorDomain&quot;</code><code class="p">;</code>
+
+<code class="k">enum</code> <code class="p">{</code>
+    <code class="n">InventoryNotLoadedError</code><code class="p">,</code>
+    <code class="n">InventoryEmptyError</code><code class="p">,</code>
+    <code class="n">InventoryInternalError</code>
+<code class="p">};</code>
+</pre>
+<p>Technically, custom error domains can be anything you want, but the
+recommended form is
+<code>com.&lt;Company&gt;.&lt;Framework-or-project&gt;.ErrorDomain</code>, as
+shown in <code>InventoryErrorDomain</code>. The <code>enum</code> defines the
+error code constants.</p>
+<p>The only thing that’s different about a function or method that is
+error-enabled is the additional <code>error</code> argument. It should specify
+<code>NSError **</code> as its type, as shown in the following iteration of
+<code>getRandomCarFromInventory()</code>. When an error occurs, you point this
+argument to a new <code>NSError</code> object. Also note how we defined
+<code>localizedDescription</code> by manually adding it to the
+<code>userInfo</code> dictionary with
+<code>NSLocalizedDescriptionKey</code>.</p>
+<pre><code class="c1">// main.m</code>
+<code class="cp">#import</code> <code class="l">&lt;Foundation/Foundation.h&gt;</code><code class="cp"></code>
+<code class="cp">#import</code> <code class="l">&quot;InventoryErrors.h&quot;</code><code class="cp"></code>
+
+<code class="nb">NSString</code> <code class="o">*</code><code class="nf">getRandomCarFromInventory</code><code class="p">(</code><code class="nb">NSArray</code> <code class="o">*</code><code class="n">inventory</code><code class="p">,</code> <code class="nb">NSError</code> <code class="o">**</code><code class="n">error</code><code class="p">)</code> <code class="p">{</code>
+    <code class="kt">int</code> <code class="n">maximum</code> <code class="o">=</code> <code class="p">(</code><code class="kt">int</code><code class="p">)[</code><code class="n">inventory</code> <code class="nf">count</code><code class="p">];</code>
+    <code class="k">if</code> <code class="p">(</code><code class="n">maximum</code> <code class="o">==</code> <code class="mi">0</code><code class="p">)</code> <code class="p">{</code>
+        <code class="k">if</code> <code class="p">(</code><code class="n">error</code> <code class="o">!=</code> <code class="kc">NULL</code><code class="p">)</code> <code class="p">{</code>
+            <code class="nb">NSDictionary</code> <code class="o">*</code><code class="n">userInfo</code> <code class="o">=</code> <code class="p">@{</code><code class="nf">NSLocalizedDescriptionKey:</code> <code class="s">@&quot;Could not&quot;</code>
+            <code class="s">&quot; select a car because there are no cars in the inventory.&quot;</code><code class="p">};</code>
+            
+            <code class="o">*</code><code class="n">error</code> <code class="o">=</code> <code class="p">[</code><code class="nb">NSError</code> <code class="nf">errorWithDomain:</code><code class="n">InventoryErrorDomain</code>
+                                         <code class="nf">code:</code><code class="n">InventoryEmptyError</code>
+                                     <code class="nf">userInfo:</code><code class="n">userInfo</code><code class="p">];</code>
+        <code class="p">}</code>
+        <code class="k">return</code> <code class="kc">nil</code><code class="p">;</code>
+    <code class="p">}</code>
+    <code class="kt">int</code> <code class="n">randomIndex</code> <code class="o">=</code> <code class="nb">arc4random_uniform</code><code class="p">(</code><code class="n">maximum</code><code class="p">);</code>
+    <code class="k">return</code> <code class="n">inventory</code><code class="p">[</code><code class="n">randomIndex</code><code class="p">];</code>
+<code class="p">}</code>
+
+<code class="kt">int</code> <code class="n">main</code><code class="p">(</code><code class="kt">int</code> <code class="n">argc</code><code class="p">,</code> <code class="kt">const</code> <code class="kt">char</code> <code class="o">*</code> <code class="n">argv</code><code class="p">[])</code> <code class="p">{</code>
+    <code class="k">@autoreleasepool</code> <code class="p">{</code>
+        <code class="nb">NSArray</code> <code class="o">*</code><code class="n">inventory</code> <code class="o">=</code> <code class="p">@[];</code>
+        <code class="nb">NSError</code> <code class="o">*</code><code class="n">error</code><code class="p">;</code>
+        <code class="nb">NSString</code> <code class="o">*</code><code class="n">car</code> <code class="o">=</code> <code class="n">getRandomCarFromInventory</code><code class="p">(</code><code class="n">inventory</code><code class="p">,</code> <code class="o">&amp;</code><code class="n">error</code><code class="p">);</code>
+        
+        <code class="k">if</code> <code class="p">(</code><code class="n">car</code> <code class="o">==</code> <code class="kc">nil</code><code class="p">)</code> <code class="p">{</code>
+            <code class="c1">// Failed</code>
+            <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;Car could not be selected&quot;</code><code class="p">);</code>
+            <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;Domain: %@&quot;</code><code class="p">,</code> <code class="n">error</code><code class="p">.</code><code class="n">domain</code><code class="p">)</code><code class="o">;</code>
+            <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;Error Code: %ld&quot;</code><code class="p">,</code> <code class="n">error</code><code class="p">.</code><code class="n">code</code><code class="p">)</code><code class="o">;</code>
+            <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;Description: %@&quot;</code><code class="p">,</code> <code class="p">[</code><code class="n">error</code> <code class="nf">localizedDescription</code><code class="p">])</code><code class="o">;</code>
+            
+        <code class="p">}</code> <code class="k">else</code> <code class="p">{</code>
+            <code class="c1">// Succeeded</code>
+            <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;Car selected!&quot;</code><code class="p">);</code>
+            <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%@&quot;</code><code class="p">,</code> <code class="n">car</code><code class="p">)</code><code class="o">;</code>
+        <code class="p">}</code>
+    <code class="p">}</code>
+    <code class="k">return</code> <code class="mi">0</code><code class="p">;</code>
+<code class="p">}</code>
+</pre>
+<p>Since it technically is an error and not an exception, this version of
+<code>getRandomCarFromInventory()</code> is the “proper” way to
+handle it (opposed to <a href="#custom-exceptions">Custom Exceptions</a>).</p>
+<h1 id="summary">Summary</h1>
+<p>Errors represent a failed operation in an iOS or OS X application.
+It’s a standardized way to record the relevant information at the point
+of detection and pass it off to the handling code. Exceptions are similar, but
+are designed as more of a development aid. They generally should not be used in
+your production-ready programs.</p>
+<p>How you handle an error or exception is largely dependent on the type of
+problem, as well as your application. But, most of the time you’ll want
+to inform the user with something like <a href="https://developer.apple.com/library/ios/documentation/UIKit/Reference/UIAlertView_Class/UIAlertView/UIAlertView.html#//apple_ref/occ/cl/UIAlertView"><code>UIAlertView</code></a>
+(iOS). or <a href="https://developer.apple.com/library/mac/documentation/Cocoa/Reference/ApplicationKit/Classes/NSAlert_Class/Reference/Reference.html"><code>NSAlert</code></a>
+(OS X). After that, you’ll probably want to figure out what went
+wrong by inspecting the <code>NSError</code> or <code>NSException</code> object
+so that you can try to recover from it.</p>
+<p>The next module explores some of the more conceptual aspects of the
+Objective-C runtime. We’ll learn about how the memory behind our objects
+is managed by experimenting with the (now obsolete) Manual Retain Release
+system, as well as the practical implications of the newer
+Automatic Reference Counting system.</p>
+<div class="divider" style="margin-top: 2em; margin-bottom: 1.3em;"></div><table class="icon-and-text advert"><tr>
+<td><a href="http://rypress.com/tutorials/cocoa"><img src="media/advert-image.png" width="120px" height="165px" class="cover"></a></td>
+<td><p id="advert-text">Be sure to check out <a href="http://rypress.com/tutorials/cocoa">Ry’s Cocoa Tutorial</a>. This
+brand new guide is a complete walkthrough of Mac App development, and it
+leverages all of the Objective-C skills that we just discussed. <a href="http://rypress.com/tutorials/cocoa">Learn more ›</a></p></td>
+</tr></table>
+<div id='mailing-list'>
+<div class='divider' style='margin: 1.8em -22px;'></div>
+<h3>Mailing List</h3>
+<p>Sign up for my low-volume mailing list to find out when new content is
+released. Next up is a comprehensive <a href='https://developer.apple.com/swift/'>Swift</a> tutorial planned for late
+January.</p>
+<form id='mailing-list-form' action='/secure/mailing-list/request-add' method='get'>
+<label>
+<div class='label'>Email Address:</div>
+<div class='input'>
+<input name='email' style='width: 200px;' type='email'/>
+</div>
+</label>
+<input id='mailing-list-button' class='button' style='margin-top: .5em;' type='submit' value='Subscribe'/>
+</form>
+<div style='clear: both'></div>
+<p class='fine-print'>You&rsquo;ll only receive emails when new tutorials are
+released, and your contact information will never be shared with third
+parties. <a href='/secure/mailing-list/unsubscribe'>Click here</a> to
+unsubscribe.</p>
+</div>
+<div class='divider'></div>
+<footer id='footer' class='fine-print'>
+<ul>
+<li><a href='/licensing.php'>&copy; 2012-2014</a></li>
+<li><a href='/'>RyPress.com</a></li>
+<li>
+<a href='/licensing.php'>All Rights Reserved</a>
+</li>
+<li>
+<a href='/tos.php'>Terms&nbsp;of&nbsp;Service</a>
+</li>
+<li>
+<a href='/privacy.php'>Privacy Policy</a>
+</li>
+</ul>
+</footer>
+</div>  
+</div>  
+</body>
+</html>

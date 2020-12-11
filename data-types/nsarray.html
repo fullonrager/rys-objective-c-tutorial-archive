@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+  <title>NSArray - Ry’s Objective-C Tutorial - RyPress</title>
+  <meta charset='UTF-8' />
+  <meta name='description' content="NSArray is Objective-C’s general-purpose array type. It
+represents an ordered collection of objects, and it provides a high-level
+interface for sorting and otherwise manipulating lists of data. Arrays
+aren’t as efficient at membership checking as sets, but the trade-off is that they reliably record the
+order of their elements." />
+  <meta name='viewport'
+  	    content='width=device-width, initial-scale=1.0, maximum-scale=1.0' />
+  <link rel="icon" type="image/png" href="/media/favicon.png" />
+  <link rel="stylesheet" href="/media/style.css" />
+  <link rel="stylesheet" href="/media/pygments.css" />
+
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  
+    ga('create', 'UA-37121774-2', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+  
+</head>
+<body>
+
+<div id='page'>
+
+<div id='content'>
+
+<nav id='main-nav'>
+	<a href='/'><img src='/media/logo-small.png'
+		 width='120px'
+		 alt='RyPress - Quality Software Tutorials'/></a>
+	<ul>
+	<li><a href='/'>Tutorials</a></li>
+	<li><a href='/secure/purchases.php'>Purchases</a></li>
+	<li><a href='/about.php'>About</a></li>
+	</ul>
+</nav>
+
+<div class='divider'></div>
+<table class="icon-and-text"><tr>
+<td><a href="../index"><img src="../media/icons/index.png" width="40px" height="40px"></a></td>
+<td><p>You’re
+
+			
+					reading
+				<a href="../index"><em>Ry’s Objective-C Tutorial</em></a>
+				→
+				
+				<a href="index"><em>Data Types</em></a></p></td>
+</tr></table><div class="divider"></div>
+
+<h1 id="nsarray">NSArray</h1>
+
+<p><code>NSArray</code> is Objective-C’s general-purpose array type. It
+represents an ordered collection of objects, and it provides a high-level
+interface for sorting and otherwise manipulating lists of data. Arrays
+aren’t as efficient at membership checking as <a href="nsset.html">sets</a>, but the trade-off is that they reliably record the
+order of their elements.</p>
+
+<figure>
+    <img style="max-width: 500px" src="media/nsarray.png">
+    <figcaption>The basic collection classes of the Foundation
+    Framework</figcaption>
+</figure>
+
+<p>Like <code>NSSet</code>, <code>NSArray</code> is immutable, so you cannot
+dynamically add or remove items. Its mutable counterpart,
+<code>NSMutableArray</code>, is discussed in the <a href="#nsmutablearray">second part</a> of this module.</p>
+
+
+<h2 id="creating-arrays">Creating Arrays</h2>
+
+<p>Immutable arrays can be defined as literals using the <code>@[]</code>
+syntax. This was added relatively late in the evolution of the language (Xcode
+4.4), so you’re likely to encounter the more verbose
+<code>arrayWithObjects:</code> factory method at some point in your Objective-C
+career. Both options are included below.</p>
+
+<pre><code class="nb">NSArray</code> <code class="o">*</code><code class="n">germanMakes</code> <code class="o">=</code> <code class="p">@[</code><code class="s">@&quot;Mercedes-Benz&quot;</code><code class="p">,</code> <code class="s">@&quot;BMW&quot;</code><code class="p">,</code> <code class="s">@&quot;Porsche&quot;</code><code class="p">,</code>
+                         <code class="s">@&quot;Opel&quot;</code><code class="p">,</code> <code class="s">@&quot;Volkswagen&quot;</code><code class="p">,</code> <code class="s">@&quot;Audi&quot;</code><code class="p">];</code>
+<code class="nb">NSArray</code> <code class="o">*</code><code class="n">ukMakes</code> <code class="o">=</code> <code class="p">[</code><code class="nb">NSArray</code> <code class="nf">arrayWithObjects:</code><code class="s">@&quot;Aston Martin&quot;</code><code class="p">,</code>
+                    <code class="s">@&quot;Lotus&quot;</code><code class="p">,</code> <code class="s">@&quot;Jaguar&quot;</code><code class="p">,</code> <code class="s">@&quot;Bentley&quot;</code><code class="p">,</code> <code class="kc">nil</code><code class="p">];</code>
+
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;First german make: %@&quot;</code><code class="p">,</code> <code class="n">germanMakes</code><code class="p">[</code><code class="mi">0</code><code class="p">])</code><code class="o">;</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;First U.K. make: %@&quot;</code><code class="p">,</code> <code class="p">[</code><code class="n">ukMakes</code> <code class="nf">objectAtIndex:</code><code class="mi">0</code><code class="p">])</code><code class="o">;</code>
+</pre>
+
+
+<p>As you can see, individual items can be accessed through the square-bracket
+subscripting syntax (<code>germanMakes[0]</code>) or the
+<code>objectAtIndex:</code> method. Prior to Xcode 4.4,
+<code>objectAtIndex:</code> was the standard way to access array elements.</p>
+
+
+<h2 id="enumerating-arrays">Enumerating Arrays</h2>
+
+<p>Fast-enumeration is the most efficient way to iterate over an
+<code>NSArray</code>, and its contents are guaranteed to appear in the correct
+order. It’s also possible to use the <code>count</code> method with a
+traditional for-loop to step through each element in the array:</p>
+
+<pre><code class="nb">NSArray</code> <code class="o">*</code><code class="n">germanMakes</code> <code class="o">=</code> <code class="p">@[</code><code class="s">@&quot;Mercedes-Benz&quot;</code><code class="p">,</code> <code class="s">@&quot;BMW&quot;</code><code class="p">,</code> <code class="s">@&quot;Porsche&quot;</code><code class="p">,</code>
+                         <code class="s">@&quot;Opel&quot;</code><code class="p">,</code> <code class="s">@&quot;Volkswagen&quot;</code><code class="p">,</code> <code class="s">@&quot;Audi&quot;</code><code class="p">];</code>
+<code class="c1">// With fast-enumeration</code>
+<code class="k">for</code> <code class="p">(</code><code class="nb">NSString</code> <code class="o">*</code><code class="n">item</code> <code class="k">in</code> <code class="n">germanMakes</code><code class="p">)</code> <code class="p">{</code>
+    <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%@&quot;</code><code class="p">,</code> <code class="n">item</code><code class="p">);</code>
+<code class="p">}</code>
+<code class="c1">// With a traditional for loop</code>
+<code class="k">for</code> <code class="p">(</code><code class="kt">int</code> <code class="n">i</code><code class="o">=</code><code class="mi">0</code><code class="p">;</code> <code class="n">i</code><code class="o">&lt;</code><code class="p">[</code><code class="n">germanMakes</code> <code class="nf">count</code><code class="p">];</code> <code class="n">i</code><code class="o">++</code><code class="p">)</code> <code class="p">{</code>
+    <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%d: %@&quot;</code><code class="p">,</code> <code class="n">i</code><code class="p">,</code> <code class="n">germanMakes</code><code class="p">[</code><code class="n">i</code><code class="p">]);</code>
+<code class="p">}</code>
+</pre>
+
+
+<p>If you’re fond of blocks, you can use the
+<code>enumerateObjectsUsingBlock:</code> method. It works the same as <a href="nsset.html#enumerating-sets"><code>NSSet</code>’s version</a>,
+except the index of each item is also passed to the block, so its signature
+looks like <code>^(id obj, NSUInteger idx, BOOL *stop)</code>. And of course,
+the objects are passed to the block in the same order as they appear in the
+array.</p>
+
+<pre><code class="p">[</code><code class="n">germanMakes</code> <code class="nf">enumerateObjectsUsingBlock:</code><code class="o">^</code><code class="p">(</code><code class="kt">id</code> <code class="n">obj</code><code class="p">,</code>
+                                          <code class="nb">NSUInteger</code> <code class="n">idx</code><code class="p">,</code>
+                                          <code class="kt">BOOL</code> <code class="o">*</code><code class="n">stop</code><code class="p">)</code> <code class="p">{</code>
+    <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%ld: %@&quot;</code><code class="p">,</code> <code class="n">idx</code><code class="p">,</code> <code class="n">obj</code><code class="p">);</code>
+<code class="p">}];</code>
+</pre>
+
+
+
+<h2 id="comparing-arrays">Comparing Arrays</h2>
+
+<p>Arrays can be compared for equality with the aptly named
+<code>isEqualToArray:</code> method, which returns <code>YES</code> when both
+arrays have the same number of elements and every pair pass an
+<code>isEqual:</code> comparison. <code>NSArray</code> does not offer the
+same subset and intersection comparisons as <code>NSSet</code>.</p>
+
+<pre><code class="nb">NSArray</code> <code class="o">*</code><code class="n">germanMakes</code> <code class="o">=</code> <code class="p">@[</code><code class="s">@&quot;Mercedes-Benz&quot;</code><code class="p">,</code> <code class="s">@&quot;BMW&quot;</code><code class="p">,</code> <code class="s">@&quot;Porsche&quot;</code><code class="p">,</code>
+                         <code class="s">@&quot;Opel&quot;</code><code class="p">,</code> <code class="s">@&quot;Volkswagen&quot;</code><code class="p">,</code> <code class="s">@&quot;Audi&quot;</code><code class="p">];</code>
+<code class="nb">NSArray</code> <code class="o">*</code><code class="n">sameGermanMakes</code> <code class="o">=</code> <code class="p">[</code><code class="nb">NSArray</code> <code class="nf">arrayWithObjects:</code><code class="s">@&quot;Mercedes-Benz&quot;</code><code class="p">,</code>
+                            <code class="s">@&quot;BMW&quot;</code><code class="p">,</code> <code class="s">@&quot;Porsche&quot;</code><code class="p">,</code> <code class="s">@&quot;Opel&quot;</code><code class="p">,</code>
+                            <code class="s">@&quot;Volkswagen&quot;</code><code class="p">,</code> <code class="s">@&quot;Audi&quot;</code><code class="p">,</code> <code class="kc">nil</code><code class="p">];</code>
+
+<code class="k">if</code> <code class="p">([</code><code class="n">germanMakes</code> <code class="nf">isEqualToArray:</code><code class="n">sameGermanMakes</code><code class="p">])</code> <code class="p">{</code>
+    <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;Oh good, literal arrays are the same as NSArrays&quot;</code><code class="p">);</code>
+<code class="p">}</code>
+</pre>
+
+
+
+<h2 id="membership-checking">Membership Checking</h2>
+
+<p><code>NSArray</code> provides similar membership checking utilities to
+<code>NSSet</code>. The <code>containsObject:</code> method works the exact
+same (it returns <code>YES</code> if the object is in the array,
+<code>NO</code> otherwise), but instead of <code>member:</code>,
+<code>NSArray</code> uses <code>indexOfObject:</code>. This either returns the
+index of the first occurrence of the requested object or
+<code>NSNotFound</code> if it’s not in the array.</p>
+
+<pre><code class="nb">NSArray</code> <code class="o">*</code><code class="n">germanMakes</code> <code class="o">=</code> <code class="p">@[</code><code class="s">@&quot;Mercedes-Benz&quot;</code><code class="p">,</code> <code class="s">@&quot;BMW&quot;</code><code class="p">,</code> <code class="s">@&quot;Porsche&quot;</code><code class="p">,</code>
+                         <code class="s">@&quot;Opel&quot;</code><code class="p">,</code> <code class="s">@&quot;Volkswagen&quot;</code><code class="p">,</code> <code class="s">@&quot;Audi&quot;</code><code class="p">];</code>
+<code class="c1">// BOOL checking</code>
+<code class="k">if</code> <code class="p">([</code><code class="n">germanMakes</code> <code class="nf">containsObject:</code><code class="s">@&quot;BMW&quot;</code><code class="p">])</code> <code class="p">{</code>
+    <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;BMW is a German auto maker&quot;</code><code class="p">);</code>
+<code class="p">}</code>
+<code class="c1">// Index checking</code>
+<code class="nb">NSUInteger</code> <code class="n">index</code> <code class="o">=</code> <code class="p">[</code><code class="n">germanMakes</code> <code class="nf">indexOfObject:</code><code class="s">@&quot;BMW&quot;</code><code class="p">];</code>
+<code class="k">if</code> <code class="p">(</code><code class="n">index</code> <code class="o">==</code> <code class="nb">NSNotFound</code><code class="p">)</code> <code class="p">{</code>
+    <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;Well that&#39;s not quite right...&quot;</code><code class="p">);</code>
+<code class="p">}</code> <code class="k">else</code> <code class="p">{</code>
+    <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;BMW is a German auto maker and is at index %ld&quot;</code><code class="p">,</code> <code class="n">index</code><code class="p">);</code>
+<code class="p">}</code>
+</pre>
+
+
+<p>Since arrays can contain more than one reference to the same object,
+it’s possible that the first occurrence isn’t the only one. To find
+other occurrences, you can use the related <code>indexOfObject:inRange:</code>
+method.</p>
+
+<p>Remember that <a href="nsset.html">sets</a> are more efficient
+for membership checking, so if you’re querying against a large collection
+of objects, you should probably be using a set instead of an array.</p>
+
+
+<h2 id="sorting-arrays">Sorting Arrays</h2>
+
+<p>Sorting is one of the main advantages of arrays. One of the most flexible
+ways to sort an array is with the <code>sortedArrayUsingComparator:</code>
+method. This accepts an <code>^NSComparisonResult(id obj1, id obj2)</code>
+block, which should return one of the following enumerators depending on the
+relationship between <code>obj1</code> and <code>obj2</code>:</p>
+
+<table>
+<thead>
+<tr>
+    <th>Return Value</th>
+    <th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+    <td><code>NSOrderedAscending</code></td>
+    <td>
+<code>obj1</code> comes before <code>obj2</code>
+</td>
+</tr>
+<tr>
+    <td><code>NSOrderedSame</code></td>
+    <td>
+<code>obj1</code> and <code>obj2</code> have no order</td>
+</tr>
+<tr>
+    <td><code>NSOrderedDescending</code></td>
+    <td>
+<code>obj1</code> comes after <code>obj2</code>
+</td>
+</tr>
+</tbody>
+</table>
+
+<p>The following example sorts a list of car manufacturers based on how long
+their name is, from shortest to longest.</p>
+
+<pre><code class="nb">NSArray</code> <code class="o">*</code><code class="n">germanMakes</code> <code class="o">=</code> <code class="p">@[</code><code class="s">@&quot;Mercedes-Benz&quot;</code><code class="p">,</code> <code class="s">@&quot;BMW&quot;</code><code class="p">,</code> <code class="s">@&quot;Porsche&quot;</code><code class="p">,</code>
+                         <code class="s">@&quot;Opel&quot;</code><code class="p">,</code> <code class="s">@&quot;Volkswagen&quot;</code><code class="p">,</code> <code class="s">@&quot;Audi&quot;</code><code class="p">];</code>
+<code class="nb">NSArray</code> <code class="o">*</code><code class="n">sortedMakes</code> <code class="o">=</code> <code class="p">[</code><code class="n">germanMakes</code> <code class="nf">sortedArrayUsingComparator:</code>
+    <code class="o">^</code><code class="nb">NSComparisonResult</code><code class="p">(</code><code class="kt">id</code> <code class="n">obj1</code><code class="p">,</code> <code class="kt">id</code> <code class="n">obj2</code><code class="p">)</code> <code class="p">{</code>
+        <code class="k">if</code> <code class="p">([</code><code class="n">obj1</code> <code class="nf">length</code><code class="p">]</code> <code class="o">&lt;</code> <code class="p">[</code><code class="n">obj2</code> <code class="nf">length</code><code class="p">])</code> <code class="p">{</code>
+            <code class="k">return</code> <code class="nb">NSOrderedAscending</code><code class="p">;</code>
+        <code class="p">}</code> <code class="k">else</code> <code class="k">if</code> <code class="p">([</code><code class="n">obj1</code> <code class="nf">length</code><code class="p">]</code> <code class="o">&gt;</code> <code class="p">[</code><code class="n">obj2</code> <code class="nf">length</code><code class="p">])</code> <code class="p">{</code>
+            <code class="k">return</code> <code class="nb">NSOrderedDescending</code><code class="p">;</code>
+        <code class="p">}</code> <code class="k">else</code> <code class="p">{</code>
+            <code class="k">return</code> <code class="nb">NSOrderedSame</code><code class="p">;</code>
+        <code class="p">}</code>
+<code class="p">}];</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%@&quot;</code><code class="p">,</code> <code class="n">sortedMakes</code><code class="p">)</code><code class="o">;</code>
+</pre>
+
+
+<p>Like <code>NSSet</code>, <code>NSArray</code> is immutable, so the sorted
+array is actually a <em>new</em> array, though it still references the same
+elements as the original array (this is the same behavior as
+<code>NSSet</code>).</p>
+
+
+<h2 id="filtering-arrays">Filtering Arrays</h2>
+
+<p>You can filter an array with the <code>filteredArrayUsingPredicate:</code>
+method. A short introduction to predicates can be found in the <a href="nsset.html#filtering-with-predicates">NSSet</a> module, and a minimal
+example is included below. Just as with the sort method discussed above, this
+generates a brand new array.</p>
+
+
+<pre><code class="nb">NSArray</code> <code class="o">*</code><code class="n">germanMakes</code> <code class="o">=</code> <code class="p">@[</code><code class="s">@&quot;Mercedes-Benz&quot;</code><code class="p">,</code> <code class="s">@&quot;BMW&quot;</code><code class="p">,</code> <code class="s">@&quot;Porsche&quot;</code><code class="p">,</code>
+                         <code class="s">@&quot;Opel&quot;</code><code class="p">,</code> <code class="s">@&quot;Volkswagen&quot;</code><code class="p">,</code> <code class="s">@&quot;Audi&quot;</code><code class="p">];</code>
+
+<code class="nb">NSPredicate</code> <code class="o">*</code><code class="n">beforeL</code> <code class="o">=</code> <code class="p">[</code><code class="nb">NSPredicate</code> <code class="nf">predicateWithBlock:</code>
+    <code class="o">^</code><code class="kt">BOOL</code><code class="p">(</code><code class="kt">id</code> <code class="n">evaluatedObject</code><code class="p">,</code> <code class="nb">NSDictionary</code> <code class="o">*</code><code class="n">bindings</code><code class="p">)</code> <code class="p">{</code>
+        <code class="nb">NSComparisonResult</code> <code class="n">result</code> <code class="o">=</code> <code class="p">[</code><code class="s">@&quot;L&quot;</code> <code class="nf">compare:</code><code class="n">evaluatedObject</code><code class="p">];</code>
+        <code class="k">if</code> <code class="p">(</code><code class="n">result</code> <code class="o">==</code> <code class="nb">NSOrderedDescending</code><code class="p">)</code> <code class="p">{</code>
+            <code class="k">return</code> <code class="kc">YES</code><code class="p">;</code>
+        <code class="p">}</code> <code class="k">else</code> <code class="p">{</code>
+            <code class="k">return</code> <code class="kc">NO</code><code class="p">;</code>
+        <code class="p">}</code>
+    <code class="p">}];</code>
+<code class="nb">NSArray</code> <code class="o">*</code><code class="n">makesBeforeL</code> <code class="o">=</code> <code class="p">[</code><code class="n">germanMakes</code>
+                         <code class="nf">filteredArrayUsingPredicate:</code><code class="n">beforeL</code><code class="p">];</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%@&quot;</code><code class="p">,</code> <code class="n">makesBeforeL</code><code class="p">)</code><code class="o">;</code>    <code class="c1">// BMW, Audi</code>
+</pre>
+
+
+
+<h2 id="subdividing-arrays">Subdividing Arrays</h2>
+
+<p>Subdividing an array is essentially the same as extracting substrings from
+an <code>NSString</code>, but instead of <code>substringWithRange:</code>, you
+use <code>subarrayWithRange:</code>, as shown below.</p>
+
+<pre><code class="nb">NSArray</code> <code class="o">*</code><code class="n">germanMakes</code> <code class="o">=</code> <code class="p">@[</code><code class="s">@&quot;Mercedes-Benz&quot;</code><code class="p">,</code> <code class="s">@&quot;BMW&quot;</code><code class="p">,</code> <code class="s">@&quot;Porsche&quot;</code><code class="p">,</code>
+                         <code class="s">@&quot;Opel&quot;</code><code class="p">,</code> <code class="s">@&quot;Volkswagen&quot;</code><code class="p">,</code> <code class="s">@&quot;Audi&quot;</code><code class="p">];</code>
+
+<code class="nb">NSArray</code> <code class="o">*</code><code class="n">lastTwo</code> <code class="o">=</code> <code class="p">[</code><code class="n">germanMakes</code> <code class="nf">subarrayWithRange:</code><code class="nb">NSMakeRange</code><code class="p">(</code><code class="mi">4</code><code class="p">,</code> <code class="mi">2</code><code class="p">)];</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%@&quot;</code><code class="p">,</code> <code class="n">lastTwo</code><code class="p">)</code><code class="o">;</code>    <code class="c1">// Volkswagen, Audi</code>
+</pre>
+
+
+
+<h2 id="combining-arrays">Combining Arrays</h2>
+
+<p>Arrays can be combined via <code>arrayByAddingObjectsFromArray:</code>. As
+with all of the other immutable methods discussed above, this returns a
+<em>new</em> array containing all of the elements in the original array, along
+with the contents of the parameter.</p>
+
+<pre><code class="nb">NSArray</code> <code class="o">*</code><code class="n">germanMakes</code> <code class="o">=</code> <code class="p">@[</code><code class="s">@&quot;Mercedes-Benz&quot;</code><code class="p">,</code> <code class="s">@&quot;BMW&quot;</code><code class="p">,</code> <code class="s">@&quot;Porsche&quot;</code><code class="p">,</code>
+                         <code class="s">@&quot;Opel&quot;</code><code class="p">,</code> <code class="s">@&quot;Volkswagen&quot;</code><code class="p">,</code> <code class="s">@&quot;Audi&quot;</code><code class="p">];</code>
+<code class="nb">NSArray</code> <code class="o">*</code><code class="n">ukMakes</code> <code class="o">=</code> <code class="p">@[</code><code class="s">@&quot;Aston Martin&quot;</code><code class="p">,</code> <code class="s">@&quot;Lotus&quot;</code><code class="p">,</code> <code class="s">@&quot;Jaguar&quot;</code><code class="p">,</code> <code class="s">@&quot;Bentley&quot;</code><code class="p">];</code>
+
+<code class="nb">NSArray</code> <code class="o">*</code><code class="n">allMakes</code> <code class="o">=</code> <code class="p">[</code><code class="n">germanMakes</code> <code class="nf">arrayByAddingObjectsFromArray:</code><code class="n">ukMakes</code><code class="p">];</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%@&quot;</code><code class="p">,</code> <code class="n">allMakes</code><code class="p">)</code><code class="o">;</code>
+</pre>
+
+
+
+<h2 id="string-conversion">String Conversion</h2>
+
+<p>The <code>componentsJoinedByString:</code> method concatenates each element
+of the array into a string, separating them by the specified symbol(s).</p>
+
+<pre><code class="nb">NSArray</code> <code class="o">*</code><code class="n">ukMakes</code> <code class="o">=</code> <code class="p">@[</code><code class="s">@&quot;Aston Martin&quot;</code><code class="p">,</code> <code class="s">@&quot;Lotus&quot;</code><code class="p">,</code> <code class="s">@&quot;Jaguar&quot;</code><code class="p">,</code> <code class="s">@&quot;Bentley&quot;</code><code class="p">];</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%@&quot;</code><code class="p">,</code> <code class="p">[</code><code class="n">ukMakes</code> <code class="nf">componentsJoinedByString:</code><code class="s">@&quot;, &quot;</code><code class="p">])</code><code class="o">;</code>
+</pre>
+
+
+<p>This can be useful for regular expression generation, file path
+manipulation, and rudimentary CSV processing; however, if you’re doing
+serious work with file paths/data, you’ll probably want to look for a
+dedicated library.</p>
+
+
+<h1 id="nsmutablearray">NSMutableArray</h1>
+
+<p>The <code>NSMutableArray</code> class lets you dynamically add or remove
+items from arbitrary locations in the collection. Keep in mind that it’s
+slower to insert or delete elements from a mutable array than a set or a
+dictionary.</p>
+
+<p>Like mutable sets, mutable arrays are often used to represent the state of a
+system, but the fact that <code>NSMutableArray</code> records the order of its
+elements opens up new modeling opportunities. For instance, consider the auto
+repair shop we talked about in the <a href="nsset.html#nsmutableset">NSSet</a>
+module. Whereas a set can only represent the status of a collection of
+automobiles, an array can record the order in which they should be fixed.</p>
+
+
+<h2 id="creating-mutable-arrays">Creating Mutable Arrays</h2>
+
+<p>Literal arrays are always immutable, so the easiest way to create mutable
+arrays is still through the <code>arrayWithObjects:</code> method. Be careful
+to use <code>NSMutableArray</code>’s version of the method, not
+<code>NSArray</code>’s. For example:</p>
+
+<pre><code class="nb">NSMutableArray</code> <code class="o">*</code><code class="n">brokenCars</code> <code class="o">=</code> <code class="p">[</code><code class="nb">NSMutableArray</code> <code class="nf">arrayWithObjects:</code>
+                              <code class="s">@&quot;Audi A6&quot;</code><code class="p">,</code> <code class="s">@&quot;BMW Z3&quot;</code><code class="p">,</code>
+                              <code class="s">@&quot;Audi Quattro&quot;</code><code class="p">,</code> <code class="s">@&quot;Audi TT&quot;</code><code class="p">,</code> <code class="kc">nil</code><code class="p">];</code>
+</pre>
+
+
+<p>You can create empty mutable arrays using the <code>array</code> or
+<code>arrayWithCapacity:</code> class methods. Or, if you already have an
+immutable array that you want to convert to a mutable one, you can pass it to
+the <code>arrayWithArray:</code> class method.</p>
+
+
+<h2 id="adding-and-removing-objects">Adding and Removing Objects</h2>
+
+<p>The two basic methods for manipulating the contents of an array are the
+<code>addObject:</code> and <code>removeLastObject</code> methods. The former
+adds an object to the end of the array, and the latter is pretty
+self-documenting. Note that these are also useful methods for treating an
+<code>NSArray</code> as a stack.</p>
+
+<pre><code class="nb">NSMutableArray</code> <code class="o">*</code><code class="n">brokenCars</code> <code class="o">=</code> <code class="p">[</code><code class="nb">NSMutableArray</code> <code class="nf">arrayWithObjects:</code>
+                              <code class="s">@&quot;Audi A6&quot;</code><code class="p">,</code> <code class="s">@&quot;BMW Z3&quot;</code><code class="p">,</code>
+                              <code class="s">@&quot;Audi Quattro&quot;</code><code class="p">,</code> <code class="s">@&quot;Audi TT&quot;</code><code class="p">,</code> <code class="kc">nil</code><code class="p">];</code>
+<code class="p">[</code><code class="n">brokenCars</code> <code class="nf">addObject:</code><code class="s">@&quot;BMW F25&quot;</code><code class="p">];</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%@&quot;</code><code class="p">,</code> <code class="n">brokenCars</code><code class="p">)</code><code class="o">;</code>       <code class="c1">// BMW F25 added to end</code>
+<code class="p">[</code><code class="n">brokenCars</code> <code class="nf">removeLastObject</code><code class="p">];</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%@&quot;</code><code class="p">,</code> <code class="n">brokenCars</code><code class="p">)</code><code class="o">;</code>       <code class="c1">// BMW F25 removed from end</code>
+</pre>
+
+
+<p>It’s most efficient to add or remove items at the <em>end</em> of an
+array, but you can also insert or delete objects at arbitrary locations using
+<code>insertObject:atIndex:</code> and <code>removeObjectAtIndex:</code>. Or,
+if you don’t know the index of a particular object, you can use the
+<code>removeObject:</code> method, which is really just a convenience method
+for <code>indexOfObject:</code> followed by
+<code>removeObjectAtIndex:</code>.</p>
+
+<pre><code class="c1">// Add BMW F25 to front</code>
+<code class="p">[</code><code class="n">brokenCars</code> <code class="nf">insertObject:</code><code class="s">@&quot;BMW F25&quot;</code> <code class="nf">atIndex:</code><code class="mi">0</code><code class="p">];</code>
+<code class="c1">// Remove BMW F25 from front</code>
+<code class="p">[</code><code class="n">brokenCars</code> <code class="nf">removeObjectAtIndex:</code><code class="mi">0</code><code class="p">];</code>
+<code class="c1">// Remove Audi Quattro</code>
+<code class="p">[</code><code class="n">brokenCars</code> <code class="nf">removeObject:</code><code class="s">@&quot;Audi Quattro&quot;</code><code class="p">];</code>
+</pre>
+
+
+<p>It’s also possible to replace the contents of an index with the
+<code>replaceObjectAtIndex:withObject:</code> method, as shown below.</p>
+
+<pre><code class="c1">// Change second item to Audi Q5</code>
+<code class="p">[</code><code class="n">brokenCars</code> <code class="nf">replaceObjectAtIndex:</code><code class="mi">1</code> <code class="nf">withObject:</code><code class="s">@&quot;Audi Q5&quot;</code><code class="p">];</code>
+</pre>
+
+
+<p>These are the basic methods for manipulating mutable arrays, but be sure to
+check out the <a href="https://developer.apple.com/library/mac/#documentation/Cocoa/Reference/Foundation/Classes/NSMutableArray_Class/Reference/Reference.html">official
+documentation</a> if you need more advanced functionality.</p>
+
+
+<h2 id="sorting-with-descriptors">Sorting With Descriptors</h2>
+
+<p>Inline sorts can be accomplished through <code>sortUsingComparator:</code>,
+which works just like the immutable version discussed in <a href="#sorting-arrays">Sorting Arrays</a>. However, this section discusses an
+alternative method for sorting arrays called <code>NSSortDescriptor</code>.
+Sort descriptors typically result in code that is more semantic and less
+redundant than block-based sorts.</p>
+
+<p>The <code>NSSortDescriptor</code> class encapsulates all of the information
+required to sort an array of <a href="nsdictionary.html">dictionaries</a> or
+custom objects. This includes the property to be compared, the comparison
+method, and whether the sort is ascending or descending. Once you configure a
+descriptor(s), you can sort an array by passing it to the
+<code>sortUsingDescriptors:</code> method. For example, the following snippet
+sorts an array of cars by price and then by model.</p>
+
+<pre><code class="nb">NSDictionary</code> <code class="o">*</code><code class="n">car1</code> <code class="o">=</code> <code class="p">@{</code>
+    <code class="s">@&quot;make&quot;</code><code class="o">:</code> <code class="s">@&quot;Volkswagen&quot;</code><code class="p">,</code>
+    <code class="s">@&quot;model&quot;</code><code class="o">:</code> <code class="s">@&quot;Golf&quot;</code><code class="p">,</code>
+    <code class="s">@&quot;price&quot;</code><code class="o">:</code> <code class="p">[</code><code class="nb">NSDecimalNumber</code> <code class="nf">decimalNumberWithString:</code><code class="s">@&quot;18750.00&quot;</code><code class="p">]</code>
+<code class="p">};</code>
+<code class="nb">NSDictionary</code> <code class="o">*</code><code class="n">car2</code> <code class="o">=</code> <code class="p">@{</code>
+    <code class="s">@&quot;make&quot;</code><code class="o">:</code> <code class="s">@&quot;Volkswagen&quot;</code><code class="p">,</code>
+    <code class="s">@&quot;model&quot;</code><code class="o">:</code> <code class="s">@&quot;Eos&quot;</code><code class="p">,</code>
+    <code class="s">@&quot;price&quot;</code><code class="o">:</code> <code class="p">[</code><code class="nb">NSDecimalNumber</code> <code class="nf">decimalNumberWithString:</code><code class="s">@&quot;35820.00&quot;</code><code class="p">]</code>
+<code class="p">};</code>
+<code class="nb">NSDictionary</code> <code class="o">*</code><code class="n">car3</code> <code class="o">=</code> <code class="p">@{</code>
+    <code class="s">@&quot;make&quot;</code><code class="o">:</code> <code class="s">@&quot;Volkswagen&quot;</code><code class="p">,</code>
+    <code class="s">@&quot;model&quot;</code><code class="o">:</code> <code class="s">@&quot;Jetta A5&quot;</code><code class="p">,</code>
+    <code class="s">@&quot;price&quot;</code><code class="o">:</code> <code class="p">[</code><code class="nb">NSDecimalNumber</code> <code class="nf">decimalNumberWithString:</code><code class="s">@&quot;16675.00&quot;</code><code class="p">]</code>
+<code class="p">};</code>
+<code class="nb">NSDictionary</code> <code class="o">*</code><code class="n">car4</code> <code class="o">=</code> <code class="p">@{</code>
+    <code class="s">@&quot;make&quot;</code><code class="o">:</code> <code class="s">@&quot;Volkswagen&quot;</code><code class="p">,</code>
+    <code class="s">@&quot;model&quot;</code><code class="o">:</code> <code class="s">@&quot;Jetta A4&quot;</code><code class="p">,</code>
+    <code class="s">@&quot;price&quot;</code><code class="o">:</code> <code class="p">[</code><code class="nb">NSDecimalNumber</code> <code class="nf">decimalNumberWithString:</code><code class="s">@&quot;16675.00&quot;</code><code class="p">]</code>
+<code class="p">};</code>
+<code class="nb">NSMutableArray</code> <code class="o">*</code><code class="n">cars</code> <code class="o">=</code> <code class="p">[</code><code class="nb">NSMutableArray</code> <code class="nf">arrayWithObjects:</code>
+                        <code class="n">car1</code><code class="p">,</code> <code class="n">car2</code><code class="p">,</code> <code class="n">car3</code><code class="p">,</code> <code class="n">car4</code><code class="p">,</code> <code class="kc">nil</code><code class="p">];</code>
+
+<code class="nb">NSSortDescriptor</code> <code class="o">*</code><code class="n">priceDescriptor</code> <code class="o">=</code> <code class="p">[</code><code class="nb">NSSortDescriptor</code>
+                                     <code class="nf">sortDescriptorWithKey:</code><code class="s">@&quot;price&quot;</code>
+                                                 <code class="nf">ascending:</code><code class="kc">YES</code>
+                                                  <code class="nf">selector:</code><code class="k">@selector</code><code class="p">(</code><code class="nf">compare:</code><code class="p">)];</code>
+<code class="nb">NSSortDescriptor</code> <code class="o">*</code><code class="n">modelDescriptor</code> <code class="o">=</code> <code class="p">[</code><code class="nb">NSSortDescriptor</code>
+                                     <code class="nf">sortDescriptorWithKey:</code><code class="s">@&quot;model&quot;</code>
+                                     <code class="nf">ascending:</code><code class="kc">YES</code>
+                                     <code class="nf">selector:</code><code class="k">@selector</code><code class="p">(</code><code class="nf">caseInsensitiveCompare:</code><code class="p">)];</code>
+
+<code class="nb">NSArray</code> <code class="o">*</code><code class="n">descriptors</code> <code class="o">=</code> <code class="p">@[</code><code class="n">priceDescriptor</code><code class="p">,</code> <code class="n">modelDescriptor</code><code class="p">];</code>
+<code class="p">[</code><code class="n">cars</code> <code class="nf">sortUsingDescriptors:</code><code class="n">descriptors</code><code class="p">];</code>
+<code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%@&quot;</code><code class="p">,</code> <code class="n">cars</code><code class="p">)</code><code class="o">;</code>    <code class="c1">// car4, car3, car1, car2</code>
+</pre>
+
+
+<p>The descriptor’s <code>selector</code> is called on each key’s
+value, so in the above code, we’re calling <code>compare:</code> on
+<code>item[@"price"]</code> and <code>caseInsensitiveCompare:</code> on
+<code>item[@"model"]</code> for each pair of items in the array.</p>
+
+
+<h2 id="filtering-mutable-arrays">Filtering Mutable Arrays</h2>
+
+<p>Filtering works the same as it does with immutable arrays, except items are
+removed from the existing array instead of generating a new one, and you use
+the <code>filterUsingPredicate:</code> method.</p>
+
+
+<h2 id="enumeration-considerations">Enumeration Considerations</h2>
+
+<p>As with all mutable collections, you’re not allowed to alter it in the
+middle of an enumeration. This is covered in the <a href="nsset.html#enumeration-considerations">Enumeration Considerations</a>
+section of the <code>NSSet</code> module, but instead of using
+<code>allObjects</code> for the snapshot, you can create a temporary copy of
+the original array by passing it to the <code>arrayWithArray:</code> class
+method.</p>
+
+
+<div class="divider" style="margin-top: 2em; margin-bottom: 1.3em;"></div><table class="icon-and-text advert"><tr>
+<td><a href="http://rypress.com/tutorials/cocoa"><img src="../media/advert-image.png" width="120px" height="165px" class="cover"></a></td>
+<td><p id="advert-text">Be sure to check out <a href="http://rypress.com/tutorials/cocoa">Ry’s Cocoa Tutorial</a>. This
+brand new guide is a complete walkthrough of Mac App development, and it
+leverages all of the Objective-C skills that we just discussed. <a href="http://rypress.com/tutorials/cocoa">Learn more ›</a></p></td>
+</tr></table>
+<div id='mailing-list'>
+
+<div class='divider' style='margin: 1.8em -22px;'></div>
+
+<h3>Mailing List</h3>
+
+<p>Sign up for my low-volume mailing list to find out when new content is
+released. Next up is a comprehensive <a
+href='https://developer.apple.com/swift/'>Swift</a> tutorial planned for late
+January.</p>
+
+<form id='mailing-list-form'
+	  action='/secure/mailing-list/request-add' method='get'>
+<label>
+	<div class='label'>Email Address:</div>
+	<div class='input'>
+	<input name='email'
+		   style='width: 200px;'
+		   type='email' />
+	</div>
+</label>
+
+<input id='mailing-list-button'
+	   class='button'
+	   style='margin-top: .5em;'
+	   type='submit' value='Subscribe'/>
+
+</form>
+
+<div style='clear: both'></div>
+
+<p class='fine-print'>You&rsquo;ll only receive emails when new tutorials are
+released, and your contact information will never be shared with third
+parties. <a href='/secure/mailing-list/unsubscribe'>Click here</a> to
+unsubscribe.</p>
+
+</div>
+
+
+<div class='divider'></div>
+
+<footer id='footer' class='fine-print'>
+  <ul>
+  	<li><a href='/licensing.php'>&copy; 2012-2014</a></li>
+	<li><a href='/'>RyPress.com</a></li>
+	<li>
+		<a href='/licensing.php'>All Rights Reserved</a>
+	</li>
+	<li>
+		<a href='/tos.php'>Terms&nbsp;of&nbsp;Service</a>
+	</li>
+	<li>
+		<a href='/privacy.php'>Privacy Policy</a>
+	</li>
+  </ul>
+</footer>
+
+</div>		<!-- .content -->
+</div>		<!-- .page -->
+</body>
+</html>

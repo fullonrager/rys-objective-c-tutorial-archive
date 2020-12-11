@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<title>Objective-C Data Types - Ry’s Objective-C Tutorial - RyPress</title>
+<meta charset='UTF-8'/>
+<meta name='description' content="Objective-C inherits all of the primitive types of C, and defines a few of
+its own, too. But, applications also require higher-level tools like strings,
+dictionaries, and dates. The Foundation
+Framework defines several classes that provide the standard,
+object-oriented data structures found in typical high-level programming
+languages."/>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'/>
+<link rel="icon" type="image/png" href="/media/favicon.png"/>
+<link rel="stylesheet" href="/media/style.css"/>
+<link rel="stylesheet" href="/media/pygments.css"/>
+<script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  
+    ga('create', 'UA-37121774-2', 'auto');
+    ga('send', 'pageview');
+  </script>
+</head>
+<body>
+<div id='page'>
+<div id='banner'>
+<a href='/tutorials/cocoa/index'>Ry&rsquo;s Cocoa Tutorial</a> is now only $10.
+Happy Holidays! <span style='font-size: .8em'>(Offer extended to Jan 31st, 2016)</span>
+</div>
+<div id='content'>
+<nav id='main-nav'>
+<a href='/'><img src='/media/logo-small.png' width='120px' alt='RyPress - Quality Software Tutorials'/></a>
+<ul>
+<li><a href='/'>Tutorials</a></li>
+<li><a href='/secure/purchases.php'>Purchases</a></li>
+<li><a href='/about.php'>About</a></li>
+</ul>
+</nav>
+<div class='divider'></div>
+<table class="icon-and-text"><tr>
+<td><a href="../index"><img src="../media/icons/index.png" width="40px" height="40px"></a></td>
+<td><p>You’re
+reading
+<a href="../index"><em>Ry’s Objective-C Tutorial</em></a></p></td>
+</tr></table><div class="divider"></div>
+<h1 id="objective-c-data-types">Objective-C Data Types</h1>
+<div class="tutorial-toc">
+<div class="left-col">
+<a href="primitives.html"><img src="media/icons/primitives.png"><span>Primitives</span></a><a href="nsnumber.html"><img src="media/icons/nsnumber.png"><span>NSNumber</span></a><a href="nsdecimalnumber.html"><img src="media/icons/nsdecimalnumber.png"><span>NSDecimalNumber</span></a><a href="nsstring.html"><img src="media/icons/nsstring.png"><span>NSString</span></a>
+</div>
+<div class="right-col">
+<a href="nsset.html"><img src="media/icons/nsset.png"><span>NSSet</span></a><a href="nsarray.html"><img src="media/icons/nsarray.png"><span>NSArray</span></a><a href="nsdictionary.html"><img src="media/icons/nsdictionary.png"><span>NSDictionary</span></a><a href="dates.html"><img src="media/icons/dates.png"><span>Dates</span></a>
+</div>
+</div><div style="clear: both"></div>
+<p>Objective-C inherits all of the primitive types of C, and defines a few of
+its own, too. But, applications also require higher-level tools like strings,
+dictionaries, and dates. The <a href="https://developer.apple.com/library/mac/#documentation/Cocoa/Reference/Foundation/ObjC_classic/_index.html">Foundation
+Framework</a> defines several classes that provide the standard,
+object-oriented data structures found in typical high-level programming
+languages.</p>
+<p>The <a href="primitives.html">Primitives</a> module introduces
+Objective-C’s native types, and the rest of the above modules cover the
+fundamental Foundation classes. Below, you’ll find general information
+about interacting with these classes.</p>
+<h2 id="creating-objects">Creating Objects</h2>
+<p>There are two ways to instantiate objects in Objective-C. First, you have
+the standard <code>alloc</code>/<code>init</code> pattern introduced in the <a href="../classes.html">Classes</a> module. For example, you can create a new
+<code>NSNumber</code> object with the following:</p>
+<pre><code class="nb">NSNumber</code> <code class="o">*</code><code class="n">twentySeven</code> <code class="o">=</code> <code class="p">[[</code><code class="n">NSNumber</code> <code class="nf">alloc</code><code class="p">]</code> <code class="nf">initWithInt:</code><code class="mi">27</code><code class="p">];</code>
+</pre>
+<p>But, most of the Foundation Framework classes also provide corresponding
+factory methods, like so:</p>
+<pre><code class="nb">NSNumber</code> <code class="o">*</code><code class="n">twentySeven</code> <code class="o">=</code> <code class="p">[</code><code class="nb">NSNumber</code> <code class="nf">numberWithInt:</code><code class="mi">27</code><code class="p">];</code>
+</pre>
+<p>This allocates a new <code>NSNumber</code> object for you, <a href="../memory-management.html#the-autorelease-method">autoreleases</a> it, and
+returns it. Before <a href="../memory-management.html#automatic-reference-counting">ARC</a>, this was a
+convenient way to create objects, but in modern programs, there is no practical
+difference between these two instantiation patterns.</p>
+<p>In addition, numbers, strings, arrays, and dictionaries can be created as
+literals (e.g., <code>@"Bill"</code>). You’ll see all three notations
+throughout the Objective-C literature, as well as in this tutorial.</p>
+<h2 id="comparing-objects">Comparing Objects</h2>
+<p>Comparing objects is one of the biggest pitfalls for Objective-C beginners.
+There are two distinct types of equality comparisons in Objective-C:</p>
+<ul>
+<li>
+<strong>Pointer comparison</strong> uses the <code>==</code> operator
+to see if two pointers refer to the same memory address (i.e., the same
+object). It’s not possible for different objects to compare equal
+with this kind of comparison.</li>
+<li>
+<strong>Value comparison</strong> uses methods like
+<code>isEqualToNumber:</code> to see if two objects represent the same
+value. It <em>is</em> possible for different objects to compare equal with
+this kind of comparison.</li>
+</ul>
+<p>Generally, you’ll want to use the second option for more robust
+comparisons. The relevant methods are introduced alongside each data type
+(e.g., <code>NSNumber</code>’s <a href="nsnumber.html#comparing-numbers">Comparing Numbers</a>
+section).</p>
+<div class="divider" style="margin-top: 2em; margin-bottom: 1.3em;"></div><table class="icon-and-text advert"><tr>
+<td><a href="http://rypress.com/tutorials/cocoa"><img src="../media/advert-image.png" width="120px" height="165px" class="cover"></a></td>
+<td><p id="advert-text">Be sure to check out <a href="http://rypress.com/tutorials/cocoa">Ry’s Cocoa Tutorial</a>. This
+brand new guide is a complete walkthrough of Mac App development, and it
+leverages all of the Objective-C skills that we just discussed. <a href="http://rypress.com/tutorials/cocoa">Learn more ›</a></p></td>
+</tr></table>
+<div id='mailing-list'>
+<div class='divider' style='margin: 1.8em -22px;'></div>
+<h3>Mailing List</h3>
+<p>Sign up for my low-volume mailing list to find out when new content is
+released. Next up is a comprehensive <a href='https://developer.apple.com/swift/'>Swift</a> tutorial planned for late
+January.</p>
+<form id='mailing-list-form' action='/secure/mailing-list/request-add' method='get'>
+<label>
+<div class='label'>Email Address:</div>
+<div class='input'>
+<input name='email' style='width: 200px;' type='email'/>
+</div>
+</label>
+<input id='mailing-list-button' class='button' style='margin-top: .5em;' type='submit' value='Subscribe'/>
+</form>
+<div style='clear: both'></div>
+<p class='fine-print'>You&rsquo;ll only receive emails when new tutorials are
+released, and your contact information will never be shared with third
+parties. <a href='/secure/mailing-list/unsubscribe'>Click here</a> to
+unsubscribe.</p>
+</div>
+<div class='divider'></div>
+<footer id='footer' class='fine-print'>
+<ul>
+<li><a href='/licensing.php'>&copy; 2012-2014</a></li>
+<li><a href='/'>RyPress.com</a></li>
+<li>
+<a href='/licensing.php'>All Rights Reserved</a>
+</li>
+<li>
+<a href='/tos.php'>Terms&nbsp;of&nbsp;Service</a>
+</li>
+<li>
+<a href='/privacy.php'>Privacy Policy</a>
+</li>
+</ul>
+</footer>
+</div>  
+</div>  
+</body>
+</html>

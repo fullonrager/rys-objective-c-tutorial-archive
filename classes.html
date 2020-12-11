@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+  <title>Classes - Ry’s Objective-C Tutorial - RyPress</title>
+  <meta charset='UTF-8' />
+  <meta name='description' content="As in many other object-oriented programming language, Objective-C classes
+provide the blueprint for creating objects. First, you define a reusable set of
+properties and behaviors inside of a class. Then, you instantiate objects from
+that class to interact with those properties and behaviors." />
+  <meta name='viewport'
+  	    content='width=device-width, initial-scale=1.0, maximum-scale=1.0' />
+  <link rel="icon" type="image/png" href="media/favicon.png" />
+  <link rel="stylesheet" href="media/style.css" />
+  <link rel="stylesheet" href="media/pygments.css" />
+
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  
+    ga('create', 'UA-37121774-2', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+  
+</head>
+<body>
+
+<div id='page'>
+
+<div id='content'>
+
+<nav id='main-nav'>
+	<a href='/'><img src='media/logo-small.png'
+		 width='120px'
+		 alt='RyPress - Quality Software Tutorials'/></a>
+	<ul>
+	<li><a href='/'>Tutorials</a></li>
+	<li><a href='/secure/purchases.php'>Purchases</a></li>
+	<li><a href='/about.php'>About</a></li>
+	</ul>
+</nav>
+
+<div class='divider'></div>
+<table class="icon-and-text"><tr>
+<td><a href="index"><img src="media/icons/index.png" width="40px" height="40px"></a></td>
+<td><p>You’re
+
+			
+					reading
+				<a href="index.html"><em>Ry’s Objective-C Tutorial</em></a></p></td>
+</tr></table><div class="divider"></div>
+
+<h1 id="classes">Classes</h1>
+
+<p>As in many other object-oriented programming language, Objective-C classes
+provide the blueprint for creating objects. First, you define a reusable set of
+properties and behaviors inside of a class. Then, you instantiate objects from
+that class to interact with those properties and behaviors.</p>
+
+<p>Objective-C is similar to C++ in that it abstracts a class’s interface
+from its implementation. An <strong>interface</strong> declares the public
+properties and methods of a class, and the corresponding
+<strong>implementation</strong> defines the code that actually makes these
+properties and methods work. This is the same separation of concerns that we
+saw with <a href="functions.html#declarations-vs-implementations">functions</a>.</p>
+
+<figure>
+    <img style="max-width: 500px" src="media/classes/interface-vs-implementation.png">
+    <figcaption>A class’s interface and implementation</figcaption>
+</figure>
+
+<p>In this module, we’ll explore the basic syntax for class interfaces,
+implementations, properties, and methods, as well as the canonical way to
+instantiate objects. We’ll also introduce some of Objective-C’s
+introspection and reflection capabilities.</p>
+
+
+<h2 id="creating-classes">Creating Classes</h2>
+
+<p>We’ll be working with a class called <code>Car</code> whose interface
+resides in a file named <code>Car.h</code> (also called a “header”)
+and whose implementation resides in <code>Car.m</code>. These are the standard
+file extensions for Objective-C classes. The class’s header file is what
+other classes use when they need to interact with it, and its implementation
+file is used only by the compiler.</p>
+
+<p>Xcode provides a convenient template for creating new classes. To create our
+<code>Car</code> class, navigate to <em>File &gt; New &gt; File…</em> or
+use the <em>Cmd+N</em> shortcut. For the template, choose <em>Objective-C
+class</em> under the <em>iOS &gt; Cocoa Touch</em> category. After that,
+you’ll be presented with some configuration options:</p>
+
+<figure>
+    <img style="max-width: 357px" src="media/classes/class-creation.png">
+    <figcaption>Creating the <code>Car</code> class</figcaption>
+</figure>
+
+<p>Use <code>Car</code> for the <em>Class</em> field and <code>NSObject</code>
+for the <em>Subclass of</em> field. <a href="https://developer.apple.com/library/mac/#documentation/Cocoa/Reference/Foundation/Classes/NSObject_Class/Reference/Reference.html"><code>NSObject</code></a>
+is Objective-C’s top-level class from which almost all others inherit.
+Clicking <em>Next</em> will prompt you to select a location for the file. Save
+it in the top-level of the project directory. At the bottom of that dialog,
+make sure that your project is checked in the <em>Targets</em> section. This is
+what actually adds the class to the list of compiled sources.</p>
+
+<figure>
+    <img style="max-width: 334px" src="media/classes/adding-class-to-target.png">
+    <figcaption>Adding the class to the build target</figcaption>
+</figure>
+
+<p>After clicking <em>Next</em>, you should see new <code>Car.h</code> and
+<code>Car.m</code> files in Xcode’s <em>Project Navigator</em>. If you
+select the project name in the navigator, you’ll also find
+<code>Car.m</code> in the <em>Build Phases</em> tab under the <em>Compile
+Sources</em> section. Any files that you want the compiler to see must be in
+this list (if you didn’t create your source files through Xcode, this is
+where you can manually add them).</p>
+
+<figure>
+    <img style="max-width: 600px" src="media/classes/compile-sources.png">
+    <figcaption>The list of compiled source files</figcaption>
+</figure>
+
+
+<h2 id="interfaces">Interfaces</h2>
+
+<p><code>Car.h</code> contains some template code, but let’s go ahead and
+change it to the following. This declares a property called <code>model</code>
+and a method called <code>drive</code>.</p>
+
+<pre><code class="c1">// Car.h</code>
+<code class="cp">#import</code> <code class="l">&lt;Foundation/Foundation.h&gt;</code><code class="cp"></code>
+
+<code class="k">@interface</code> <code class="nc">Car</code> : <code class="nc">NSObject</code> <code class="p">{</code>
+    <code class="c1">// Protected instance variables (not recommended)</code>
+<code class="p">}</code>
+
+<code class="k">@property</code> <code class="p">(</code><code class="k">copy</code><code class="p">)</code> <code class="nb">NSString</code> <code class="o">*</code><code class="n">model</code><code class="p">;</code>
+
+<code class="k">-</code> <code class="p">(</code><code class="kt">void</code><code class="p">)</code><code class="nf">drive</code><code class="p">;</code>
+
+<code class="k">@end</code>
+</pre>
+
+
+<p>An interface is created with the <code>@interface</code> directive, after
+which come the class and the superclass name, separated by a colon. Protected
+variables can be defined inside of the curly braces, but most developers treat
+instance variables as implementation details and prefer to store them in the
+<code>.m</code> file instead of the interface.</p>
+
+<p>The <code>@property</code> directive declares a public property, and the
+<code>(copy)</code> attribute defines its memory management behavior. In this
+case, the value assigned to <code>model</code> will be stored as a copy instead
+of a direct pointer. The <a href="properties.html">Properties</a> module
+discusses this in more detail. Next come the property’s data type and
+name, just like a normal variable declaration.</p>
+
+<p>The <code>-(void)drive</code> line declares a method called
+<code>drive</code> that takes no parameters, and the <code>(void)</code>
+portion defines its return type. The minus sign prepended to the method marks
+it as an <em>instance</em> method (opposed to a <a href="#class-methods-and-variables"><em>class</em> method</a>).</p>
+
+
+<h2 id="implementations">Implementations</h2>
+
+<p>The first thing any class implementation needs to do is import its
+corresponding interface. The <code>@implementation</code> directive is similar
+to <code>@interface</code>, except you don’t need to include the super
+class. Private instance variables can be stored between curly braces after the
+class name:</p>
+
+<pre><code class="c1">// Car.m</code>
+<code class="cp">#import</code> <code class="l">&quot;Car.h&quot;</code><code class="cp"></code>
+
+<code class="k">@implementation</code> <code class="nc">Car</code> <code class="p">{</code>
+    <code class="c1">// Private instance variables</code>
+    <code class="kt">double</code> <code class="n">_odometer</code><code class="p">;</code>
+<code class="p">}</code>
+
+<code class="k">@synthesize</code> <code class="n">model</code> <code class="o">=</code> <code class="n">_model</code><code class="p">;</code>    <code class="c1">// Optional for Xcode 4.4+</code>
+
+<code class="k">-</code> <code class="p">(</code><code class="kt">void</code><code class="p">)</code><code class="nf">drive</code> <code class="p">{</code>
+    <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;Driving a %@. Vrooooom!&quot;</code><code class="p">,</code> <code class="kc">self</code><code class="p">.</code><code class="n">model</code><code class="p">);</code>
+<code class="p">}</code>
+
+<code class="k">@end</code>
+</pre>
+
+
+<p><code>@synthesize</code> is a convenience directive that automatically
+generates accessor methods for the property. By default, the getter is simply
+the property name (<code>model</code>), and the setter is the capitalized name
+with the <code>set</code> prefix (<code>setModel</code>). This is much easier
+than manually creating accessors for every property. The <code>_model</code>
+portion of the synthesize statement defines the private instance variable name
+to use for the property.</p>
+
+<p>As of Xcode 4.4, properties declared with <code>@property</code> will be
+automatically synthesized, so it’s safe to omit the
+<code>@synthesize</code> line if you’re ok with the default instance
+variable naming conventions.</p>
+
+<p>The <code>drive</code> implementation has the same signature as the
+interface, but it’s followed by whatever code should be executed when the
+method is called. Note how we accessed the value via <code>self.model</code>
+instead of the <code>_model</code> instance variable. This is a best practice
+step because it utilizes the property’s <a href="properties.html">accessor methods</a>. Typically, the only place
+you’ll need to directly access instance variables is in <a href="#constructor-methods"><code>init</code> methods</a> and the <a href="memory-management.html#the-dealloc-method"><code>dealloc</code>
+method</a>.</p>
+
+<p>The <code>self</code> keyword refers to the instance calling the method
+(like <code>this</code> in C++ and Java). In addition to accessing properties,
+this can be used to call other methods defined on the same class (e.g.,
+<code>[self anotherMethod]</code>). We’ll see many examples of this
+throughout the tutorial.</p>
+
+
+<h2 id="instantiation-and-usage">Instantiation and Usage</h2>
+
+<p>Any files that need access to a class must import its header file
+(<code>Car.h</code>)—they should never, ever try to access the
+implementation file directly. That would defeat the goal of separating the
+public API from its underlying implementation. So, to see our <code>Car</code>
+class in action, change <code>main.m</code> to the following.</p>
+
+<pre><code class="c1">// main.m</code>
+<code class="cp">#import</code> <code class="l">&lt;Foundation/Foundation.h&gt;</code><code class="cp"></code>
+<code class="cp">#import</code> <code class="l">&quot;Car.h&quot;</code><code class="cp"></code>
+
+<code class="kt">int</code> <code class="nf">main</code><code class="p">(</code><code class="kt">int</code> <code class="n">argc</code><code class="p">,</code> <code class="kt">const</code> <code class="kt">char</code> <code class="o">*</code> <code class="n">argv</code><code class="p">[])</code> <code class="p">{</code>
+    <code class="k">@autoreleasepool</code> <code class="p">{</code>
+        <code class="n">Car</code> <code class="o">*</code><code class="n">toyota</code> <code class="o">=</code> <code class="p">[[</code><code class="n">Car</code> <code class="nf">alloc</code><code class="p">]</code> <code class="nf">init</code><code class="p">];</code>
+        
+        <code class="p">[</code><code class="n">toyota</code> <code class="nf">setModel:</code><code class="s">@&quot;Toyota Corolla&quot;</code><code class="p">];</code>
+        <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;Created a %@&quot;</code><code class="p">,</code> <code class="p">[</code><code class="n">toyota</code> <code class="nf">model</code><code class="p">]);</code>
+        
+        <code class="n">toyota</code><code class="p">.</code><code class="n">model</code> <code class="o">=</code> <code class="s">@&quot;Toyota Camry&quot;</code><code class="p">;</code>
+        <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;Changed the car to a %@&quot;</code><code class="p">,</code> <code class="n">toyota</code><code class="p">.</code><code class="n">model</code><code class="p">);</code>
+        
+        <code class="p">[</code><code class="n">toyota</code> <code class="nf">drive</code><code class="p">];</code>
+        
+    <code class="p">}</code>
+    <code class="k">return</code> <code class="mi">0</code><code class="p">;</code>
+<code class="p">}</code>
+</pre>
+
+
+<p>After the interface has been imported with the <code>#import</code>
+directive, you can instantiate objects with the
+<code>alloc</code>/<code>init</code> pattern shown above. As you can see,
+instantiation is a two-step process: first you must allocate some memory for
+the object by calling the <code>alloc</code> method, then you need to
+initialize it so it’s ready to use. You should never use an uninitialized
+object.</p>
+
+<p>It’s worth <a href="c-basics.html#pointers-in-objective-c">repeating</a> that <em>all</em>
+objects must be stored as pointers. This is why we used <code>Car
+*toyota</code> instead of <code>Car toyota</code> to declare the variable.</p>
+
+<p>To call a method on an Objective-C object, you place the instance and the
+method in square brackets, separated by a space. Arguments are passed after the
+method name, preceded by a colon. So, if you’re coming from a C++, Java,
+or Python background, the <code>[toyota setModel:@"Toyota Corolla"]</code>
+call would translate to:</p>
+
+<pre><code class="n">toyota</code><code class="o">.</code><code class="na">setModel</code><code class="o">(</code><code class="s">&quot;Toyota Corolla&quot;</code><code class="o">);</code>
+</pre>
+
+
+<p>This square-bracket syntax can be unsettling for newcomers to the language,
+but rest assured, you’ll be more than comfortable with
+Objective-C’s method conventions after reading through the <a href="methods.html">Methods</a> module.</p>
+
+<p>This example also shows you both ways to work with an object’s
+properties. You can either use the synthesized <code>model</code> and
+<code>setModel</code> accessor methods, or you can use the convenient
+dot-syntax, which should be more familiar to developers who have been using
+Simula-style languages.</p>
+
+
+<h2 id="class-methods-and-variables">Class Methods and Variables</h2>
+
+<p>The above snippets define instance-level properties and methods, but
+it’s also possible to define class-level ones. These are commonly called
+“static” methods/properties in other programming languages (not to
+be confused with the <a href="functions.html#the-static-keyword"><code>static</code> keyword</a>).</p>
+
+<p>Class method declarations look just like instance methods, except they are
+prefixed with a plus sign instead of a minus sign. For example, let’s add
+the following class-level method to <code>Car.h</code>:</p>
+
+<pre><code class="c1">// Car.h</code>
+<code class="k">+</code> <code class="p">(</code><code class="kt">void</code><code class="p">)</code><code class="nf">setDefaultModel:</code><code class="p">(</code><code class="nb">NSString</code> <code class="o">*</code><code class="p">)</code><code class="nv">aModel</code><code class="p">;</code>
+</pre>
+
+
+<p>Similarly, a class method <em>implementation</em> is also preceded by a plus
+sign. While there is technically no such thing as a class-level variable in
+Objective-C, you can emulate one by declaring a <code>static</code> variable
+before defining the implementation:</p>
+
+<pre><code class="c1">// Car.m</code>
+<code class="cp">#import</code> <code class="l">&quot;Car.h&quot;</code><code class="cp"></code>
+
+<code class="kt">static</code> <code class="nb">NSString</code> <code class="o">*</code><code class="n">_defaultModel</code><code class="p">;</code>
+
+<code class="k">@implementation</code> <code class="nc">Car</code> <code class="p">{</code>
+<code class="p">...</code>
+
+<code class="o">+</code> <code class="p">(</code><code class="kt">void</code><code class="p">)</code><code class="nf">setDefaultModel:</code><code class="p">(</code><code class="nb">NSString</code> <code class="o">*</code><code class="p">)</code><code class="n">aModel</code> <code class="p">{</code>
+    <code class="n">_defaultModel</code> <code class="o">=</code> <code class="p">[</code><code class="n">aModel</code> <code class="nf">copy</code><code class="p">];</code>
+<code class="p">}</code>
+
+<code class="k">@end</code>
+</pre>
+
+
+<p>The <code>[aModel copy]</code> call creates a copy of the parameter instead
+of assigning it directly. This is what’s going on under the hood when we
+used the <code>(copy)</code> attribute on the <code>model</code> property.</p>
+
+<p>Class methods use the same square-bracket syntax as instance methods, but
+they must be called directly on the class, as shown below. They <em>cannot</em>
+be called on an instance of that class (<code>[toyota setDefaultModel:@"Model
+T"]</code> will throw an error).</p>
+
+<pre><code class="c1">// main.m</code>
+<code class="p">[</code><code class="n">Car</code> <code class="nf">setDefaultModel:</code><code class="s">@&quot;Nissan Versa&quot;</code><code class="p">];</code>
+</pre>
+
+
+
+<h2 id="constructor-methods">“Constructor” Methods</h2>
+
+<p>There are no constructor methods in Objective-C. Instead, an object is
+<strong>initialized</strong> by calling the <code>init</code> method
+immediately after it’s allocated. This is why instantiation is always a
+two-step process: allocate, then initialize. There is also a class-level
+initialization method that will be discussed in a moment.</p>
+
+<p><code>init</code> is the default initialization method, but you can also
+define your own versions to accept configuration parameters. There’s
+nothing special about custom initialization methods—they’re just
+normal instance methods, except the method name should always begin with
+<code>init</code>. An exemplary “constructor” method is shown
+below.</p>
+
+<pre><code class="c1">// Car.h</code>
+<code class="k">-</code> <code class="p">(</code><code class="kt">id</code><code class="p">)</code><code class="nf">initWithModel:</code><code class="p">(</code><code class="nb">NSString</code> <code class="o">*</code><code class="p">)</code><code class="nv">aModel</code><code class="p">;</code>
+</pre>
+
+
+<p>To implement this method, you should follow the canonical initialization
+pattern shown in <code>initWithModel:</code> below. The <code>super</code>
+keyword refers to the parent class, and again, the <code>self</code> keyword
+refers to the instance calling the method. Go ahead and add the following
+methods to <code>Car.m</code>.</p>
+
+<pre><code class="c1">// Car.m</code>
+<code class="k">-</code> <code class="p">(</code><code class="kt">id</code><code class="p">)</code><code class="nf">initWithModel:</code><code class="p">(</code><code class="nb">NSString</code> <code class="o">*</code><code class="p">)</code><code class="nv">aModel</code> <code class="p">{</code>
+    <code class="kc">self</code> <code class="o">=</code> <code class="p">[</code><code class="n">super</code> <code class="nf">init</code><code class="p">];</code>
+    <code class="k">if</code> <code class="p">(</code><code class="kc">self</code><code class="p">)</code> <code class="p">{</code>
+        <code class="c1">// Any custom setup work goes here</code>
+        <code class="n">_model</code> <code class="o">=</code> <code class="p">[</code><code class="n">aModel</code> <code class="nf">copy</code><code class="p">];</code>
+        <code class="n">_odometer</code> <code class="o">=</code> <code class="mi">0</code><code class="p">;</code>
+    <code class="p">}</code>
+    <code class="k">return</code> <code class="kc">self</code><code class="p">;</code>
+<code class="p">}</code>
+
+<code class="o">-</code> <code class="p">(</code><code class="kt">id</code><code class="p">)</code><code class="n">init</code> <code class="p">{</code>
+    <code class="c1">// Forward to the &quot;designated&quot; initialization method</code>
+    <code class="k">return</code> <code class="p">[</code><code class="kc">self</code> <code class="nf">initWithModel:</code><code class="n">_defaultModel</code><code class="p">];</code>
+<code class="p">}</code>
+</pre>
+
+
+<p>Initialization methods should always return a reference to the object
+itself, and if it cannot be initialized, it should return <code>nil</code>.
+This is why we need to check if <code>self</code> exists before trying to use
+it. There should typically only be one initialization method that needs to do
+this, and the rest should forward calls to this <strong>designated
+initializer</strong>. This eliminates boilerplate code when you have several
+custom <code>init</code> methods.</p>
+
+<p>Also notice how we directly assigned values to the <code>_model</code> and
+<code>_odometer</code> instance variables in <code>initWithModel:</code>.
+Remember that this is one of the only places you should do this—in the
+rest of your methods you should be using <code>self.model</code> and
+<code>self.odometer</code>.</p>
+
+
+<h3 id="class-level-initialization">Class-Level Initialization</h3>
+
+<p>The <code>initialize</code> method is the class-level equivalent of
+<code>init</code>. It gives you a chance to set up the class before anyone uses
+it. For example, we can use this to populate the <code>_defaultModel</code>
+variable with a valid value, like so:</p>
+
+<pre><code class="c1">// Car.m</code>
+<code class="k">+</code> <code class="p">(</code><code class="kt">void</code><code class="p">)</code><code class="nf">initialize</code> <code class="p">{</code>
+    <code class="k">if</code> <code class="p">(</code><code class="kc">self</code> <code class="o">==</code> <code class="p">[</code><code class="n">Car</code> <code class="nf">class</code><code class="p">])</code> <code class="p">{</code>
+        <code class="c1">// Makes sure this isn&#39;t executed more than once</code>
+        <code class="n">_defaultModel</code> <code class="o">=</code> <code class="s">@&quot;Nissan Versa&quot;</code><code class="p">;</code>
+    <code class="p">}</code>
+<code class="p">}</code>
+</pre>
+
+
+<p>The <code>initialize</code> class method is called once for every class
+before the class is used. This includes all subclasses of <code>Car</code>,
+which means that <code>Car</code> will get two <code>initialize</code> calls if
+one of its subclasses didn’t re-implement it. As a result, it’s
+good practice to use the <code>self == [Car class]</code>
+conditional to ensure that the initialization code is only run once. Also note
+that in class methods, the <code>self</code> keyword refers to the <em>class
+itself</em>, not an instance.</p>
+
+<p>Objective-C doesn’t force you to mark methods as overrides. Even
+though <code>init</code> and <code>initialize</code> are both defined by its
+superclass, <code>NSObject</code>, the compiler won’t complain when you
+redefine them in <code>Car.m</code>.</p>
+
+<p>The next iteration of <code>main.m</code> shows our custom initialization
+methods in action. Before the first time the class is used, <code>[Car
+initialize]</code> is called automatically, setting <code>_defaultModel</code>
+to <code>@"Nissan Versa"</code>. This can be seen in the first
+<code>NSLog()</code>. You can also see the result of the custom initialization
+method (<code>initWithModel:</code>) in the second log output.</p>
+
+<pre><code class="c1">// main.m</code>
+<code class="cp">#import</code> <code class="l">&lt;Foundation/Foundation.h&gt;</code><code class="cp"></code>
+<code class="cp">#import</code> <code class="l">&quot;Car.h&quot;</code><code class="cp"></code>
+
+<code class="kt">int</code> <code class="nf">main</code><code class="p">(</code><code class="kt">int</code> <code class="n">argc</code><code class="p">,</code> <code class="kt">const</code> <code class="kt">char</code> <code class="o">*</code> <code class="n">argv</code><code class="p">[])</code> <code class="p">{</code>
+    <code class="k">@autoreleasepool</code> <code class="p">{</code>
+        
+        <code class="c1">// Instantiating objects</code>
+        <code class="n">Car</code> <code class="o">*</code><code class="n">nissan</code> <code class="o">=</code> <code class="p">[[</code><code class="n">Car</code> <code class="nf">alloc</code><code class="p">]</code> <code class="nf">init</code><code class="p">];</code>
+        <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;Created a %@&quot;</code><code class="p">,</code> <code class="p">[</code><code class="n">nissan</code> <code class="nf">model</code><code class="p">]);</code>
+        
+        <code class="n">Car</code> <code class="o">*</code><code class="n">chevy</code> <code class="o">=</code> <code class="p">[[</code><code class="n">Car</code> <code class="nf">alloc</code><code class="p">]</code> <code class="nf">initWithModel:</code><code class="s">@&quot;Chevy Corvette&quot;</code><code class="p">];</code>
+        <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;Created a %@, too.&quot;</code><code class="p">,</code> <code class="n">chevy</code><code class="p">.</code><code class="n">model</code><code class="p">);</code>
+        
+    <code class="p">}</code>
+    <code class="k">return</code> <code class="mi">0</code><code class="p">;</code>
+<code class="p">}</code>
+</pre>
+
+
+
+<h2 id="dynamic-typing">Dynamic Typing</h2>
+
+<p>Classes themselves are represented as objects, which makes it possible to
+query their properties (introspection), or even change their behavior
+on-the-fly (reflection). These are very powerful dynamic typing capabilities,
+as they let you call methods and set properties on objects even when you
+don’t know what type of object they are.</p>
+
+<p>The easiest way to get a class object is via the <code>class</code>
+class-level method (apologies for the redundant terminology). For example,
+<code>[Car class]</code> returns an object representing the <code>Car</code>
+class. You can pass this object around to methods like
+<code>isMemberOfClass:</code> and <code>isKindOfClass:</code> to get
+information about other instances. A comprehensive example is included
+below.</p>
+
+<pre><code class="c1">// main.m</code>
+<code class="cp">#import</code> <code class="l">&lt;Foundation/Foundation.h&gt;</code><code class="cp"></code>
+<code class="cp">#import</code> <code class="l">&quot;Car.h&quot;</code><code class="cp"></code>
+
+<code class="kt">int</code> <code class="nf">main</code><code class="p">(</code><code class="kt">int</code> <code class="n">argc</code><code class="p">,</code> <code class="kt">const</code> <code class="kt">char</code> <code class="o">*</code> <code class="n">argv</code><code class="p">[])</code> <code class="p">{</code>
+    <code class="k">@autoreleasepool</code> <code class="p">{</code>
+        <code class="n">Car</code> <code class="o">*</code><code class="n">delorean</code> <code class="o">=</code> <code class="p">[[</code><code class="n">Car</code> <code class="nf">alloc</code><code class="p">]</code> <code class="nf">initWithModel:</code><code class="s">@&quot;DeLorean&quot;</code><code class="p">];</code>
+        
+        <code class="c1">// Get the class of an object</code>
+        <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%@ is an instance of the %@ class&quot;</code><code class="p">,</code>
+              <code class="p">[</code><code class="n">delorean</code> <code class="nf">model</code><code class="p">],</code> <code class="p">[</code><code class="n">delorean</code> <code class="nf">class</code><code class="p">]);</code>
+        
+        <code class="c1">// Check an object against a class and all subclasses</code>
+        <code class="k">if</code> <code class="p">([</code><code class="n">delorean</code> <code class="nf">isKindOfClass:</code><code class="p">[</code><code class="n">NSObject</code> <code class="nf">class</code><code class="p">]])</code> <code class="p">{</code>
+            <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%@ is an instance of NSObject or one &quot;</code>
+                  <code class="s">&quot;of its subclasses&quot;</code><code class="p">,</code>
+                  <code class="p">[</code><code class="n">delorean</code> <code class="nf">model</code><code class="p">]);</code>
+        <code class="p">}</code> <code class="k">else</code> <code class="p">{</code>
+            <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%@ is not an instance of NSObject or &quot;</code>
+                  <code class="s">&quot;one of its subclasses&quot;</code><code class="p">,</code>
+                  <code class="p">[</code><code class="n">delorean</code> <code class="nf">model</code><code class="p">]);</code>
+        <code class="p">}</code>
+        
+        <code class="c1">// Check an object against a class, but not its subclasses</code>
+        <code class="k">if</code> <code class="p">([</code><code class="n">delorean</code> <code class="nf">isMemberOfClass:</code><code class="p">[</code><code class="n">NSObject</code> <code class="nf">class</code><code class="p">]])</code> <code class="p">{</code>
+            <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%@ is a instance of NSObject&quot;</code><code class="p">,</code>
+                  <code class="p">[</code><code class="n">delorean</code> <code class="nf">model</code><code class="p">]);</code>
+        <code class="p">}</code> <code class="k">else</code> <code class="p">{</code>
+            <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;%@ is not an instance of NSObject&quot;</code><code class="p">,</code>
+                  <code class="p">[</code><code class="n">delorean</code> <code class="nf">model</code><code class="p">]);</code>
+        <code class="p">}</code>
+        
+        <code class="c1">// Convert between strings and classes</code>
+        <code class="k">if</code> <code class="p">(</code><code class="nb">NSClassFromString</code><code class="p">(</code><code class="s">@&quot;Car&quot;</code><code class="p">)</code> <code class="o">==</code> <code class="p">[</code><code class="n">Car</code> <code class="nf">class</code><code class="p">])</code> <code class="p">{</code>
+            <code class="nb">NSLog</code><code class="p">(</code><code class="s">@&quot;I can convert between strings and classes!&quot;</code><code class="p">);</code>
+        <code class="p">}</code>
+    <code class="p">}</code>
+    <code class="k">return</code> <code class="mi">0</code><code class="p">;</code>
+<code class="p">}</code>
+</pre>
+
+
+<p>The <code>NSClassFromString()</code> function is an alternative way to get
+your hands on a class object. This is very flexible, as it lets you dynamically
+request class objects at runtime; however, it’s also rather inefficient.
+For this reason, you should opt for the <code>class</code> method whenever
+possible.</p>
+
+<p>If you’re interested in dynamic typing, be sure to check out <a href="methods.html#selectors">Selectors</a> and <a href="data-types/primitives.html#the-id-type">The <code>id</code> Type</a>.</p>
+
+
+<h2 id="summary">Summary</h2>
+
+<p>In this module, we learned how to create classes, instantiate objects,
+define initialization methods, and work with class-level methods and variables.
+We also took a brief look at dynamic typing.</p>
+
+<p>The <a href="functions.html#function-libraries">previous module</a>
+mentioned that Objective-C doesn’t support namespaces, which is why the
+Cocoa functions require prefixes like <code>NS</code>, <code>CA</code>,
+<code>AV</code>, etc to avoid naming collisions. This applies to classes, too.
+The recommended convention is to use a three-letter prefix for your
+application-specific classes (e.g., <code>XYZCar</code>).</p>
+
+<p>While this is pretty much everything you need to know to start writing your
+own classes, we did skim over some important details, so don’t worry if
+you’re feeling not entirely comfortable with properties or methods. The
+next module will begin filling in these holes with a closer look at the
+<code>@property</code> directive and all of the attributes that affect its
+behavior.</p>
+
+<div class="divider" style="margin-top: 2em; margin-bottom: 1.3em;"></div><table class="icon-and-text advert"><tr>
+<td><a href="http://rypress.com/tutorials/cocoa"><img src="media/advert-image.png" width="120px" height="165px" class="cover"></a></td>
+<td><p id="advert-text">Be sure to check out <a href="http://rypress.com/tutorials/cocoa">Ry’s Cocoa Tutorial</a>. This
+brand new guide is a complete walkthrough of Mac App development, and it
+leverages all of the Objective-C skills that we just discussed. <a href="http://rypress.com/tutorials/cocoa">Learn more ›</a></p></td>
+</tr></table>
+<div id='mailing-list'>
+
+<div class='divider' style='margin: 1.8em -22px;'></div>
+
+<h3>Mailing List</h3>
+
+<p>Sign up for my low-volume mailing list to find out when new content is
+released. Next up is a comprehensive <a
+href='https://developer.apple.com/swift/'>Swift</a> tutorial planned for late
+January.</p>
+
+<form id='mailing-list-form'
+	  action='/secure/mailing-list/request-add' method='get'>
+<label>
+	<div class='label'>Email Address:</div>
+	<div class='input'>
+	<input name='email'
+		   style='width: 200px;'
+		   type='email' />
+	</div>
+</label>
+
+<input id='mailing-list-button'
+	   class='button'
+	   style='margin-top: .5em;'
+	   type='submit' value='Subscribe'/>
+
+</form>
+
+<div style='clear: both'></div>
+
+<p class='fine-print'>You&rsquo;ll only receive emails when new tutorials are
+released, and your contact information will never be shared with third
+parties. <a href='/secure/mailing-list/unsubscribe'>Click here</a> to
+unsubscribe.</p>
+
+</div>
+
+
+<div class='divider'></div>
+
+<footer id='footer' class='fine-print'>
+  <ul>
+  	<li><a href='/licensing.php'>&copy; 2012-2014</a></li>
+	<li><a href='/'>RyPress.com</a></li>
+	<li>
+		<a href='/licensing.php'>All Rights Reserved</a>
+	</li>
+	<li>
+		<a href='/tos.php'>Terms&nbsp;of&nbsp;Service</a>
+	</li>
+	<li>
+		<a href='/privacy.php'>Privacy Policy</a>
+	</li>
+  </ul>
+</footer>
+
+</div>		<!-- .content -->
+</div>		<!-- .page -->
+</body>
+</html>
